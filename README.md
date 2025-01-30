@@ -3,7 +3,7 @@
 ## Team Members
 
 | Name | CCID   | GitHub Username |
-|  | ------ | --------------- |
+|  -------| ------ | --------------- |
 | Joao Pedro Amaral Pereira | amaralpe | joao-pamper     |
 | Eason Trang | Eason1 | Ea-sonT     |
 | Liqi Yin | liqi4 | Yinliqi     |
