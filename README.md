@@ -29,7 +29,7 @@
 
 ## Documentation
 
-- [Wiki Link]
-- [Scrum Board]
+- [https://github.com/cmput301-w25/project-z/wiki]
+- [https://github.com/orgs/cmput301-w25/projects/46]
 - [UI Mockups]
 - [UML]
