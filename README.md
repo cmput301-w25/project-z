@@ -5,7 +5,7 @@
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
 | Joao Pedro Amaral Pereira | amaralpe | joao-pamper     |
-| [Full Name] | [CCID] | [@username]     |
+| Eason Trang | Eason1 | Ea-sonT     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
