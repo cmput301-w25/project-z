@@ -6,7 +6,7 @@
 | ----------- | ------ | --------------- |
 | Joao Pedro Amaral Pereira | amaralpe | joao-pamper     |
 | Eason Trang | Eason1 | Ea-sonT     |
-| [Full Name] | [CCID] | [@username]     |
+| Liqi Yin | liqi4 | Yinliqi     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
