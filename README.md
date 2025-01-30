@@ -2,12 +2,12 @@
 
 ## Team Members
 
-| Name        | CCID   | GitHub Username |
-| ----------- | ------ | --------------- |
+| Name | CCID   | GitHub Username |
+|  | ------ | --------------- |
 | Joao Pedro Amaral Pereira | amaralpe | joao-pamper     |
 | Eason Trang | Eason1 | Ea-sonT     |
 | Liqi Yin | liqi4 | Yinliqi     |
-| [Full Name] | [CCID] | [@username]     |
+| James Ma | jyma1 | jyma1     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 
