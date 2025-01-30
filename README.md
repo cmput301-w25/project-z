@@ -8,7 +8,7 @@
 | Eason Trang | Eason1 | Ea-sonT     |
 | Liqi Yin | liqi4 | Yinliqi     |
 | James Ma | jyma1 | jyma1     |
-| [Full Name] | [CCID] | [@username]     |
+| Luis Martinez | lmartine | luismjr  |
 | [Full Name] | [CCID] | [@username]     |
 
 ## Project Description
