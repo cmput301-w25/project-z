@@ -4,4 +4,10 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
+    <string name="accept_request">ACCEPT</string>
+    <string name="decline_request">DECLINE</string>
+    <string name="user_request">[User] has requested to follow you</string>
+    <string name="profile_accessibility">Profile Picture</string>
+    <string name="notifications">NOTIFICATIONS</string>
+
 </resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:orientation="vertical">
+
+    <!-- NOTIFICATIONS HEADER -->
+    <TextView
+        android:id="@+id/notificationsHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/itim_regular"
+        android:gravity="start"
+        android:text="@string/notifications"
+        android:textAlignment="viewStart"
+        android:textColor="#0FA3B1"
+        android:textSize="24sp" />
+
+    <!-- RecyclerView for Notifications -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notificationsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" />
+
+    <!-- Bottom Navigation Bar -->
+    <include
+        android:id="@+id/bottomNavBar"
+        layout="@layout/bottom_bar_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+</LinearLayout>
