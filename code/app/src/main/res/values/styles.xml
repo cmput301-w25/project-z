@@ -1,5 +1,5 @@
 <resources>
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:fontFamily">@font/custom_font</item>
+        <item name="android:fontFamily">@font/itim_regular</item>
     </style>
 </resources>

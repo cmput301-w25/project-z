@@ -13,7 +13,7 @@
         android:text="User Sign In"
         android:textSize="32sp"
         android:textColor="@color/textColor"
-        android:fontFamily="@font/caveat_family"
+        android:fontFamily="@font/itim_regular"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp" />
 
