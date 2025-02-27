@@ -20,4 +20,6 @@ public class FollowingActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    private int id;
 }
