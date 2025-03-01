@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.z;
 
 public class EmotionalStates {
     public boolean angry = false;
