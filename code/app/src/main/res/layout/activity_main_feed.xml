@@ -1,118 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/home_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
-    android:padding="20dp">
+    android:padding="0dp">
 
-    <!-- User Greeting Section -->
+    <!-- User Avatar -->
+    <ImageView
+        android:id="@+id/userAvatar"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="16dp"
+        android:background="@drawable/rounded_card"
+        android:backgroundTint="#0FA3B1"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_user_placeholder" />
 
-    <!-- Activity Section -->
-
-
-    <!-- Mood Card List -->
-
-    <LinearLayout
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
+    <!-- Welcome Message -->
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:padding="10dp">
+        android:layout_alignTop="@id/userAvatar"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@id/userAvatar"
+        android:fontFamily="@font/itim_regular"
+        android:text="Welcome, [User]. How are you feeling today?"
+        android:textColor="@color/textColor"
+        android:textSize="15sp" />
 
-
-    </LinearLayout>
-
+    <!-- Activity Label -->
     <TextView
         android:id="@+id/tvActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/userAvatar"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/itim_regular"
         android:text="ACTIVITY"
         android:textColor="@color/textColor"
-        android:textSize="18sp"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
+    <!-- Filter Button (Small) -->
+    <ImageButton
+        android:id="@+id/btnFilter"
+        android:layout_width="48dp"
+        android:layout_height="35dp"
+        android:layout_alignTop="@id/tvActivity"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="filter button"
+        android:scaleType="centerInside"
+        android:src="@drawable/filter_button" />
+
+    <!-- Map Button (Next to Filter) -->
+    <ImageButton
+        android:id="@+id/btnMap"
+        android:layout_width="35dp"
+        android:layout_height="30dp"
+        android:layout_alignTop="@id/tvActivity"
+        android:layout_marginEnd="12dp"
+        android:layout_toStartOf="@id/btnFilter"
+        android:background="@android:color/transparent"
+        android:contentDescription="map button"
+        android:scaleType="centerInside"
+        android:src="@drawable/map_marker" />
+
+    <!-- RecyclerView (Mood Card List) -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewMainFeed"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavBar"
         android:layout_below="@id/tvActivity"
-        android:layout_above="@id/bottomNavigation"
-        android:layout_marginTop="10dp" />
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" />
 
-
-
-    <!-- Bottom Navigation Bar -->
-    <LinearLayout
+    <!-- Bottom Navigation Bar (Reused) -->
+    <include
+        android:id="@+id/bottomNavBar"
+        layout="@layout/bottom_bar_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_alignParentBottom="true"
-        android:padding="10dp">
-
-        <ImageView
-            android:id="@+id/navHome"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rounded_card"
-            android:src="@drawable/ic_home" />
-
-        <ImageView
-            android:id="@+id/navProfile"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_profile"
-            android:background="@drawable/rounded_card"
-            android:layout_marginLeft="10dp"/>
-
-        <ImageView
-            android:id="@+id/navAddMood"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/ic_add"
-            android:background="@drawable/rounded_card"
-            android:layout_marginLeft="10dp"/>
-
-        <ImageView
-            android:id="@+id/navNotifications"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_notifications"
-            android:background="@drawable/rounded_card"
-            android:layout_marginLeft="10dp"/>
-
-        <ImageView
-            android:id="@+id/navSearch"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_search"
-            android:background="@drawable/rounded_card"
-            android:layout_marginLeft="10dp"/>
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/userAvatar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/rounded_card"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_user_placeholder" />
-
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@id/userAvatar"
-        android:gravity="end"
-        android:text="Welcome, [User]. How are you feeling today?"
-        android:textColor="@color/textColor"
-        android:textSize="14sp" />
-
-
+        android:layout_marginBottom="8dp" />
 
 </RelativeLayout>

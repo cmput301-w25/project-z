@@ -8,13 +8,13 @@ public class Mood implements Serializable {
 
     private int id;
     private int ownerId;
-    private EmotionalState emtionalState;
+    private EmotionalStates emotionalState;
     private String trigger;
     private String socialSituation;
     private Date createdAt;
     private Map location;
 
-    public Mood(int id, int ownerId, EmotionalState emotionalState, String trigger,
+    public Mood(int id, int ownerId, EmotionalStates emotionalState, String trigger,
                 String socialSituation, Date createdAt, Map location) {
         this.id = id;
         this.ownerId = ownerId;
@@ -41,12 +41,12 @@ public class Mood implements Serializable {
         this.ownerId = ownerId;
     }
 
-    public EmotionalState getEmotionalState() {
-        return emtionalState;
+    public EmotionalStates getEmotionalState() {
+        return emotionalState;
     }
 
-    public void setEmotionalState(EmotionalState emotionalState) {
-        this.emtionalState = emotionalState;
+    public void setEmotionalState(EmotionalStates emotionalState) {
+        this.emotionalState = emotionalState;
     }
 
     public String getTrigger() {

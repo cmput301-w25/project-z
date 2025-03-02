@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.z;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,21 +9,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SearchActivity extends AppCompatActivity{
 
-    private EditText SearchBar;
-    private Button SearchButton;
+    private EditText searchBar;
+    private Button searchButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout."xml file");
+        setContentView(R.layout.activity_search);
 
-        SearchBar = findViewById(R.id.search_bar);
-        SearchButton = findViewById(R.id.search_button);
+        searchBar = findViewById(R.id.search_bar);
+        searchButton = findViewById(R.id.search_button);
 
-        SearchButton.setOnClickListener(new View.OnClickListener() {
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String query = SearchBar.getText().toString();
+                String query = searchBar.getText().toString();
             }
         });
     }

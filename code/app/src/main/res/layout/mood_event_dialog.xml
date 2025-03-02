@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_card"
+    android:backgroundTint="#F9F7F3"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Mood Image (if uploaded) -->
+    <ImageView
+        android:id="@+id/imgMoodPost"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:background="@drawable/rounded_card"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <!-- User Mood Text -->
+    <TextView
+        android:id="@+id/tvMoodUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="[User] is feeling [emotion]"
+        android:textColor="#0FA3B1"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Mood Description -->
+    <TextView
+        android:id="@+id/tvMoodDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="Full description of mood event..."
+        android:textColor="@color/textColor"
+        android:textSize="18sp" />
+
+    <!-- Hashtags -->
+    <TextView
+        android:id="@+id/tvMoodTags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="#moods"
+        android:textColor="#0FA3B1"
+        android:textSize="16sp" />
+
+    <!-- Buttons Row: BACK and DELETE -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:backgroundTint="#0FA3B1"
+            android:fontFamily="@font/itim_regular"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="BACK"
+            android:textColor="#F9F7F3"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <!-- Delete Button -->
+        <ImageButton
+            android:id="@+id/btnDeletePost"
+            android:layout_width="50dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#0FA3B1"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/delete_post"
+            android:visibility="gone"
+            app:tint="#F9F7F3" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,11 +27,11 @@ public class ProfileActivity extends AppCompatActivity {
         getMoods("exampleUserId");
 
         // Display main buttons
-        Button createMood = findViewById(R.id.create_mood_button);
-        Button following= findViewById(R.id.create_timeline_button);
-        Button profile = findViewById(R.id.profile_button);
-        Button notifications = findViewById(R.id.notifications_button);
-        Button search = findViewById(R.id.search_button);
+        ImageButton createMood = findViewById(R.id.nav_add);
+        ImageButton home = findViewById(R.id.nav_home);
+        ImageButton profile = findViewById(R.id.nav_profile);
+        ImageButton notifications = findViewById(R.id.nav_notifications);
+        ImageButton search = findViewById(R.id.nav_search);
     }
 
     private void getMoods(String userId) {
@@ -45,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
                         Log.e("Firestore", "Error getting moods", e));
     }
 
+    /*
     following.setOnClickListener(v -> {
         Intent intent = new Intent(ProfileActivity.this, FollowingActivity.class);
         startActivity(intent);
@@ -61,7 +64,8 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
     search.setOnClickListener(v -> {
-            Intent intent = new Intent(ProfileActivity.this, SearchActivity.class);
+            Intent intent = new Intent(ProfileActivity.this, com.example.myapplication.SearchActivity.class);
             startActivity(intent);
         });
+     */
 }
