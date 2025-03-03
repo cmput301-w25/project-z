@@ -40,7 +40,8 @@ dependencies {
     implementation(libs.constraintlayout)
 
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
-    implementation(libs.firebase.firestore)
+    implementation("com.google.firebase:firebase-firestore:25.1.1")
+    //implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
 
     // TODO: Add the dependencies for Firebase products you want to use

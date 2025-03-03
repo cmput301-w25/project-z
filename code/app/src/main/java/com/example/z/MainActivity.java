@@ -16,29 +16,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity {
 
+    /*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main_feed);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.home_page), (v, insets) -> {
+        setContentView(R.layout.activity_profile);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.profile_page), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
     }
+    */
 
     // code to test out notifications adds 5 placeholder cards to test...comment out code above and uncomment this
-    /*private RecyclerView recyclerView;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_notification);
+        setContentView(R.layout.activity_profile);
 
         // Initialize RecyclerView
-        recyclerView = findViewById(R.id.notificationsRecyclerView);
+        recyclerView = findViewById(R.id.recyclerViewUserMoods);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Set a basic adapter with placeholder cards
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 // Inflate your notification card layout
                 View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.notification_card, parent, false);
+                        .inflate(R.layout.item_mood_card, parent, false);
                 return new RecyclerView.ViewHolder(view) {};
             }
 
@@ -66,10 +68,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Apply insets for proper padding
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.notification_page), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.profile_page), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-    }*/
+    }
 }
