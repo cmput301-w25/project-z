@@ -34,16 +34,17 @@ public class AccessAppActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_access_app);
+        setContentView(R.layout.activity_signup);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        emailInput = findViewById(R.id.username_input);
-        passwordInput = findViewById(R.id.password_input);
-        usernameInput = findViewById(R.id.username_input);
+        emailInput = findViewById(R.id.etEmail);
+        passwordInput = findViewById(R.id.etPassword);
+        usernameInput = findViewById(R.id.etUsername);
 
         // Set up login button
+        /*
         Button loginButton = findViewById(R.id.login_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,9 +54,10 @@ public class AccessAppActivity extends AppCompatActivity {
                 loginUser();
             }
         });
+        */
 
         // Set up signup button
-        Button signupButton = findViewById(R.id.signup_button);
+        Button signupButton = findViewById(R.id.btnSignup);
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

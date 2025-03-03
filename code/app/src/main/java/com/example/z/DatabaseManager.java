@@ -33,6 +33,7 @@ public class DatabaseManager {
                         System.err.println("Error saving mood: " + e));
     }
 
+    /*
     public boolean validateUser(String username, String password) {
         return userDatabase.containsKey(username) && userDatabase.get(username).equals(password);
     }
@@ -49,5 +50,6 @@ public class DatabaseManager {
         db = FirebaseFirestore.getInstance();
         movieRef = db.collection("movies");
     }
+    */
 }
 
