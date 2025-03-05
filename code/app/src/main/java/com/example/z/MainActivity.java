@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,6 +92,13 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+        // Enable Firestore offline persistence
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true) // Enable offline persistence
+                .build();
+        firestore.setFirestoreSettings(settings);
+
         // Delay for the splash screen (optional)
         int SPLASH_DELAY = 2000; // 2 seconds
 
@@ -105,4 +114,14 @@ public class MainActivity extends AppCompatActivity {
             finish(); // Close the SplashActivity
         }, SPLASH_DELAY);
     }
+
+    /*
+    // logs you out every time you close the app (for testing)
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FirebaseAuth.getInstance().signOut(); // Sign out user when app is closed
+    }
+    */
+
 }

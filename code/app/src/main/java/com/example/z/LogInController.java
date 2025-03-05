@@ -16,14 +16,14 @@ public class LogInController {
 
     public void loginUser(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
-                        context.startActivity(new Intent(context, ProfileActivity.class));
-                        ((LogInActivity) context).finish(); // Close the LogInActivity
-                    } else {
-                        Toast.makeText(context, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
+                    context.startActivity(new Intent(context, ProfileActivity.class));
+                    ((LogInActivity) context).finish(); // Close the LogInActivity
+                } else {
+                    Toast.makeText(context, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 }
