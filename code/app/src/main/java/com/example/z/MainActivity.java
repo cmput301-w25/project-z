@@ -1,10 +1,11 @@
 package com.example.z;
 
+import android.content.Intent;
+import android.os.Handler;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     */
+
+    /*
 
     // code to test out notifications adds 5 placeholder cards to test...comment out code above and uncomment this
     private RecyclerView recyclerView;
@@ -73,5 +78,31 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+     */
+    private FirebaseAuth mAuth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
+        // Delay for the splash screen (optional)
+        int SPLASH_DELAY = 2000; // 2 seconds
+
+        new Handler().postDelayed(() -> {
+            // Check if the user is logged in
+            if (mAuth.getCurrentUser() != null) {
+                // User is logged in, redirect to MainActivity
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+            } else {
+                // User is not logged in, redirect to LoginActivity
+                startActivity(new Intent(MainActivity.this, LogInActivity.class));
+            }
+            finish(); // Close the SplashActivity
+        }, SPLASH_DELAY);
     }
 }
