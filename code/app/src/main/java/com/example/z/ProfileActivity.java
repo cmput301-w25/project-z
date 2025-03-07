@@ -32,7 +32,13 @@ public class ProfileActivity extends AppCompatActivity {
         ImageButton profile = findViewById(R.id.nav_profile);
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
+
+        createMood.setOnClickListener(v -> {
+            MoodFragment moodFragment = new MoodFragment();
+            moodFragment.show(getSupportFragmentManager(), "AddMoodDialog");
+        });
     }
+
 
     private void getMoods(String userId) {
         db.collection("moods")
@@ -46,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnFailureListener(e ->
                         Log.e("Firestore", "Error getting moods", e));
     }
+
 
     /*
     following.setOnClickListener(v -> {
