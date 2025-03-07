@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -14,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoodFragment.MoodListener {
 
     /*
     @Override
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerViewUserMoods);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
 
         // Set a basic adapter with placeholder cards
         recyclerView.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -73,5 +77,18 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
+        ImageButton createMood = findViewById(R.id.nav_add);
+        createMood.setOnClickListener(v -> {
+            MoodFragment moodFragment = new MoodFragment();
+            moodFragment.show(getSupportFragmentManager(), "AddMoodDialog");
+        });
     }
+    @Override
+    public void addMood(Mood mood) {
+        Toast.makeText(this, "Mood Added: " + mood.toString(), Toast.LENGTH_SHORT).show();
+    }
+
+
 }
