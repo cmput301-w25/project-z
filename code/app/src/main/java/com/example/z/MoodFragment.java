@@ -8,11 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import java.util.Date;
 
 public class MoodFragment extends DialogFragment {
     interface MoodListener {
@@ -22,8 +26,6 @@ public class MoodFragment extends DialogFragment {
     private String editDate;
     private String editState;
     private String editTrigger;
-    private Spinner edit_social_situation;
-    private Spinner edit_mood_emotion;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -39,8 +41,11 @@ public class MoodFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.add_mood_event_alert_dialog, null);
-        edit_social_situation = view.findViewById(R.id.spinner_social_situation);
-        edit_mood_emotion = view.findViewById(R.id.spinner_mood);
+        Spinner edit_social_situation = view.findViewById(R.id.spinner_social_situation);
+        Spinner edit_mood_emotion = view.findViewById(R.id.spinner_mood);
+        EditText edit_mood_description = view.findViewById(R.id.edit_description);
+        EditText edit_trigger = view.findViewById(R.id.edit_hashtags);
+
 
         ArrayAdapter<SocialSituations> SocialAdapter = new ArrayAdapter<>(
                 getContext(), android.R.layout.simple_spinner_item, SocialSituations.values()
@@ -52,7 +57,9 @@ public class MoodFragment extends DialogFragment {
                 getContext(), android.R.layout.simple_spinner_item, userMoods.values()
         );
         EmotionalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        edit_social_situation.setAdapter(EmotionalAdapter);
+        edit_mood_emotion.setAdapter(EmotionalAdapter);
+
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
@@ -60,9 +67,26 @@ public class MoodFragment extends DialogFragment {
         postButton.setOnClickListener(v -> {
             String social_situation = edit_social_situation.getSelectedItem().toString();
             String user_mood = edit_mood_emotion.getSelectedItem().toString();
+            String description = edit_mood_description.getText().toString();
+            String trigger = edit_trigger.getText().toString();
+            Date current_date = new Date();
+            Map location = new Map();
 
+            if (social_situation.equals("Select")) {social_situation = null;}
 
-            //listener.addMood(new Mood("id", "ownerID", user_mood, "trigger", social_situation, "date", "location"));
+            if (user_mood.equals("Select")) {
+                Toast.makeText(getContext(), "Please Fill Out Necessary Boxes", Toast.LENGTH_SHORT).show();
+            }
+
+            if (description.length() > 20) {
+                Toast.makeText(getContext(), "Maximum Letters For Description is 20", Toast.LENGTH_SHORT).show();
+            }else {
+                String[] words = user_mood.split(" ");
+                if (words.length > 3) {
+                    Toast.makeText(getContext(), "Maximum Words For Description is 3", Toast.LENGTH_SHORT).show();
+                }
+            }
+            //listener.addMood(new Mood("id", "ownerID", user_mood, trigger, social_situation, current_date, location, description));
         });
         return builder.create();
     }

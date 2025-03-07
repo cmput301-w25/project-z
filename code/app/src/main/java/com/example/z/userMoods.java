@@ -1,6 +1,7 @@
 package com.example.z;
 
 public enum userMoods {
+    SELECT,
     ANGER,
     CONFUSION,
     DISGUST,

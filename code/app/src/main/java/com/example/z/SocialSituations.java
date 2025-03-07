@@ -1,7 +1,7 @@
 package com.example.z;
 
 public enum SocialSituations {
-    SELECT_A_SOCIAL_SITUATION,
+    SELECT,
     ALONE,
     WITH_A_PERSON,
     WITH_SEVERAL_PEOPLE,

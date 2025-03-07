@@ -13,9 +13,10 @@ public class Mood implements Serializable {
     private String socialSituation;
     private Date createdAt;
     private Map location;
+    private String description;
 
     public Mood(int id, int ownerId, EmotionalStates emotionalState, String trigger,
-                String socialSituation, Date createdAt, Map location) {
+                String socialSituation, Date createdAt, Map location, String description) {
         this.id = id;
         this.ownerId = ownerId;
         this.emotionalState = emotionalState;
@@ -23,7 +24,12 @@ public class Mood implements Serializable {
         this.socialSituation = socialSituation;
         this.createdAt = createdAt;
         this.location = location;
+        this.description = description;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
 
     public int getId() {
         return id;
