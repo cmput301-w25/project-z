@@ -17,12 +17,14 @@ public class DatabaseManager {
         moodsRef = db.collection("moods"); // Reference to moods collection
     }
 
-    public void saveMood(String userId, String moodType, String description) {
+    public void saveMood(String userId, String moodType, String description, String socialSituation, String Trigger) {
         // Create a mood object
         Map<String, Object> mood = new HashMap<>();
         mood.put("userId", userId);
         mood.put("type", moodType);
         mood.put("description", description);
+        mood.put("situation", socialSituation);
+        mood.put("trigger", Trigger);
         mood.put("timestamp", System.currentTimeMillis());
 
         // Save to Firestore

@@ -2,7 +2,6 @@ package com.example.z;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,78 +15,77 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import java.util.Date;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class MoodFragment extends DialogFragment {
-    interface MoodListener {
-        void addMood(Mood mood);
-    }
-    private MoodListener listener;
-    private String editDate;
-    private String editState;
-    private String editTrigger;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof MoodListener) {
-            listener = (MoodListener) context;
-        } else {
-            throw new RuntimeException(context + " must implement addMoodListener");
-        }
-    }
+    private Spinner edit_social_situation;
+    private Spinner edit_mood_emotion;
+    private EditText edit_mood_description;
+    private EditText edit_trigger;
+    private DatabaseManager databaseManager;
+    private FirebaseAuth auth;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.add_mood_event_alert_dialog, null);
-        Spinner edit_social_situation = view.findViewById(R.id.spinner_social_situation);
-        Spinner edit_mood_emotion = view.findViewById(R.id.spinner_mood);
-        EditText edit_mood_description = view.findViewById(R.id.edit_description);
-        EditText edit_trigger = view.findViewById(R.id.edit_hashtags);
+        edit_social_situation = view.findViewById(R.id.spinner_social_situation);
+        edit_mood_emotion = view.findViewById(R.id.spinner_mood);
+        edit_mood_description = view.findViewById(R.id.edit_description);
+        edit_trigger = view.findViewById(R.id.edit_hashtags);
 
+        auth = FirebaseAuth.getInstance();
+        databaseManager = new DatabaseManager();
 
-        ArrayAdapter<SocialSituations> SocialAdapter = new ArrayAdapter<>(
+        ArrayAdapter<SocialSituations> socialAdapter = new ArrayAdapter<>(
                 getContext(), android.R.layout.simple_spinner_item, SocialSituations.values()
         );
-        SocialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        edit_social_situation.setAdapter(SocialAdapter);
+        socialAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        edit_social_situation.setAdapter(socialAdapter);
 
-        ArrayAdapter<userMoods> EmotionalAdapter = new ArrayAdapter<>(
+        ArrayAdapter<userMoods> emotionalAdapter = new ArrayAdapter<>(
                 getContext(), android.R.layout.simple_spinner_item, userMoods.values()
         );
-        EmotionalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        edit_mood_emotion.setAdapter(EmotionalAdapter);
-
-
+        emotionalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        edit_mood_emotion.setAdapter(emotionalAdapter);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
         Button postButton = view.findViewById(R.id.btn_post);
-        postButton.setOnClickListener(v -> {
-            String social_situation = edit_social_situation.getSelectedItem().toString();
-            String user_mood = edit_mood_emotion.getSelectedItem().toString();
-            String description = edit_mood_description.getText().toString();
-            String trigger = edit_trigger.getText().toString();
-            Date current_date = new Date();
-            Map location = new Map();
 
-            if (social_situation.equals("Select")) {social_situation = null;}
+        postButton.setOnClickListener(v -> saveMoodToFirebase());
 
-            if (user_mood.equals("Select")) {
-                Toast.makeText(getContext(), "Please Fill Out Necessary Boxes", Toast.LENGTH_SHORT).show();
-            }
-
-            if (description.length() > 20) {
-                Toast.makeText(getContext(), "Maximum Letters For Description is 20", Toast.LENGTH_SHORT).show();
-            }else {
-                String[] words = user_mood.split(" ");
-                if (words.length > 3) {
-                    Toast.makeText(getContext(), "Maximum Words For Description is 3", Toast.LENGTH_SHORT).show();
-                }
-            }
-            //listener.addMood(new Mood("id", "ownerID", user_mood, trigger, social_situation, current_date, location, description));
-        });
         return builder.create();
+    }
+
+    private void saveMoodToFirebase() {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(getContext(), "You need to be logged in!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = user.getUid();
+        String mood = edit_mood_emotion.getSelectedItem().toString();
+        String socialSituation = edit_social_situation.getSelectedItem().toString();
+        String description = edit_mood_description.getText().toString();
+        String trigger = edit_trigger.getText().toString();
+
+        if (mood.equals("Select") || socialSituation.equals("Select")) {
+            Toast.makeText(getContext(), "Please fill out all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (description.length() > 20) {
+            Toast.makeText(getContext(), "Description must be 20 characters max", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        databaseManager.saveMood(userId, mood, description, socialSituation, trigger);
+
+        Toast.makeText(getContext(), "Mood added successfully!", Toast.LENGTH_SHORT).show();
+        dismiss();
     }
 }

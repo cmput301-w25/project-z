@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity implements MoodFragment.MoodListener {
+public class MainActivity extends AppCompatActivity {
 
     /*
     @Override
@@ -84,10 +84,6 @@ public class MainActivity extends AppCompatActivity implements MoodFragment.Mood
             MoodFragment moodFragment = new MoodFragment();
             moodFragment.show(getSupportFragmentManager(), "AddMoodDialog");
         });
-    }
-    @Override
-    public void addMood(Mood mood) {
-        Toast.makeText(this, "Mood Added: " + mood.toString(), Toast.LENGTH_SHORT).show();
     }
 
 
