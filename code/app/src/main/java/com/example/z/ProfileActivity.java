@@ -33,10 +33,6 @@ public class ProfileActivity extends AppCompatActivity {
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
 
-        createMood.setOnClickListener(v -> {
-            MoodFragment moodFragment = new MoodFragment();
-            moodFragment.show(getSupportFragmentManager(), "AddMoodDialog");
-        });
     }
 
 

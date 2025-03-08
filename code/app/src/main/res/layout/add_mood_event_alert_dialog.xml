@@ -88,10 +88,10 @@
     <Spinner
         android:id="@+id/spinner_social_situation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1"/>
+        android:backgroundTint="#0FA3B1" />
 
     <LinearLayout
         android:layout_width="match_parent"
