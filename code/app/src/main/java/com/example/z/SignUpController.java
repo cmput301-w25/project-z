@@ -6,11 +6,24 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * SignUpController handles the logic for user registration.
+ * It interacts with Firebase Authentication and Firestore to create new user accounts
+ * and save user profiles.
+ *
+ * Outstanding Issues:
+ * - No retry mechanism for Firestore or Firebase Authentication failures.
+ */
 public class SignUpController {
     private Context context;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
+    /**
+     * Constructor for SignUpController.
+     *
+     * @param context The context of the calling activity.
+     */
     public SignUpController(Context context) {
         this.context = context;
         mAuth = FirebaseAuth.getInstance();
@@ -18,6 +31,15 @@ public class SignUpController {
         FirebaseFirestore.setLoggingEnabled(true); // Enable Firestore logging
     }
 
+    /**
+     * Registers a new user with the provided email, username, and password.
+     * @param email
+     *      The user's email address.
+     * @param username
+     *      The desired username.
+     * @param password
+     *      The user's password.
+     */
     public void signUpUser(String email, String username, String password) {
         // Check if username is unique
         db.collection("users")
@@ -33,21 +55,32 @@ public class SignUpController {
                                         // Save user profile to Firestore
                                         saveUserProfile(email, username);
                                     } else {
+                                        // Provide feedback
                                         Toast.makeText(context, "Firestore Authentication failed. ", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     } else {
+                        // Provide feedback
                         Toast.makeText(context, "Username already exists", Toast.LENGTH_SHORT).show();
                     }
                 } else {
+                    // Provide feedback
                     Toast.makeText(context, "Error checking username", Toast.LENGTH_SHORT).show();
                 }
             });
     }
 
+    /**
+     * Saves the user's profile to Firestore.
+     * @param email
+     *      The user's email address.
+     * @param username
+     *      The user's username.
+     */
     private void saveUserProfile(String email, String username) {
 
         if (mAuth.getCurrentUser() == null) {
+            // Provide feedback
             Toast.makeText(context, "User not authenticated. Please try again.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -62,7 +95,7 @@ public class SignUpController {
             .document(userId)
             .set(user)
             .addOnSuccessListener(aVoid -> {
-                // Show success Toast
+                // Provide feedback
                 Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
 
                 // redirect to profile activity
@@ -71,7 +104,7 @@ public class SignUpController {
                 ((SignUpActivity) context).finish(); // Close the SignUpActivity
             })
             .addOnFailureListener(e -> {
-                // Show failure Toast
+                // Provide feedback
                 Toast.makeText(context, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
     }

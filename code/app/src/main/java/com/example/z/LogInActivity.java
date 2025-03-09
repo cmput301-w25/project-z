@@ -8,6 +8,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * LogInActivity handles user authentication.
+ * It provides a UI for users to input their email and password.
+ * It delegates the login logic to the LogInController.
+ *
+ * Outstanding Issues:
+ * - No "Forgot Password" functionality.
+ * - No input validation for email format.
+ */
 public class LogInActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
@@ -35,6 +44,7 @@ public class LogInActivity extends AppCompatActivity {
 
             // Validate inputs
             if (email.isEmpty() || password.isEmpty()) {
+                // Provide feedback
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                 return;
             }

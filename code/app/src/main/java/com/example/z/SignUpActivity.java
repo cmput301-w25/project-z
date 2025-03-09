@@ -16,6 +16,14 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView tvLogin;
     private SignUpController signUpController;
 
+    /**
+     * SignUpActivity is responsible for handling user registration.
+     * It provides a UI for users to input their email, username, and password.
+     * It delegates the sign-up logic to the SignUpController.
+     *
+     * Outstanding Issues:
+     * - No input validation for email format.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +47,7 @@ public class SignUpActivity extends AppCompatActivity {
 
             // Validate inputs
             if (email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+                // Provide feedback
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -47,6 +56,7 @@ public class SignUpActivity extends AppCompatActivity {
             signUpController.signUpUser(email, username, password);
         });
 
+        // Set up login text click listener
         tvLogin.setOnClickListener(v -> {
             Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
             startActivity(intent);
