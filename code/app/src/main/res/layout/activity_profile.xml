@@ -26,25 +26,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/profileImage"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="25dp"
         android:layout_toEndOf="@id/profileImage"
         android:fontFamily="@font/itim_regular"
         android:text="[User]"
         android:textColor="@color/textColor"
         android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <!-- User Handle -->
-    <TextView
-        android:id="@+id/userHandle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/username"
-        android:layout_toEndOf="@id/profileImage"
-        android:fontFamily="@font/itim_regular"
-        android:text="[Username]"
-        android:textColor="@color/textColorSecondary"
-        android:textSize="14sp" />
 
     <!-- Bio Section -->
     <TextView

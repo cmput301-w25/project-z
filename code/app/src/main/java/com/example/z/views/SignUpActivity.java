@@ -1,4 +1,4 @@
-package com.example.z;
+package com.example.z.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.z.R;
+import com.example.z.user.SignUpController;
 
 public class SignUpActivity extends AppCompatActivity {
     private EditText etEmail, etUsername, etPassword;

@@ -1,8 +1,13 @@
-package com.example.z;
+package com.example.z.user;
 
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 import android.content.Context;
+
+import com.example.z.utils.AccessCallBack;
+import com.example.z.views.LogInActivity;
+import com.example.z.views.ProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**
@@ -35,18 +40,19 @@ public class LogInController {
      */
     public void loginUser(String email, String password, AccessCallBack callback) {
         mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    // Provide feedback
-                    Log.d("LoginTest", "Login successful!");
-                    Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
-                    callback.onAccessResult(true, "Login successful!");
-                } else {
-                    // Provide feedback
-                    Log.d("LoginTest", "Login failed: " + task.getException().getMessage());
-                    Toast.makeText(context, "Wrong email and/or password!", Toast.LENGTH_SHORT).show();
-                    callback.onAccessResult(false, "Login failed!");
-                }
-            });
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Provide feedback
+                        Log.d("LoginTest", "Login successful!");
+                        Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
+                        callback.onAccessResult(true, "Login successful!");
+                    } else {
+                        // Provide feedback
+                        Log.d("LoginTest", "Login failed: " + task.getException().getMessage());
+                        Toast.makeText(context, "Wrong email and/or password!", Toast.LENGTH_SHORT).show();
+                        callback.onAccessResult(false, "Login failed!");
+                    }
+                });
     }
 }
+

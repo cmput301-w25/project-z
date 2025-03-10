@@ -1,8 +1,13 @@
-package com.example.z;
+package com.example.z.user;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.example.z.utils.AccessCallBack;
+import com.example.z.views.ProfileActivity;
+import com.example.z.views.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -121,3 +126,4 @@ public class SignUpController {
                 });
     }
 }
+

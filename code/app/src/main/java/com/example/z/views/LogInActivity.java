@@ -1,4 +1,4 @@
-package com.example.z;
+package com.example.z.views;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.z.R;
+import com.example.z.user.LogInController;
 
 /**
  * LogInActivity handles user authentication.

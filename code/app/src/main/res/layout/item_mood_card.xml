@@ -67,7 +67,22 @@
                     android:text="#mood"
                     android:textColor="#F9F7F3"
                     android:textSize="14sp" />
+
+                <!-- New Date Section (Bottom-Right) -->
+                <TextView
+                    android:id="@+id/tvMoodDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="end"
+                    android:fontFamily="@font/itim_regular"
+                    android:text="Jan 01, 2024"
+                    android:textColor="#F9F7F3"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    android:layout_gravity="end" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </FrameLayout>
+
