@@ -23,8 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1"/>
+        android:background="@drawable/spinner_background" />
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -90,8 +90,7 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1" />
+        android:background="@drawable/spinner_background" />
 
     <LinearLayout
         android:layout_width="match_parent"
