@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.z"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -35,8 +35,41 @@ android {
 
 dependencies {
 
+
+
+
+    // JUnit 4 (Ensure JUnit 5 is not used because PowerMock does not support JUnit 5)
+    testImplementation("junit:junit:4.13.2")
+
+    // Mockito for unit testing
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    testImplementation("org.mockito:mockito-inline:3.12.4")
+    androidTestImplementation("org.mockito:mockito-android:3.12.4")
+
+    // PowerMock dependencies for Mockito
+    testImplementation("org.powermock:powermock-core:2.0.9")
+    testImplementation("org.powermock:powermock-api-mockito2:2.0.9") {
+        exclude(group = "org.mockito", module = "mockito-core")
+    }
+    testImplementation("org.powermock:powermock-module-junit4:2.0.9")
+
+    testImplementation("org.powermock:powermock-classloading-xstream:2.0.9")
+
+    androidTestImplementation("org.powermock:powermock-module-junit4:2.0.9")
+    androidTestImplementation("org.powermock:powermock-api-mockito2:2.0.9")
+
+
+    // JUnit for testing
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+
+
+
     configurations.all {
         exclude(group = "com.google.protobuf", module = "protobuf-lite")
+        exclude(group = "org.mockito", module = "mockito-android")
+        exclude(group = "org.mockito", module = "mockito-inline")
     }
 
     implementation(libs.appcompat)
@@ -58,6 +91,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
 
 }
 

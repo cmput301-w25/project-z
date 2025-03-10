@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         prefs.edit().putBoolean("shouldLogout", true).apply();
     }
-
+    public FirebaseAuth getAuth() {
+        return mAuth;
+    }
 }
 
