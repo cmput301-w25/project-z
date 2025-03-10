@@ -9,6 +9,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import android.util.Log;
 
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.matcher.IntentMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -18,11 +19,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
 
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivtyTest {
@@ -45,12 +53,12 @@ public class SignUpActivtyTest {
     @Before
     public void seedDatabase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference userTestRef = db.collection("user_test");
+        CollectionReference userTestRef = db.collection("users");
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.createUserWithEmailAndPassword("valid@example.com", "valid123");
 
-        User user = new User("valid@example.com", "valid123");
+        User user = new User("valid@example.com", "username1");
         userTestRef.document().set(user);
     }
 
@@ -86,15 +94,18 @@ public class SignUpActivtyTest {
 
     @Test
     public void testSignUpWithValidCredentials() {
-        // Enter valid email, username, and password
-        onView(withId(R.id.etEmail)).perform(typeText("idk@example.com"));
-        onView(withId(R.id.etUsername)).perform(typeText("valid123"));
+        // Generate unique credentials using timestamp
+        long timestamp = System.currentTimeMillis();
+        String uniqueEmail = "test" + timestamp + "@example.com";
+        String uniqueUsername = "test" + timestamp;
+
+        // Enter unique email, username, and password
+        onView(withId(R.id.etEmail)).perform(typeText(uniqueEmail));
+        onView(withId(R.id.etUsername)).perform(typeText(uniqueUsername));
         onView(withId(R.id.etPassword)).perform(typeText("test123"));
 
-        // Click the sign-up button
-        Log.d("TEST", "About to click sign-up button");
+        // Click Sign Up button
         onView(withId(R.id.btnSignup)).perform(click());
-        Log.d("TEST", "Sign-up button clicked");
 
         // Verify that ProfileActivity is launched
         Intents.intended(IntentMatchers.hasComponent(ProfileActivity.class.getName()));
@@ -102,9 +113,12 @@ public class SignUpActivtyTest {
 
     @Test
     public void testSignUpWithExistingUsername() {
+        long timestamp = System.currentTimeMillis();
+        String uniqueEmail = "test" + timestamp + "@example.com";
+
         // Enter an email and username that already exist in the database
-        onView(withId(R.id.etEmail)).perform(typeText("test2@example.com"));
-        onView(withId(R.id.etUsername)).perform(typeText("test"));
+        onView(withId(R.id.etEmail)).perform(typeText(uniqueEmail));
+        onView(withId(R.id.etUsername)).perform(typeText("username1"));
         onView(withId(R.id.etPassword)).perform(typeText("test321"));
 
         // Click the sign-up button
@@ -112,6 +126,30 @@ public class SignUpActivtyTest {
 
         // Verify that an error message is displayed
         onView(withId(R.id.etUsername)).check(matches(hasErrorText("Username already exists")));
+    }
+
+    @After
+    public void tearDown() {
+        String projectId = "project-z-24051";
+        URL url = null;
+        try {
+            url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
+        } catch (MalformedURLException exception) {
+            Log.e("URL Error", Objects.requireNonNull(exception.getMessage()));
+        }
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("DELETE");
+            int response = urlConnection.getResponseCode();
+            Log.i("Response Code", "Response Code: " + response);
+        } catch (IOException exception) {
+            Log.e("IO Error", Objects.requireNonNull(exception.getMessage()));
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.z;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -67,6 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
                     finish(); // Close the LogInActivity
                 } else {
                     // Username already exists
+                    Log.d("SignUpActivity", "Sign-up failed: " + message);
                     etUsername.setError("Username already exists");
                 }
             });
