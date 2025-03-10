@@ -1,4 +1,4 @@
-package com.example.z;
+package com.example.z.image;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -47,6 +47,7 @@ public class Image extends AppCompatActivity {
             startActivityForResult(intent, TAKE_PHOTO);
         }
     }
+<<<<<<< HEAD:code/app/src/main/java/com/example/z/Image.java
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -68,5 +69,7 @@ public class Image extends AppCompatActivity {
             }
         }
     }
+=======
+>>>>>>> f29a11405863da1772bc2acad2e69795617a6add:code/app/src/main/java/com/example/z/image/Image.java
 }
 
