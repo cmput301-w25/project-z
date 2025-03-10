@@ -1,6 +1,6 @@
 package com.example.z;
 
-public interface accessCallback {
+public interface AccessCallBack {
     void onAccessResult(boolean isSuccess, String message);
 }
 

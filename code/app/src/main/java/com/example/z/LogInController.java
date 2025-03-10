@@ -1,8 +1,6 @@
 package com.example.z;
 
-import android.content.Intent;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.Toast;
 import android.content.Context;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,7 +33,7 @@ public class LogInController {
      * @param password
      *      The user's password.
      */
-    public void loginUser(String email, String password, accessCallback callback) {
+    public void loginUser(String email, String password, AccessCallBack callback) {
         mAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {

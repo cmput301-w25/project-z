@@ -31,6 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class SignUpActivtyTest {
@@ -48,6 +50,13 @@ public class SignUpActivtyTest {
 
         FirebaseFirestore.getInstance().useEmulator(androidLocalhost, portNumber);
         FirebaseAuth.getInstance().useEmulator(androidLocalhost, 9099); // Default port for Auth Emulator
+
+        // Add delay to ensure emulators are ready
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Before
@@ -56,10 +65,25 @@ public class SignUpActivtyTest {
         CollectionReference userTestRef = db.collection("users");
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.createUserWithEmailAndPassword("valid@example.com", "valid123");
 
-        User user = new User("valid@example.com", "username1");
-        userTestRef.document().set(user);
+        CountDownLatch authLatch = new CountDownLatch(1);
+
+        auth.createUserWithEmailAndPassword("valid@example.com", "valid123")
+                .addOnCompleteListener(task -> {
+                    User user = new User("valid@example.com", "username1");
+                    userTestRef.document().set(user)
+                            .addOnCompleteListener(firestoreTask -> {
+                                authLatch.countDown();
+                            });
+                });
+
+        try {
+            // Wait for operations to complete (with a reasonable timeout)
+            authLatch.await(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Log.e("Test Setup", "Database seeding was interrupted", e);
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+        }
     }
 
     @Test
@@ -106,6 +130,13 @@ public class SignUpActivtyTest {
 
         // Click Sign Up button
         onView(withId(R.id.btnSignup)).perform(click());
+
+        // Add a small delay to ensure emulators are ready
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Verify that ProfileActivity is launched
         Intents.intended(IntentMatchers.hasComponent(ProfileActivity.class.getName()));

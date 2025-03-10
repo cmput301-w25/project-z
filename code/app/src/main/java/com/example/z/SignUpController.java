@@ -1,7 +1,6 @@
 package com.example.z;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +40,7 @@ public class SignUpController {
      * @param password
      *      The user's password.
      */
-    public void signUpUser(String email, String username, String password, accessCallback callback) {
+    public void signUpUser(String email, String username, String password, AccessCallBack callback) {
         // Check if username is unique
         db.collection("users")
                 .whereEqualTo("username", username)
@@ -91,7 +90,7 @@ public class SignUpController {
      * @param username
      *      The user's username.
      */
-    private void saveUserProfile(String email, String username, accessCallback callback) {
+    private void saveUserProfile(String email, String username, AccessCallBack callback) {
         if (mAuth.getCurrentUser() == null) {
             // Provide feedback
             Toast.makeText(context, "User not authenticated. Please try again.", Toast.LENGTH_SHORT).show();
