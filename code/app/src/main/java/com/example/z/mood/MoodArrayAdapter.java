@@ -72,7 +72,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
         }
 
         if (holder.moodTag != null) {
-            holder.moodTag.setText(mood.getTrigger());
+            holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
         }
 
         Date moodDate = mood.getCreatedAt();

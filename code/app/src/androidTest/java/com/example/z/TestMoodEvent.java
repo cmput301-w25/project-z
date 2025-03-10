@@ -1,22 +1,18 @@
 package com.example.z;
 
-import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isPlatformPopup;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static java.util.EnumSet.allOf;
-
-import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -27,9 +23,11 @@ import androidx.test.filters.LargeTest;
 
 import com.example.z.views.ProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +37,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * UI Tests for Mood Events: Adding, Editing, Deleting, and Validation.
@@ -48,52 +52,132 @@ import java.util.Objects;
 @LargeTest
 public class TestMoodEvent {
 
+    private static FirebaseAuth auth;
+    private static FirebaseFirestore db;
+
     @Rule
     public ActivityScenarioRule<ProfileActivity> activityScenarioRule =
             new ActivityScenarioRule<>(ProfileActivity.class);
 
+    @Before
+    public void seedMoodEntry() throws InterruptedException {
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            throw new AssertionError("Test requires a logged-in user!");
+        }
+
+        String userId = user.getUid();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean alreadyExists = new AtomicBoolean(false);
+
+        db.collection("moods")
+                .whereEqualTo("userId", userId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        Log.d("TEST", "Mood entry already exists in Emulator. Skipping seeding.");
+                        alreadyExists.set(true);
+                    }
+                    latch.countDown();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("TEST", "Failed to check existing moods in Emulator", e);
+                    latch.countDown();
+                });
+
+        latch.await(5, TimeUnit.SECONDS);
+
+        if (alreadyExists.get()) {
+            return;
+        }
+
+        // Create a single mood entry in Emulator
+        Map<String, Object> moodData = new HashMap<>();
+        moodData.put("userId", userId);
+        moodData.put("username", "TestUser");
+        moodData.put("type", "happiness");
+        moodData.put("description", "Feeling great!");
+        moodData.put("situation", "alone");
+        moodData.put("trigger", "sunshine");
+        moodData.put("timestamp", new Date());
+
+        db.collection("moods").add(moodData)
+                .addOnSuccessListener(documentReference ->
+                        Log.d("TEST", "Seeded Mood Entry in Emulator: " + documentReference.getId()))
+                .addOnFailureListener(e ->
+                        Log.e("TEST", "Failed to seed mood entry in Emulator", e));
+    }
+
     @BeforeClass
-    public static void setup(){
-        // Specific address for emulated device to access our localHost
-        String androidLocalhost = "10.0.2.2";
+    public static void setUp() throws InterruptedException {
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        int portNumber = 8080;
-        FirebaseFirestore.getInstance().useEmulator(androidLocalhost, portNumber);
+        // 👇 Ensure Emulator is Used BEFORE any Firestore operations
+        auth.useEmulator("10.0.2.2", 9099);  // Firebase Auth Emulator
+        db.useEmulator("10.0.2.2", 8080);    // Firestore Emulator
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+        CountDownLatch latch = new CountDownLatch(1);
 
-        // Log in test user (Make sure this user exists in Firebase)
-        auth.signInWithEmailAndPassword("0XDZAMXVL2WA7Q35qlP3Y2UdpZI3", "123456")
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("TestSetup", "Test user logged in successfully.");
+        auth.signOut();
+
+        auth.signInWithEmailAndPassword("testuser@example.com", "testpassword")
+                .addOnCompleteListener(signInTask -> {
+                    if (signInTask.isSuccessful()) {
+                        Log.d("TestSetup", "User already exists in Emulator, proceeding.");
+                        ensureFirestoreUserExists(auth.getCurrentUser(), latch);
                     } else {
-                        Log.e("TestSetup", "Failed to log in test user: " + task.getException().getMessage());
+                        // Create User in Firebase Auth
+                        auth.createUserWithEmailAndPassword("testuser@example.com", "testpassword")
+                                .addOnCompleteListener(createTask -> {
+                                    if (createTask.isSuccessful()) {
+                                        FirebaseUser user = auth.getCurrentUser();
+                                        if (user != null) {
+                                            ensureFirestoreUserExists(user, latch);
+                                        }
+                                    } else {
+                                        Log.e("TestSetup", "User creation failed: " + createTask.getException().getMessage());
+                                        latch.countDown();
+                                    }
+                                });
                     }
                 });
+
+        // Wait until Firebase Auth & Firestore setup completes
+        latch.await(10, TimeUnit.SECONDS);
     }
+
 
     /**
      * Test Adding a Mood Event
      */
     @Test
     public void testAddMoodEvent() {
+
+        SystemClock.sleep(2000);
         // Click Add Mood Button
         onView(withId(R.id.nav_add)).perform(click());
-
-        // Select a Mood (Spinner)
+        SystemClock.sleep(2000);
+        // Select a Mood from Spinner
         onView(withId(R.id.spinner_mood)).perform(click());
-        onView(withText("Happiness")).perform(click());
-
+        SystemClock.sleep(2000);
+        // Select the "happiness" option using its displayed text
+        onView(withText("happiness")).inRoot(isPlatformPopup()).perform(click());
+        SystemClock.sleep(2000);
         // Type a Description
         onView(withId(R.id.edit_description)).perform(typeText("Feeling great today!"));
-
+        SystemClock.sleep(2000);
         // Type a Trigger
         onView(withId(R.id.edit_hashtags)).perform(typeText("Sunshine"));
-
+        SystemClock.sleep(2000);
         // Click Post
         onView(withId(R.id.btn_post)).perform(click());
-
+        SystemClock.sleep(2000);
         // Verify Mood is Added to RecyclerView
         onView(withId(R.id.recyclerViewUserMoods))
                 .perform(RecyclerViewActions.scrollToPosition(0))
@@ -105,17 +189,18 @@ public class TestMoodEvent {
      */
     @Test
     public void testEditMoodEvent() {
+        SystemClock.sleep(2000);
         // Long Press on First Mood Item to Edit
         onView(withId(R.id.recyclerViewUserMoods))
-                .perform(actionOnItemAtPosition(0, click()));
-
+                .perform(actionOnItemAtPosition(0, longClick()));
+        SystemClock.sleep(2000);
         // Modify the Mood Description
         onView(withId(R.id.edit_description))
                 .perform(replaceText("Updated description!"));
-
+        SystemClock.sleep(2000);
         // Save Changes
         onView(withId(R.id.btn_post)).perform(click());
-
+        SystemClock.sleep(2000);
         // Verify Updated Text is Displayed
         onView(withId(R.id.recyclerViewUserMoods))
                 .perform(RecyclerViewActions.scrollToPosition(0))
@@ -127,17 +212,18 @@ public class TestMoodEvent {
      */
     @Test
     public void testDeleteMoodEvent() {
+        SystemClock.sleep(2000);
+        String moodDescription = "Feeling great!";
         // Click First Mood Item
         onView(withId(R.id.recyclerViewUserMoods))
                 .perform(actionOnItemAtPosition(0, click()));
-
+        SystemClock.sleep(2000);
         // Click Delete Button
         onView(withId(R.id.btnDeletePost)).perform(click());
-
-        // Verify Mood is Removed from RecyclerView
-        onView(withId(R.id.recyclerViewUserMoods))
-                .perform(RecyclerViewActions.scrollToPosition(0))
-                .check(matches(isDisplayed())); // Might need to check item count instead
+        SystemClock.sleep(2000);
+        // Verify the deleted mood is NOT in the RecyclerView anymore
+        onView(withText(moodDescription))
+                .check(doesNotExist());
     }
 
     /**
@@ -146,21 +232,57 @@ public class TestMoodEvent {
     @Test
     public void testErrorMessageForEmptyMoodType() {
         // Click Add Mood Button
+        SystemClock.sleep(2000);
         onView(withId(R.id.nav_add)).perform(click());
         SystemClock.sleep(2000);
         // Leave Mood Spinner Unselected
         // Type Description
-        onView(withId(R.id.edit_description)).perform(typeText("This should fail!"));
+        onView(withId(R.id.edit_description)).perform(typeText("This test should pop up an error!"));
         SystemClock.sleep(2000);
         // Click Post Button
         onView(withId(R.id.btn_post)).perform(click());
         SystemClock.sleep(2000);
-        // Verify Toast Error Message (Requires Espresso-Intents)
+        // Verify the message appears
         onView(withText("You must tell us how you are feeling!"))
                 .check(matches(isDisplayed()));
         SystemClock.sleep(2000);
-        // Press Back to Close Dialog
-        pressBack();
+        // Click the "OK" button on the AlertDialog
+        onView(withId(android.R.id.button1)).perform(click());
+        SystemClock.sleep(2000);
+    }
+
+    /**
+     * Test Error Message for Description Exceeding 20 Characters
+     */
+    @Test
+    public void testErrorMessageForLongDescription() {
+        // Click Add Mood Button
+        SystemClock.sleep(2000);
+        onView(withId(R.id.nav_add)).perform(click());
+        SystemClock.sleep(2000);
+
+        // Select a Mood from Spinner (Assuming selecting a mood is required)
+        onView(withId(R.id.spinner_mood)).perform(click());
+        SystemClock.sleep(2000);
+        onView(withText("happiness")).inRoot(isPlatformPopup()).perform(click());
+        SystemClock.sleep(2000);
+
+        // Type a Description Longer than 20 Characters
+        onView(withId(R.id.edit_description)).perform(typeText("This description is way too long for the field!"));
+        SystemClock.sleep(2000);
+
+        // Click Post Button
+        onView(withId(R.id.btn_post)).perform(click());
+        SystemClock.sleep(2000);
+
+        // Verify the error message appears
+        onView(withText("Description must be 20 characters max!"))
+                .check(matches(isDisplayed()));
+        SystemClock.sleep(2000);
+
+        // Click the "OK" button on the AlertDialog
+        onView(withId(android.R.id.button1)).perform(click());
+        SystemClock.sleep(2000);
     }
 
     @After
@@ -185,5 +307,44 @@ public class TestMoodEvent {
                 urlConnection.disconnect();
             }
         }
+    }
+
+    /**
+     * Ensures that the Firestore user document exists before proceeding with tests.
+     */
+    private static void ensureFirestoreUserExists(FirebaseUser user, CountDownLatch latch) {
+        if (user == null) {
+            latch.countDown();
+            return;
+        }
+
+        String userId = user.getUid();
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        // Create user in Firestore Emulator
+                        Map<String, Object> testUser = new HashMap<>();
+                        testUser.put("username", "TestUser");
+                        testUser.put("email", "testuser@example.com");
+
+                        db.collection("users").document(userId)
+                                .set(testUser)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("TestSetup", "Firestore Emulator user document created.");
+                                    latch.countDown();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("TestSetup", "Error creating Firestore Emulator user", e);
+                                    latch.countDown();
+                                });
+                    } else {
+                        Log.d("TestSetup", "Firestore user already exists. Proceeding.");
+                        latch.countDown();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("TestSetup", "Error checking Firestore user document", e);
+                    latch.countDown();
+                });
     }
 }

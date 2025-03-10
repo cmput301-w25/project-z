@@ -172,13 +172,13 @@ public class EditMoodFragment extends DialogFragment {
 
         // Validate Mood Selection
         if (selectedMood == null || selectedMood.toString().equalsIgnoreCase("Select")) {
-            Toast.makeText(getContext(), "You must tell us how you are feeling!", Toast.LENGTH_SHORT).show();
+            showErrorDialog("You must tell us how you are feeling!");
             return;
         }
 
         // Validate Description Length
         if (updatedDescription.length() > 20) {
-            Toast.makeText(getContext(), "Description must be 20 characters max", Toast.LENGTH_SHORT).show();
+            showErrorDialog("Description must be 20 characters max!");
             return;
         }
 
@@ -220,6 +220,15 @@ public class EditMoodFragment extends DialogFragment {
          * Called when a mood update is successfully completed.
          */
         void onMoodUpdated();
+    }
+
+    private void showErrorDialog(String message) {
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Error")
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert) // Adds a red exclamation mark icon
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }
 

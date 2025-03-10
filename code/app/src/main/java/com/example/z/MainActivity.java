@@ -69,20 +69,18 @@ public class MainActivity extends AppCompatActivity {
         }, SPLASH_DELAY);
     }
 
-    /*
     /**
      * Called when the activity is stopped.
      * This can be used to automatically log out the user when the app is closed.
      *
      * Note: This method is currently commented out.
      */
-    /*
     @Override
     protected void onStop() {
         super.onStop();
         SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         prefs.edit().putBoolean("shouldLogout", true).apply();
     }
-     */
+
 }
 
