@@ -1,24 +1,30 @@
 package com.example.z.user;
 
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 import android.content.Context;
 
+import com.example.z.utils.AccessCallBack;
 import com.example.z.views.LogInActivity;
 import com.example.z.views.ProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**
- * Handles user login functionality using Firebase Authentication.
+ * LogInController handles the logic for user authentication.
+ * It interacts with Firebase Authentication to log in users.
+ *
+ * Outstanding Issues:
+ * - No error handling for network issues.
  */
 public class LogInController {
     private Context context;
     private FirebaseAuth mAuth;
 
     /**
-     * Constructs a new LogInController.
-     *
-     * @param context The context from which this controller is being used.
+     * Constructor for LogInController.
+     * @param context
+     *      The context of the calling activity.
      */
     public LogInController(Context context) {
         this.context = context;
@@ -26,26 +32,25 @@ public class LogInController {
     }
 
     /**
-     * Attempts to log in a user with the provided email and password.
-     * If authentication is successful, the user is redirected to the ProfileActivity.
-     *
-     * @param email    The email address of the user.
-     * @param password The password entered by the user.
+     * Authenticates a user with the provided email and password.
+     * @param email
+     *      The user's email address.
+     * @param password
+     *      The user's password.
      */
-    public void loginUser(String email, String password) {
+    public void loginUser(String email, String password, AccessCallBack callback) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        // Provide feedback
+                        Log.d("LoginTest", "Login successful!");
                         Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
-
-                        // Navigate to ProfileActivity upon successful login
-                        context.startActivity(new Intent(context, ProfileActivity.class));
-
-                        // Close the LogInActivity to prevent back navigation
-                        ((LogInActivity) context).finish();
+                        callback.onAccessResult(true, "Login successful!");
                     } else {
-                        // Display an error message if authentication fails
-                        Toast.makeText(context, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        // Provide feedback
+                        Log.d("LoginTest", "Login failed: " + task.getException().getMessage());
+                        Toast.makeText(context, "Wrong email and/or password!", Toast.LENGTH_SHORT).show();
+                        callback.onAccessResult(false, "Login failed!");
                     }
                 });
     }

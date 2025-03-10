@@ -1,5 +1,6 @@
 package com.example.z.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -12,20 +13,22 @@ import com.example.z.R;
 import com.example.z.user.LogInController;
 
 /**
- * LogInActivity handles user authentication, allowing users to log in or navigate to the sign-up page.
+ * LogInActivity handles user authentication.
+ * It provides a UI for users to input their email and password.
+ * It delegates the login logic to the LogInController.
+ *
+ * Outstanding Issues:
+ * - No "Forgot Password" functionality.
+ * - No input validation for email format.
  */
 public class LogInActivity extends AppCompatActivity {
-
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnSignUp;
+    private Button btnLogin;
     private LogInController logInController;
 
-    /**
-     * Called when the activity is created.
-     * Initializes UI components and sets up button click listeners.
-     *
-     * @param savedInstanceState The saved state of the activity.
-     */
+    private Button btnSignUp;
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +40,7 @@ public class LogInActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
 
-        // Initialize login controller
+        context = this;
         logInController = new LogInController(this);
 
         // Set up login button click listener
@@ -46,20 +49,40 @@ public class LogInActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             // Validate inputs
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            if (email.isEmpty()) {
+                // Provide feedback
+                etEmail.setError("Email cannot be empty.");
+            }
+            // Validate inputs
+            if (password.isEmpty()) {
+                // Provide feedback
+                etPassword.setError("Password cannot be empty.");
+            }
+
+            if (password.isEmpty() || email.isEmpty()) {
                 return;
             }
 
-            // Delegate login logic to LogInController
-            logInController.loginUser(email, password);
+            logInController.loginUser(email, password, (isSuccess, message) -> {
+                if (isSuccess) {
+                    // Login successful
+                    startActivity(new Intent(LogInActivity.this, ProfileActivity.class));
+                    finish(); // Close the LogInActivity
+                }
+                else {
+                    etPassword.setError("Wrong password and/or email.");
+                    etEmail.setError("Wrong password and/or email.");
+                }
+            });
+
         });
 
-        // Set up sign-up button click listener
         btnSignUp.setOnClickListener(v -> {
             Intent intent = new Intent(LogInActivity.this, SignUpActivity.class);
             startActivity(intent);
         });
+
     }
 }
+
 

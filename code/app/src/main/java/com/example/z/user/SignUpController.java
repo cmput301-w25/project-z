@@ -2,15 +2,22 @@ package com.example.z.user;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.example.z.utils.AccessCallBack;
 import com.example.z.views.ProfileActivity;
 import com.example.z.views.SignUpActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
- * Handles user sign-up logic, including authentication and Firestore user profile storage.
+ * SignUpController handles the logic for user registration.
+ * It interacts with Firebase Authentication and Firestore to create new user accounts
+ * and save user profiles.
+ *
+ * Outstanding Issues:
+ * - No retry mechanism for Firestore or Firebase Authentication failures.
  */
 public class SignUpController {
     private Context context;
@@ -18,9 +25,9 @@ public class SignUpController {
     private FirebaseFirestore db;
 
     /**
-     * Constructs a new SignUpController.
+     * Constructor for SignUpController.
      *
-     * @param context The context from which this controller is being used.
+     * @param context The context of the calling activity.
      */
     public SignUpController(Context context) {
         this.context = context;
@@ -30,14 +37,16 @@ public class SignUpController {
     }
 
     /**
-     * Attempts to sign up a new user with the provided credentials.
-     * Checks if the username is unique before proceeding with Firebase authentication.
-     *
-     * @param email    The email address of the user.
-     * @param username The desired username of the user.
-     * @param password The password chosen by the user.
+     * Registers a new user with the provided email, username, and password.
+     * @param email
+     *      The user's email address.
+     * @param username
+     *      The desired username.
+     * @param password
+     *      The user's password.
      */
-    public void signUpUser(String email, String username, String password) {
+    public void signUpUser(String email, String username, String password, AccessCallBack callback) {
+        // Check if username is unique
         db.collection("users")
                 .whereEqualTo("username", username)
                 .get()
@@ -48,48 +57,72 @@ public class SignUpController {
                             mAuth.createUserWithEmailAndPassword(email, password)
                                     .addOnCompleteListener(authTask -> {
                                         if (authTask.isSuccessful()) {
-                                            saveUserProfile(email, username);
+                                            // Save user profile to Firestore
+                                            saveUserProfile(email, username, callback);
                                         } else {
-                                            Toast.makeText(context, "Firestore Authentication failed.", Toast.LENGTH_SHORT).show();
+                                            // Get the detailed error message
+                                            String errorMessage = authTask.getException() != null ?
+                                                    authTask.getException().getMessage() : "Unknown error";
+
+                                            // Log and show the exact Firebase error
+                                            Log.e("FirebaseAuthError", errorMessage);
+                                            Toast.makeText(context, "Firebase Authentication failed: " + errorMessage,
+                                                    Toast.LENGTH_LONG).show();
+
+                                            // Call the callback with failure
+                                            callback.onAccessResult(false, errorMessage);
                                         }
                                     });
                         } else {
-                            Toast.makeText(context, "Username already exists", Toast.LENGTH_SHORT).show();
+                            // Provide feedback when username already exists
+                            callback.onAccessResult(false, "Username already exists");
                         }
                     } else {
-                        Toast.makeText(context, "Error checking username", Toast.LENGTH_SHORT).show();
+                        // Provide feedback
+                        String errorMessage = task.getException() != null ?
+                                task.getException().getMessage() : "Unknown error";
+                        Toast.makeText(context, "Error checking username: " + errorMessage, Toast.LENGTH_SHORT).show();
+                        callback.onAccessResult(false, "Error checking username: " + errorMessage);
                     }
                 });
     }
 
+
     /**
-     * Saves the authenticated user's profile information to Firestore.
-     *
-     * @param email    The email address of the user.
-     * @param username The username of the user.
+     * Saves the user's profile to Firestore.
+     * @param email
+     *      The user's email address.
+     * @param username
+     *      The user's username.
      */
-    private void saveUserProfile(String email, String username) {
+    private void saveUserProfile(String email, String username, AccessCallBack callback) {
         if (mAuth.getCurrentUser() == null) {
+            // Provide feedback
             Toast.makeText(context, "User not authenticated. Please try again.", Toast.LENGTH_SHORT).show();
+            callback.onAccessResult(false, "User not authenticated");
             return;
         }
 
         String userId = mAuth.getCurrentUser().getUid();
+
+        // Create a User object
         User user = new User(email, username);
 
+        // Save to Firestore
         db.collection("users")
                 .document(userId)
                 .set(user)
                 .addOnSuccessListener(aVoid -> {
+                    // Provide feedback
                     Toast.makeText(context, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                    callback.onAccessResult(true, "Profile saved successfully");
 
-                    // Redirect to ProfileActivity
-                    Intent intent = new Intent(context, ProfileActivity.class);
-                    context.startActivity(intent);
-                    ((SignUpActivity) context).finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(context, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    // Provide feedback
+                    String errorMessage = e.getMessage();
+                    Toast.makeText(context, "Error saving profile: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    callback.onAccessResult(false, "Error saving profile: " + errorMessage);
                 });
     }
 }
