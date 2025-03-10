@@ -19,6 +19,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Image used to add more context to a users mood
+ *
+ *  Outstanding Issues:
+ *      - Not integrated with add/edit mood functionality (further logic required)
+ */
 public class Image extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
     private static final int TAKE_PHOTO = 2;

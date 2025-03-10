@@ -21,6 +21,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 /**
  * A dialog fragment that displays details of a selected mood post.
  * Allows the user to view mood details and delete the post if they are the owner.
+ *
+ *  Outstanding issues:
+ *      - Cannot display image
  */
 public class ViewMoodDialogFragment extends DialogFragment {
     private Mood mood;

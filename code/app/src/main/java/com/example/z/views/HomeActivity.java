@@ -12,6 +12,9 @@ import com.example.z.mood.MoodFragment;
 /**
  * HomeActivity serves as the main feed where users can navigate to other pages
  * such as Profile, Notifications, and Search, as well as add new posts and when implemented view other users posts.
+ *
+ *  Outstanding Issues:
+ *      - Cannot see other users moods yet
  */
 public class HomeActivity extends AppCompatActivity {
 

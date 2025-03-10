@@ -13,6 +13,9 @@ import com.example.z.mood.MoodFragment;
 /**
  * MapActivity is responsible for displaying a map with user events marked on it.
  * Users can navigate between different sections of the app and add a new mood post.
+ *
+ *  Outstanding Issues:
+ *      - Cannot display map with mood events yet
  */
 public class MapActivity extends AppCompatActivity {
 

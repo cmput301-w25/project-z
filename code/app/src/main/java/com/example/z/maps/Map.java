@@ -13,7 +13,9 @@ import java.util.List;
 /**
  * Represents a map that holds mood events and users.
  * This class provides methods to store and manage mood events and user data.
- * This class is still a work in progress for part 4 so things may change.
+ *
+ *  Outstanding issues:
+ *      - Not integrated with MapActivity yet (further logic required)
  */
 public class Map {
 

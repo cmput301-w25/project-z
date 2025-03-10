@@ -17,9 +17,8 @@ import com.example.z.user.LogInController;
  * It provides a UI for users to input their email and password.
  * It delegates the login logic to the LogInController.
  *
- * Outstanding Issues:
- * - No "Forgot Password" functionality.
- * - No input validation for email format.
+ *  Outstanding Issues:
+ *      - Maybe more input validation and feedback required for minor edge cases
  */
 public class LogInActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
