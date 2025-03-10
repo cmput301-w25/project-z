@@ -31,11 +31,13 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
         ImageButton addPostButton = findViewById(R.id.nav_add);
+        ImageButton map = findViewById(R.id.btnMap);
 
         // Set click listeners for navigation
         profile.setOnClickListener(v -> navigateTo(ProfileActivity.class));
         notifications.setOnClickListener(v -> navigateTo(NotificationActivity.class));
         search.setOnClickListener(v -> navigateTo(SearchActivity.class));
+        map.setOnClickListener(v -> navigateTo(MapActivity.class));
 
         addPostButton.setOnClickListener(v -> openAddPostDialog());
     }
