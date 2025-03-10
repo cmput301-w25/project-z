@@ -3,6 +3,7 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+
 android {
     namespace = "com.example.z"
     compileSdk = 34
@@ -34,15 +35,21 @@ android {
 
 dependencies {
 
+    configurations.all {
+        exclude(group = "com.google.protobuf", module = "protobuf-lite")
+    }
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    //implementation(files("C:/Users/deols/AppData/Local/Android/Sdk/platforms/android-34/android.jar"))
 
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-firestore:25.1.1")
     //implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
+    implementation(libs.espresso.contrib)
 
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
@@ -51,4 +58,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
 }
+

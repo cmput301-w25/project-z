@@ -1,4 +1,4 @@
-package com.example.z;
+package com.example.z.views;
 
 import android.os.Bundle;
 
@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.z.R;
 
 public class FollowingActivity extends AppCompatActivity {
     @Override
@@ -20,5 +22,4 @@ public class FollowingActivity extends AppCompatActivity {
             return insets;
         });
     }
-
 }

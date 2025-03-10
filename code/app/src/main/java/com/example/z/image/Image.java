@@ -1,4 +1,4 @@
-package com.example.z;
+package com.example.z.image;
 
 import android.widget.ImageView;
 
@@ -17,5 +17,4 @@ public class Image {
     public void displayImage(int ID) {
 
     }
-
 }
