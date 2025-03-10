@@ -63,12 +63,14 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
         ImageButton home = findViewById(R.id.nav_home);
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
+        ImageButton map = findViewById(R.id.btnMapMoods);
 
         // Set click listeners for navigation
         createMood.setOnClickListener(v -> addMoodEvent());
         home.setOnClickListener(v -> switchActivity(HomeActivity.class));
         search.setOnClickListener(v -> switchActivity(SearchActivity.class));
         notifications.setOnClickListener(v -> switchActivity(NotificationActivity.class));
+        map.setOnClickListener(v -> switchActivity(MapActivity.class));
     }
 
     /**
