@@ -5,6 +5,7 @@ package com.example.z;
  * Represents a pending follow request between two users.
  */
 public class FollowRequest {
+    private String id;
     private String followerId;
     private String followeeId;
     private long timestamp;
@@ -16,15 +17,15 @@ public class FollowRequest {
 
     /**
      * Constructs a new FollowRequest object.
-     *
+     *     
+     * @param id  The ID of the request
      * @param followerId The ID of the user sending the follow request.
      * @param followeeId The ID of the user receiving the follow request.
-     * @param timestamp  The time when the follow request was sent.
      */
-    public FollowRequest(String followerId, String followeeId, long timestamp) {
+    public FollowRequest(String id, String followerId, String followeeId) {
         this.followerId = followerId;
         this.followeeId = followeeId;
-        this.timestamp = timestamp;
+        this.id = id;
     }
 
     public String getFollowerId() {
