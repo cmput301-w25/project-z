@@ -1,5 +1,6 @@
 package com.example.z;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -23,6 +24,7 @@ public class LogInActivity extends AppCompatActivity {
     private LogInController logInController;
 
     private Button btnSignUp;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class LogInActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
 
+        context = this;
         logInController = new LogInController(this);
 
         // Set up login button click listener
@@ -43,14 +46,32 @@ public class LogInActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             // Validate inputs
-            if (email.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty()) {
                 // Provide feedback
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                etEmail.setError("Email cannot be empty.");
+            }
+            // Validate inputs
+            if (password.isEmpty()) {
+                // Provide feedback
+                etPassword.setError("Password cannot be empty.");
+            }
+
+            if (password.isEmpty() || email.isEmpty()) {
                 return;
             }
 
-            // Delegate login logic to LoginController
-            logInController.loginUser(email, password);
+            logInController.loginUser(email, password, (isSuccess, message) -> {
+                if (isSuccess) {
+                    // Login successful
+                    startActivity(new Intent(LogInActivity.this, ProfileActivity.class));
+                    finish(); // Close the LogInActivity
+                }
+                else {
+                    etPassword.setError("Wrong password and/or email.");
+                    etEmail.setError("Wrong password and/or email.");
+                }
+            });
+
         });
 
         btnSignUp.setOnClickListener(v -> {
@@ -60,3 +81,5 @@ public class LogInActivity extends AppCompatActivity {
 
     }
 }
+
+

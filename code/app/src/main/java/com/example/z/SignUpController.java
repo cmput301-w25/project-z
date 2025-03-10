@@ -2,6 +2,7 @@ package com.example.z;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,7 +41,7 @@ public class SignUpController {
      * @param password
      *      The user's password.
      */
-    public void signUpUser(String email, String username, String password) {
+    public void signUpUser(String email, String username, String password, accessCallback callback) {
         // Check if username is unique
         db.collection("users")
             .whereEqualTo("username", username)
@@ -54,14 +55,20 @@ public class SignUpController {
                                     if (authTask.isSuccessful()) {
                                         // Save user profile to Firestore
                                         saveUserProfile(email, username);
+                                        callback.onAccessResult(true, "SignUp successful!");
                                     } else {
-                                        // Provide feedback
-                                        Toast.makeText(context, "Firestore Authentication failed. ", Toast.LENGTH_SHORT).show();
+                                        // Get the detailed error message
+                                        String errorMessage = authTask.getException() != null ? authTask.getException().getMessage() : "Unknown error";
+
+                                        // Log and show the exact Firebase error
+                                        Log.e("FirebaseAuthError", errorMessage);
+                                        Toast.makeText(context, "Firebase Authentication failed: " + errorMessage, Toast.LENGTH_LONG).show();
+
                                     }
                                 });
                     } else {
-                        // Provide feedback
-                        Toast.makeText(context, "Username already exists", Toast.LENGTH_SHORT).show();
+                        // Provide feedback when username already exists
+                        callback.onAccessResult(false, "SignUp failed");
                     }
                 } else {
                     // Provide feedback

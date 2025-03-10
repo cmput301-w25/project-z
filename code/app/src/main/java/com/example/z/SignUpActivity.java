@@ -46,14 +46,30 @@ public class SignUpActivity extends AppCompatActivity {
             String password = etPassword.getText().toString().trim();
 
             // Validate inputs
-            if (email.isEmpty() || username.isEmpty() || password.isEmpty()) {
-                // Provide feedback
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            if (email.isEmpty()) {
+                etEmail.setError("Email cannot be empty.");
+            }
+            if (username.isEmpty()) {
+                etUsername.setError("Username cannot be empty.");
+            }
+            if (password.isEmpty()) {
+                etPassword.setError("Password cannot be empty.");
+            }
+            if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
                 return;
             }
 
             // Delegate sign-up logic to SignUpController
-            signUpController.signUpUser(email, username, password);
+            signUpController.signUpUser(email, username, password, (isSuccess, message) -> {
+                if (isSuccess) {
+                    // Signup Successful
+                    startActivity(new Intent(SignUpActivity.this, ProfileActivity.class));
+                    finish(); // Close the LogInActivity
+                } else {
+                    // Username already exists
+                    etUsername.setError("Username already exists");
+                }
+            });
         });
 
         // Set up login text click listener

@@ -115,13 +115,13 @@ public class MainActivity extends AppCompatActivity {
         }, SPLASH_DELAY);
     }
 
-    /*
+
     // logs you out every time you close the app (for testing)
     @Override
     protected void onDestroy() {
         super.onDestroy();
         FirebaseAuth.getInstance().signOut(); // Sign out user when app is closed
     }
-    */
+
 
 }

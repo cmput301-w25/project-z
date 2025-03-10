@@ -1,6 +1,8 @@
 package com.example.z;
 
 import android.content.Intent;
+import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.content.Context;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,17 +35,19 @@ public class LogInController {
      * @param password
      *      The user's password.
      */
-    public void loginUser(String email, String password) {
+    public void loginUser(String email, String password, accessCallback callback) {
         mAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     // Provide feedback
+                    Log.d("LoginTest", "Login successful!");
                     Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
-                    context.startActivity(new Intent(context, ProfileActivity.class));
-                    ((LogInActivity) context).finish(); // Close the LogInActivity
+                    callback.onAccessResult(true, "Login successful!");
                 } else {
                     // Provide feedback
-                    Toast.makeText(context, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("LoginTest", "Login failed: " + task.getException().getMessage());
+                    Toast.makeText(context, "Wrong email and/or password!", Toast.LENGTH_SHORT).show();
+                    callback.onAccessResult(false, "Login failed!");
                 }
             });
     }
