@@ -47,6 +47,9 @@ import java.util.Date;
 /**
  * Fragment for editing an existing mood entry.
  * Users can modify the details of their previously posted mood entries.
+ *
+ *  Outstanding issues:
+ *      - Cannot edit image yet
  */
 public class EditMoodFragment extends DialogFragment {
     private Spinner edit_social_situation, edit_mood_emotion;

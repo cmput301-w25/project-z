@@ -32,6 +32,9 @@ import java.util.Date;
  * MoodFragment is a DialogFragment that allows users to add a new mood post.
  * Users must provide an emotional state, description, and optionally a social situation and trigger.
  * The mood is saved to Firestore and updates the UI accordingly.
+ *
+ *  Outstanding issues:
+ *      - Cannot add picture/image
  */
 public class MoodFragment extends DialogFragment {
     private Spinner edit_social_situation;

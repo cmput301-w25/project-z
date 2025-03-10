@@ -25,8 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * AccessAppActivity handles user authentication, including sign-up and login.
+ * Used initially for testing, now replaced by LogInActivity and SignUpActivity.
+ * Not used for app functionality but was required for initial testing.
+ * Handles user authentication, including sign-up and login.
  * Users can register with an email, username, and password, or log in with existing credentials.
+ *
+ *  Outstanding Issues
+ *      - None
  */
 public class AccessAppActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
