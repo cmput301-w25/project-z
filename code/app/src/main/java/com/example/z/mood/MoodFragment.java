@@ -7,8 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import java.util.HashMap;
-import java.util.Map;
+
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -62,6 +61,11 @@ public class MoodFragment extends DialogFragment {
     private OnMoodAddedListener moodAddedListener;
     private FusedLocationProviderClient fusedLocationClient;
     private Location lastKnownLocation;
+
+    private Double latitude = null;
+    private Double longitude = null;
+
+    private boolean locationRequested = false;
 
     /**
      * Called to create the dialog for adding a new mood post.
@@ -179,17 +183,30 @@ public class MoodFragment extends DialogFragment {
             return;
         }
 
+
+
         DocumentReference moodDocRef = db.collection("moods").document();
         String documentId = moodDocRef.getId();
 
-        Map<String, Object> moodLocation = null;
         if (lastKnownLocation != null) {
-            moodLocation = new HashMap<>();
-            moodLocation.put("latitude", lastKnownLocation.getLatitude());
-            moodLocation.put("longitude", lastKnownLocation.getLongitude());
+            latitude = lastKnownLocation.getLatitude();
+            longitude = lastKnownLocation.getLongitude();
+        } else {
+            latitude = null;
+            longitude = null;
         }
 
-        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, moodLocation, description);
+        if (latitude == null || longitude == null) {
+            if (lastKnownLocation != null) {
+                latitude = lastKnownLocation.getLatitude();
+                longitude = lastKnownLocation.getLongitude();
+            } else if (locationRequested) {
+                Toast.makeText(getContext(), "Waiting for location to be retrieved...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description);
 
         // Save Mood
         saveMoodToFirebase(moodDocRef, newMood);
@@ -202,7 +219,7 @@ public class MoodFragment extends DialogFragment {
      * @param mood       The Mood object containing user input.
      */
     private void saveMoodToFirebase(DocumentReference moodDocRef, Mood mood) {
-        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt());
+        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), latitude, longitude);
 
         // Notify UI & Close Dialog
         if (moodAddedListener != null) {
@@ -239,6 +256,7 @@ public class MoodFragment extends DialogFragment {
 
 
     private void requestUserLocation() {
+        locationRequested = true;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

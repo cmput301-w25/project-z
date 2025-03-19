@@ -106,8 +106,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         LatLng location = new LatLng(lat, lng);
                         mMap.addMarker(new MarkerOptions()
                                 .position(location)
-                                .title(mood.getUsername() + " is feeling " + mood.getEmotionalState())
-                                .snippet(mood.getDescription()));
+                                .title(mood.getEmotionalState()));
+
                     }
                 }
             }
