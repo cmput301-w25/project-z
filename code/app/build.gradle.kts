@@ -47,11 +47,11 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-firestore:25.1.1")
-    implementation("com.google.android.gms:play-services-maps:18.0.2")
-
     //implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.espresso.contrib)
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
@@ -70,6 +70,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.7.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
     implementation("net.bytebuddy:byte-buddy:1.17.1")
+
 
 
 }

@@ -2,22 +2,33 @@ package com.example.z.views;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.z.R;
+import com.example.z.mood.Mood;
 import com.example.z.mood.MoodFragment;
-
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * MapActivity is responsible for displaying a map with user events marked on it.
  * Users can navigate between different sections of the app and add a new mood post.
- *
  *  Outstanding Issues:
  *      - Cannot display map with mood events yet
  */
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap mMap;
 
     /**
      * Called when the activity is created.
@@ -45,6 +56,13 @@ public class MapActivity extends AppCompatActivity {
 
         // Open dialog to add a new mood post
         addPostButton.setOnClickListener(v -> openAddPostDialog());
+
+        // Initialize the Map Fragment using getSupportFragmentManager()
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        SupportMapFragment mapFragment = (SupportMapFragment) fragmentManager.findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
     }
 
     /**
@@ -65,6 +83,35 @@ public class MapActivity extends AppCompatActivity {
         MoodFragment moodFragment = new MoodFragment();
         moodFragment.show(getSupportFragmentManager(), "AddMoodFragment");
     }
+
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+        loadMoodEvents();
+    }
+
+    private void loadMoodEvents() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("moods").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                Mood mood = doc.toObject(Mood.class);
+
+                if (mood != null && mood.getLocation() != null) {
+                    Double lat = (Double) mood.getLocation().get("latitude");
+                    Double lng = (Double) mood.getLocation().get("longitude");
+
+                    if (lat != null && lng != null) {
+                        LatLng location = new LatLng(lat, lng);
+                        mMap.addMarker(new MarkerOptions()
+                                .position(location)
+                                .title(mood.getUsername() + " is feeling " + mood.getEmotionalState())
+                                .snippet(mood.getDescription()));
+                    }
+                }
+            }
+        }).addOnFailureListener(e -> Log.e("MapActivity", "Error loading mood events", e));
+    }
+
 }
-
-

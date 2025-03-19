@@ -1,5 +1,15 @@
 package com.example.z.mood;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -9,8 +19,11 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +33,7 @@ import com.example.z.data.DatabaseManager;
 import com.example.z.R;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
+import com.google.android.gms.location.Priority;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -28,11 +42,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Date;
 
 
+
+
 /**
  * MoodFragment is a DialogFragment that allows users to add a new mood post.
  * Users must provide an emotional state, description, and optionally a social situation and trigger.
  * The mood is saved to Firestore and updates the UI accordingly.
- *
  *  Outstanding issues:
  *      - Cannot add picture/image
  */
@@ -45,6 +60,8 @@ public class MoodFragment extends DialogFragment {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private OnMoodAddedListener moodAddedListener;
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location lastKnownLocation;
 
     /**
      * Called to create the dialog for adding a new mood post.
@@ -55,11 +72,16 @@ public class MoodFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         View view = LayoutInflater.from(getContext()).inflate(R.layout.add_mood_event_alert_dialog, null);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         edit_social_situation = view.findViewById(R.id.spinner_social_situation);
         edit_mood_emotion = view.findViewById(R.id.spinner_mood);
         edit_mood_description = view.findViewById(R.id.edit_description);
         edit_trigger = view.findViewById(R.id.edit_hashtags);
+
+        ImageButton btnAttachLocation = view.findViewById(R.id.btn_attach_location);
+        btnAttachLocation.setOnClickListener(v -> requestUserLocation());
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -160,7 +182,14 @@ public class MoodFragment extends DialogFragment {
         DocumentReference moodDocRef = db.collection("moods").document();
         String documentId = moodDocRef.getId();
 
-        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description);
+        Map<String, Object> moodLocation = null;
+        if (lastKnownLocation != null) {
+            moodLocation = new HashMap<>();
+            moodLocation.put("latitude", lastKnownLocation.getLatitude());
+            moodLocation.put("longitude", lastKnownLocation.getLongitude());
+        }
+
+        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, moodLocation, description);
 
         // Save Mood
         saveMoodToFirebase(moodDocRef, newMood);
@@ -206,5 +235,27 @@ public class MoodFragment extends DialogFragment {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
+
+
+    private void requestUserLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        } else {
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                    .addOnSuccessListener(requireActivity(), location -> {
+                        if (location != null) {
+                            lastKnownLocation = location;
+                            Toast.makeText(getContext(), "Location attached!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+
+
 }
 
