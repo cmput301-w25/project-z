@@ -85,6 +85,8 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+
+
     <Spinner
         android:id="@+id/spinner_social_situation"
         android:layout_width="match_parent"
@@ -124,17 +126,20 @@
             android:src="@drawable/upload_image"
             app:tint="#F9F7F3" />
 
+
         <ImageButton
             android:id="@+id/btn_take_photo"
             android:layout_width="60dp"
             android:layout_height="42dp"
             android:layout_marginTop="15dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/rounded_button"
             android:backgroundTint="#0FA3B1"
             android:padding="10dp"
             android:scaleType="centerInside"
             android:src="@drawable/take_image"
             app:tint="#F9F7F3" />
+
     </LinearLayout>
 
     <LinearLayout

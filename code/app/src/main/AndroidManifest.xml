@@ -32,5 +32,11 @@
         <activity android:name="com.example.z.views.FollowingActivity"/>
         <activity android:name="com.example.z.views.MapActivity"/>
         <activity android:name="com.example.z.views.NotificationActivity"/>
+        <activity android:name="com.example.z.image.FirstActivity" />
+        <activity android:name="com.example.z.image.SecondActivity" />
+        <activity android:name="com.example.z.image.CapturePhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+
     </application>
 </manifest>
