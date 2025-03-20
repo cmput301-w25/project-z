@@ -3,6 +3,7 @@ package com.example.z.views;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ public class LogInActivity extends AppCompatActivity {
 
         // Set up login button click listener
         btnLogin.setOnClickListener(v -> {
+            Log.d("LoginActivity", "Login button clicked");
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
@@ -63,15 +65,29 @@ public class LogInActivity extends AppCompatActivity {
                 return;
             }
 
+            Log.d("LoginActivity", "Calling loginUser");
             logInController.loginUser(email, password, (isSuccess, message) -> {
+                Log.d("LoginActivity", "Login callback received - success: " + isSuccess + ", message: " + message);
                 if (isSuccess) {
-                    // Login successful
-                    startActivity(new Intent(LogInActivity.this, ProfileActivity.class));
-                    finish(); // Close the LogInActivity
+                    Log.d("LoginActivity", "About to start ForYouActivity");
+                    runOnUiThread(() -> {
+                        Log.d("LoginActivity", "Inside runOnUiThread");
+                        Intent intent = new Intent(LogInActivity.this, ForYouActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        Log.d("LoginActivity", "Called startActivity");
+                        finish();
+                        Log.d("LoginActivity", "Called finish()");
+                    });
                 }
                 else {
-                    etPassword.setError("Wrong password and/or email.");
-                    etEmail.setError("Wrong password and/or email.");
+                    // Add debug logging
+                    Log.d("LoginActivity", "Login failed: " + message);
+                    
+                    runOnUiThread(() -> {
+                        etPassword.setError("Wrong password and/or email.");
+                        etEmail.setError("Wrong password and/or email.");
+                    });
                 }
             });
 

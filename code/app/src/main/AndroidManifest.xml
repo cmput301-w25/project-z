@@ -32,5 +32,6 @@
         <activity android:name="com.example.z.views.FollowingActivity"/>
         <activity android:name="com.example.z.views.MapActivity"/>
         <activity android:name="com.example.z.views.NotificationActivity"/>
+        <activity android:name="com.example.z.views.ForYouActivity" />
     </application>
 </manifest>
