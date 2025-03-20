@@ -17,7 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * and save user profiles.
  *
  * Outstanding Issues:
- * - No retry mechanism for Firestore or Firebase Authentication failures.
+ * - None
  */
 public class SignUpController {
     private Context context;

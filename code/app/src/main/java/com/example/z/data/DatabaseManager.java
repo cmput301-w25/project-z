@@ -14,6 +14,9 @@ import java.util.Map;
 
 /**
  * Manages interactions with Firestore, including saving and editing mood entries.
+ *
+ *  Outstanding Issues:
+ *      - None
  */
 public class DatabaseManager {
     private FirebaseFirestore db;

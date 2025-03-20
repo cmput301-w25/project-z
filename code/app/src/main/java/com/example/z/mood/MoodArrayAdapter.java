@@ -22,6 +22,9 @@ import java.util.Locale;
 /**
  * Adapter for displaying a list of Mood objects in a RecyclerView.
  * This adapter binds mood data to the UI elements inside a mood card item.
+ *
+ *  Outstanding issues:
+ *      - None
  */
 public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.MoodViewHolder> {
     private List<Mood> moodList;

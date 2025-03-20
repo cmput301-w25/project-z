@@ -14,6 +14,9 @@ import java.util.Map;
 /**
  * Represents a mood entry in the application.
  * This class is used to store and retrieve mood-related data from Firestore.
+ *
+ *  Outstanding issues:
+ *      - None
  */
 public class Mood implements Serializable {
     private String userId;

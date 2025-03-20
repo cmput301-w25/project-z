@@ -2,6 +2,9 @@ package com.example.z.utils;
 
 /**
  * Represents different emotional states a user can have.
+ *
+ *  Outstanding issues:
+ *      - None
  */
 public enum userMoods {
     /**

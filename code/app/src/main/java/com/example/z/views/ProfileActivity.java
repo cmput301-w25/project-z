@@ -27,6 +27,9 @@ import java.util.List;
 /**
  * ProfileActivity displays the user's profile and their posted moods.
  * Users can add new moods, navigate between different sections, and view their mood history.
+ *
+ *  Outstanding Issues:
+ *      - Cannot add personal info yet
  */
 public class ProfileActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener {
     private FirebaseFirestore db;
