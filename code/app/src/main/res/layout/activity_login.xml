@@ -11,12 +11,13 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User Log In"
-        android:textSize="32sp"
-        android:textColor="@color/textColor"
-        android:fontFamily="@font/itim_regular"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp" />
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/itim_regular"
+        android:paddingRight="200dp"
+        android:text="Log In"
+        android:textColor="@color/textColor"
+        android:textSize="32sp" />
 
     <!-- Email Input Field -->
     <EditText
