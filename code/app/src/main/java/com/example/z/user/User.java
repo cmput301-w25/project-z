@@ -9,6 +9,7 @@ package com.example.z.user;
 public class User {
     private String email;
     private String username;
+    private String id;
 
     /**
      * Default constructor required for Firestore deserialization.
@@ -21,9 +22,10 @@ public class User {
      * @param email    The email address of the user.
      * @param username The username of the user.
      */
-    public User(String email, String username) {
+    public User(String email, String username, String id) {
         this.email = email;
         this.username = username;
+        this.id = id;
     }
 
     /**
@@ -60,6 +62,24 @@ public class User {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     * Retrieves the user's id.
+     *
+     * @return The id of the user.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the user's id.
+     *
+     * @param id The new id of the user.
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 }
 

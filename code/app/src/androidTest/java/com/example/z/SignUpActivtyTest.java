@@ -74,7 +74,7 @@ public class SignUpActivtyTest {
 
         auth.createUserWithEmailAndPassword("valid@example.com", "valid123")
                 .addOnCompleteListener(task -> {
-                    User user = new User("valid@example.com", "username1");
+                    User user = new User("valid@example.com", "username1", "jjsduw342");
                     userTestRef.document().set(user)
                             .addOnCompleteListener(firestoreTask -> {
                                 authLatch.countDown();
