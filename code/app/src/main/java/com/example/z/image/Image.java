@@ -10,6 +10,8 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -50,10 +52,14 @@ public class Image extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE);
     }
 
+    private static final int CAMERA_REQUEST = 100;
+
     private void capturePhoto() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, TAKE_PHOTO);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        } else {
+            Toast.makeText(this, "Camera not available", Toast.LENGTH_SHORT).show();
         }
     }
 

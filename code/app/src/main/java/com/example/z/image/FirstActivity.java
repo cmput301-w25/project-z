@@ -1,20 +1,15 @@
 package com.example.z.image;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.z.R;
 
 public class FirstActivity extends AppCompatActivity {
 
-    private static final int CAMERA_RESULT = 101;
-    private ImageButton btnTakePhoto;
-    private ImageView selectedImageView;
+    private ImageButton btnTakePhoto, btnSelectImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,20 +17,17 @@ public class FirstActivity extends AppCompatActivity {
         setContentView(R.layout.add_mood_event_alert_dialog);
 
         btnTakePhoto = findViewById(R.id.btn_take_photo);
-        selectedImageView = findViewById(R.id.imageView);
+        btnSelectImage = findViewById(R.id.btn_upload_image);
 
+        // Open Image.java when clicking the camera or gallery button
         btnTakePhoto.setOnClickListener(v -> {
-            Intent intent = new Intent(FirstActivity.this, CapturePhotoActivity.class);
-            startActivityForResult(intent, CAMERA_RESULT);
+            Intent intent = new Intent(FirstActivity.this, Image.class);
+            startActivity(intent);
         });
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_RESULT && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("capturedImage");
-            selectedImageView.setImageBitmap(photo);
-        }
+        btnSelectImage.setOnClickListener(v -> {
+            Intent intent = new Intent(FirstActivity.this, Image.class);
+            startActivity(intent);
+        });
     }
 }

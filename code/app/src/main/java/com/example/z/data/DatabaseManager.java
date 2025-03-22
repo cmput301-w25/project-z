@@ -2,6 +2,8 @@ package com.example.z.data;
 
 import static android.app.PendingIntent.getActivity;
 
+import android.net.Uri;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -45,7 +47,7 @@ public class DatabaseManager {
      * @param datePosted      The timestamp when the mood was created.
      */
     public void saveMood(String userId, DocumentReference moodDocRef, String username, String moodType,
-                         String description, String socialSituation, String trigger, Date datePosted) {
+                         String description, String socialSituation, String trigger, Date datePosted, Uri uri) {
         Map<String, Object> mood = new HashMap<>();
         mood.put("userId", userId);
         mood.put("username", username);
@@ -54,6 +56,7 @@ public class DatabaseManager {
         mood.put("situation", socialSituation);
         mood.put("trigger", trigger);
         mood.put("timestamp", datePosted);
+        mood.put("uri", uri);
 
         moodDocRef.set(mood)
                 .addOnSuccessListener(aVoid ->

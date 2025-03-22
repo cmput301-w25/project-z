@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_card"
@@ -9,173 +12,182 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/itim_regular"
-        android:text="How are you feeling?"
-        android:textColor="#0FA3B1"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <Spinner
-        android:id="@+id/spinner_mood"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/spinner_background" />
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/itim_regular"
-        android:text="Description for Mood Event"
-        android:textColor="#0FA3B1"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/edit_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1"
-        android:fontFamily="@font/itim_regular"
-        android:gravity="top"
-        android:hint="Describe your mood..."
-        android:inputType="textMultiLine"
-        android:lines="3"
-        android:padding="12dp"
-        android:textColor="#F9F7F3"
-        android:textColorHint="#F9F7F3" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/itim_regular"
-        android:text="#moods"
-        android:textColor="#0FA3B1"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <EditText
-        android:id="@+id/edit_hashtags"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1"
-        android:fontFamily="@font/itim_regular"
-        android:hint="Add hashtags..."
-        android:inputType="text"
-        android:padding="12dp"
-        android:textColor="#F9F7F3"
-        android:textColorHint="#F9F7F3" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/itim_regular"
-        android:text="What is The Social Situation"
-        android:textColor="#0FA3B1"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-
-
-    <Spinner
-        android:id="@+id/spinner_social_situation"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/spinner_background" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/btn_emoji_picker"
-            android:layout_width="60dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/rounded_button"
-            android:backgroundTint="#0FA3B1"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_mood"
-            app:tint="#F9F7F3" />
-
-        <ImageButton
-            android:id="@+id/btn_upload_image"
-            android:layout_width="60dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/rounded_button"
-            android:backgroundTint="#0FA3B1"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/upload_image"
-            app:tint="#F9F7F3" />
-
-
-        <ImageButton
-            android:id="@+id/btn_take_photo"
-            android:layout_width="60dp"
-            android:layout_height="42dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/rounded_button"
-            android:backgroundTint="#0FA3B1"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/take_image"
-            app:tint="#F9F7F3" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="end"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/btn_attach_location"
-            android:layout_width="60dp"
-            android:layout_height="42dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/rounded_button"
-            android:backgroundTint="#0FA3B1"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/map_marker_white"
-            app:tint="#F9F7F3" />
-
-        <Button
-            android:id="@+id/btn_post"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:backgroundTint="#0FA3B1"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
-            android:insetTop="4dp"
-            android:insetBottom="4dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:text="Post"
-            android:textColor="#F9F7F3"
+            android:text="How are you feeling?"
+            android:textColor="#0FA3B1"
             android:textSize="16sp"
             android:textStyle="bold" />
-    </LinearLayout>
 
-</LinearLayout>
+        <Spinner
+            android:id="@+id/spinner_mood"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/spinner_background" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/itim_regular"
+            android:text="Description for Mood Event"
+            android:textColor="#0FA3B1"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edit_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#0FA3B1"
+            android:fontFamily="@font/itim_regular"
+            android:gravity="top"
+            android:hint="Describe your mood..."
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:padding="12dp"
+            android:textColor="#F9F7F3"
+            android:textColorHint="#F9F7F3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/itim_regular"
+            android:text="#moods"
+            android:textColor="#0FA3B1"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edit_hashtags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#0FA3B1"
+            android:fontFamily="@font/itim_regular"
+            android:hint="Add hashtags..."
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="#F9F7F3"
+            android:textColorHint="#F9F7F3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/itim_regular"
+            android:text="What is The Social Situation"
+            android:textColor="#0FA3B1"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+
+
+        <Spinner
+            android:id="@+id/spinner_social_situation"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/spinner_background" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_emoji_picker"
+                android:layout_width="60dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#0FA3B1"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_mood"
+                app:tint="#F9F7F3" />
+
+            <ImageButton
+                android:id="@+id/btn_upload_image"
+                android:layout_width="60dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#0FA3B1"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/upload_image"
+                app:tint="#F9F7F3" />
+
+
+            <ImageButton
+                android:id="@+id/btn_take_photo"
+                android:layout_width="60dp"
+                android:layout_height="42dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#0FA3B1"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/take_image"
+                app:tint="#F9F7F3" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="fitCenter"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_attach_location"
+                android:layout_width="60dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/rounded_button"
+                android:backgroundTint="#0FA3B1"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/map_marker_white"
+                app:tint="#F9F7F3" />
+
+            <Button
+                android:id="@+id/btn_post"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:backgroundTint="#0FA3B1"
+                android:fontFamily="@font/itim_regular"
+                android:insetTop="4dp"
+                android:insetBottom="4dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Post"
+                android:textColor="#F9F7F3"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

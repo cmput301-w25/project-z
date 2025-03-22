@@ -1,5 +1,7 @@
 package com.example.z.mood;
 
+import android.net.Uri;
+
 import com.google.firebase.firestore.PropertyName;
 
 import java.io.Serializable;
@@ -29,6 +31,8 @@ public class Mood implements Serializable {
     private String description;
     private String documentId;
 
+    private Uri imgUri;
+
     /**
      * Constructs a Mood object with all required fields.
      *
@@ -43,7 +47,7 @@ public class Mood implements Serializable {
      * @param description     A short description of the user's mood.
      */
     public Mood(String userId, String documentId, String username, String emotionalState, String trigger,
-                String socialSituation, Date createdAt, Map<String, Object> location, String description) {
+                String socialSituation, Date createdAt, Map<String, Object> location, String description, Uri uri) {
         this.userId = userId;
         this.documentId = documentId;
         this.username = username;
@@ -53,6 +57,7 @@ public class Mood implements Serializable {
         this.createdAt = createdAt;
         this.location = location;
         this.description = description;
+        this.imgUri = uri;
     }
 
     /**
