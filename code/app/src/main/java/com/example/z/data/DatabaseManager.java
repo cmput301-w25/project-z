@@ -52,7 +52,7 @@ public class DatabaseManager {
      * @param datePosted      The timestamp when the mood was created.
      */
     public void saveMood(String userId, DocumentReference moodDocRef, String username, String moodType,
-                         String description, String socialSituation, String trigger, Date datePosted, Uri uri) {
+                         String description, String socialSituation, String trigger, Date datePosted, String img) {
         Map<String, Object> mood = new HashMap<>();
         mood.put("userId", userId);
         mood.put("username", username);
@@ -61,8 +61,8 @@ public class DatabaseManager {
         mood.put("situation", socialSituation);
         mood.put("trigger", trigger);
         mood.put("timestamp", datePosted);
-
-        imgRef.putFile(uri)
+        mood.put("img", img);
+        /*imgRef.putFile(uri)
                 .addOnSuccessListener(taskSnapshot -> {
                     imgRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
                         mood.put("uri", uri1);
@@ -72,7 +72,7 @@ public class DatabaseManager {
                     imgRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
                     mood.put("uri", uri1);
                 });
-        });
+        }); */
 
         moodDocRef.set(mood)
                 .addOnSuccessListener(aVoid ->
@@ -96,7 +96,7 @@ public class DatabaseManager {
      * @param onFailureListener Callback for failure during update.
      */
     public void editMood(String moodId, String userId, String moodType, String description,
-                         String socialSituation, String trigger, Date updatedAt, Uri uri,
+                         String socialSituation, String trigger, Date updatedAt, String img,
                          OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         DocumentReference moodRef = moodsRef.document(moodId);
 
@@ -107,14 +107,15 @@ public class DatabaseManager {
         updatedData.put("situation", socialSituation);
         updatedData.put("timestamp", updatedAt);
 
-        if (uri != null) {
-            imgRef.putFile(uri)
+        if (img != null) {
+            updatedData.put("img", img);
+            /*imgRef.putFile(uri)
                     .addOnSuccessListener(taskSnapshot -> {
                         imgRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
                             String imageUrl = uri1.toString();
                             updatedData.put("uri", imageUrl);
                         });
-                    });
+                    });*/
         }
 
         // Fetch latest username in case it has changed

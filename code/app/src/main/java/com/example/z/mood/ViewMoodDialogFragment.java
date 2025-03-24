@@ -18,6 +18,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
 import com.example.z.R;
+import com.example.z.utils.ImgUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -87,9 +88,10 @@ public class ViewMoodDialogFragment extends DialogFragment {
         tvMoodDate.setText(new java.text.SimpleDateFormat("MMM dd, yyyy - HH:mm").format(mood.getCreatedAt()));
 
         // Hide or show image placeholder (Image upload not implemented yet)
-        if (mood.getUri() != null) {
+        if (mood.getImg() != null) {
             imgMoodPost.setVisibility(View.VISIBLE);
-            Glide.with(getContext()).load(mood.getUri().toString()).into(imgMoodPost);
+            ImgUtil.displayBase64Image(mood.getImg(),imgMoodPost);
+//            Glide.with(getContext()).load(mood.getUri().toString()).into(imgMoodPost);
         } else {
             imgMoodPost.setVisibility(View.GONE);
         }

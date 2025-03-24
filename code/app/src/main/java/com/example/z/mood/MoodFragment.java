@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -32,6 +33,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.z.data.DatabaseManager;
 import com.example.z.R;
+import com.example.z.utils.ImgUtil;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,6 +69,8 @@ public class MoodFragment extends DialogFragment {
     private FirebaseFirestore db;
     private OnMoodAddedListener moodAddedListener;
     private Uri imgUri;
+    private String img;
+    private String imgPath;
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
     private static final int PICK_IMAGE = 1;
@@ -190,7 +194,7 @@ public class MoodFragment extends DialogFragment {
         DocumentReference moodDocRef = db.collection("moods").document();
         String documentId = moodDocRef.getId();
 
-        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description, imgUri);
+        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description, img);
 
         // Save Mood
         saveMoodToFirebase(moodDocRef, newMood);
@@ -203,7 +207,7 @@ public class MoodFragment extends DialogFragment {
      * @param mood       The Mood object containing user input.
      */
     private void saveMoodToFirebase(DocumentReference moodDocRef, Mood mood) {
-        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), imgUri);
+        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), img);
 
         // Notify UI & Close Dialog
         if (moodAddedListener != null) {
@@ -252,6 +256,7 @@ public class MoodFragment extends DialogFragment {
                 File photoFile = createImageFile();
                 imgUri = FileProvider.getUriForFile(getContext(),
                         "com.example.z", photoFile);
+                imgPath = photoFile.getAbsolutePath();
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
                 startActivityForResult(cameraIntent, TAKE_PHOTO);
             }
@@ -265,12 +270,21 @@ public class MoodFragment extends DialogFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && data != null) {
             imgUri = data.getData();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                try {
+                    imgPath = ImgUtil.createTempFile(getContext(), imgUri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         try {
-            InputStream imageStream = getActivity().getContentResolver().openInputStream(imgUri);
-            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-            imageView.setImageBitmap(selectedImage);
-        } catch (FileNotFoundException e) {
+//            InputStream imageStream = getActivity().getContentResolver().openInputStream(imgUri);
+//            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//            imageView.setImageBitmap(selectedImage);
+            img = ImgUtil.compressToBase64(imgPath);
+            ImgUtil.displayBase64Image(img, imageView);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -300,5 +314,6 @@ public class MoodFragment extends DialogFragment {
             }
         }
     }
+
 }
 

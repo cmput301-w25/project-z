@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.z.utils.ImgUtil;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -84,10 +85,12 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
         }
 
-        if (holder.imgMood != null && mood.getUri() != null) {
-            Glide.with(this.context).load(mood.getUri().toString()).into(holder.imgMood);
+       /* if (holder.imgMood != null && mood.getImg() != null) {
+            ImgUtil.displayBase64Image(mood.getImg(), holder.imgMood);
+//            Glide.with(this.context).load(mood.getImg().toString()).into(holder.imgMood);
         }
-
+/*/
+        
         Date moodDate = mood.getCreatedAt();
         if (moodDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault());

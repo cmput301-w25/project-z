@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -33,6 +34,7 @@ import com.bumptech.glide.Glide;
 import com.example.z.data.DatabaseManager;
 import com.example.z.R;
 import com.example.z.image.Image;
+import com.example.z.utils.ImgUtil;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,6 +87,8 @@ public class EditMoodFragment extends DialogFragment {
     private FirebaseAuth auth;
     private String moodId;
     private Uri uri;
+    private String img;
+    private String imgPath;
     private OnMoodUpdatedListener moodUpdatedListener;
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
@@ -105,8 +109,8 @@ public class EditMoodFragment extends DialogFragment {
         args.putString("trigger", mood.getTrigger());
         args.putString("moodType", mood.getEmotionalState());
         args.putString("socialSituation", mood.getSocialSituation());
-        if (mood.getUri() != null) {
-            args.putString("uri", mood.getUri().toString());
+        if (mood.getImg() != null) {
+            args.putString("img", mood.getImg());
         }
         fragment.setArguments(args);
         return fragment;
@@ -193,9 +197,10 @@ public class EditMoodFragment extends DialogFragment {
                 }
             }
 
-            if (getArguments().getString("uri") != null) {
-                uri = Uri.parse(getArguments().getString("uri"));
-                Glide.with(getContext()).load(uri.toString()).into(imageView);
+            if (getArguments().getString("img") != null) {
+                img = getArguments().getString("img");
+                //Glide.with(getContext()).load(uri.toString()).into(imageView);
+                ImgUtil.displayBase64Image(img, imageView);
             }
         }
 
@@ -239,7 +244,7 @@ public class EditMoodFragment extends DialogFragment {
 
         // Update mood entry in Firestore using DatabaseManager
         databaseManager.editMood(moodId, userId, selectedMood.toString(), updatedDescription,
-                socialSituation.toString(), updatedTrigger, updatedAt, uri,
+                socialSituation.toString(), updatedTrigger, updatedAt, img,
                 aVoid -> {
                     if (moodUpdatedListener != null) {
                         moodUpdatedListener.onMoodUpdated();
@@ -283,9 +288,22 @@ public class EditMoodFragment extends DialogFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && data != null) {
             uri = data.getData();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                try {
+                    imgPath = ImgUtil.createTempFile(getContext(), uri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
-        if (uri != null) {
-            Glide.with(getContext()).load(uri.toString()).into(imageView);
+
+        try {
+            img = ImgUtil.compressToBase64(imgPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (img != null) {
+            ImgUtil.displayBase64Image(img, imageView);
         }
     }
     private void openGallery() {
@@ -302,6 +320,7 @@ public class EditMoodFragment extends DialogFragment {
                 File photoFile = createImageFile();
                 uri = FileProvider.getUriForFile(getContext(),
                         "com.example.z", photoFile);
+                imgPath = photoFile.getAbsolutePath();
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
                 startActivityForResult(cameraIntent, TAKE_PHOTO);
             }
