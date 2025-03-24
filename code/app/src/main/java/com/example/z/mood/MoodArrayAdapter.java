@@ -1,20 +1,26 @@
 package com.example.z.mood;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -78,6 +84,10 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
         }
 
+        if (holder.imgMood != null && mood.getUri() != null) {
+            Glide.with(this.context).load(mood.getUri().toString()).into(holder.imgMood);
+        }
+
         Date moodDate = mood.getCreatedAt();
         if (moodDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault());
@@ -130,6 +140,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
      */
     public static class MoodViewHolder extends RecyclerView.ViewHolder {
         TextView moodText, descriptionText, dateText, moodTag;
+        ImageView imgMood;
 
         /**
          * Constructor for MoodViewHolder.
@@ -142,6 +153,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             descriptionText = itemView.findViewById(R.id.tvMoodDescription);
             moodTag = itemView.findViewById(R.id.tvMoodTag);
             dateText = itemView.findViewById(R.id.tvMoodDate);
+            imgMood = itemView.findViewById(R.id.imgMood);
         }
     }
 }

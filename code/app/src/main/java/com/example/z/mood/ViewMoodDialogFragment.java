@@ -1,6 +1,8 @@
 package com.example.z.mood;
 
 import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.z.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * A dialog fragment that displays details of a selected mood post.
@@ -80,16 +86,13 @@ public class ViewMoodDialogFragment extends DialogFragment {
         // Format and display the mood's timestamp
         tvMoodDate.setText(new java.text.SimpleDateFormat("MMM dd, yyyy - HH:mm").format(mood.getCreatedAt()));
 
-        /*
         // Hide or show image placeholder (Image upload not implemented yet)
-        if (mood.getImageUrl() != null && !mood.getImageUrl().isEmpty()) {
+        if (mood.getUri() != null) {
             imgMoodPost.setVisibility(View.VISIBLE);
-            // TODO: Load image using Glide or Picasso
-            // Glide.with(getContext()).load(mood.getImageUrl()).into(imgMoodPost);
+            Glide.with(getContext()).load(mood.getUri().toString()).into(imgMoodPost);
         } else {
             imgMoodPost.setVisibility(View.GONE);
         }
-        */
 
         // Show Delete button only if the logged-in user owns this post
         String currentUserId = auth.getCurrentUser().getUid();

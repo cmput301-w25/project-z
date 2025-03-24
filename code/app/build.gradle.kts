@@ -50,6 +50,9 @@ dependencies {
     //implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.espresso.contrib)
+    implementation(libs.firebase.storage)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.firebase.storage)
 
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies

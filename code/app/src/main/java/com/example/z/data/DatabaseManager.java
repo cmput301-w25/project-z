@@ -9,10 +9,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Manages interactions with Firestore, including saving and editing mood entries.
@@ -24,7 +27,8 @@ public class DatabaseManager {
     private FirebaseFirestore db;
     private CollectionReference usersRef;
     private CollectionReference moodsRef;
-
+    private StorageReference imgRef;
+    private String impref = "imgs";
     /**
      * Initializes the Firestore database and references the "users" and "moods" collections.
      */
@@ -32,6 +36,7 @@ public class DatabaseManager {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         moodsRef = db.collection("moods");
+        imgRef = FirebaseStorage.getInstance().getReference("user_images/" + UUID.randomUUID() + ".jpg");
     }
 
     /**
@@ -56,13 +61,25 @@ public class DatabaseManager {
         mood.put("situation", socialSituation);
         mood.put("trigger", trigger);
         mood.put("timestamp", datePosted);
-        mood.put("uri", uri);
+
+        imgRef.putFile(uri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    imgRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
+                        mood.put("uri", uri1);
+                    });
+                })
+                .addOnFailureListener(taskSnapshot -> {
+                    imgRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
+                    mood.put("uri", uri1);
+                });
+        });
 
         moodDocRef.set(mood)
                 .addOnSuccessListener(aVoid ->
                         System.out.println("Mood saved with ID: " + moodDocRef.getId()))
                 .addOnFailureListener(e ->
                         System.err.println("Error saving mood: " + e));
+
     }
 
     /**
@@ -79,7 +96,7 @@ public class DatabaseManager {
      * @param onFailureListener Callback for failure during update.
      */
     public void editMood(String moodId, String userId, String moodType, String description,
-                         String socialSituation, String trigger, Date updatedAt,
+                         String socialSituation, String trigger, Date updatedAt, Uri uri,
                          OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         DocumentReference moodRef = moodsRef.document(moodId);
 
@@ -89,6 +106,16 @@ public class DatabaseManager {
         updatedData.put("type", moodType);
         updatedData.put("situation", socialSituation);
         updatedData.put("timestamp", updatedAt);
+
+        if (uri != null) {
+            imgRef.putFile(uri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        imgRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
+                            String imageUrl = uri1.toString();
+                            updatedData.put("uri", imageUrl);
+                        });
+                    });
+        }
 
         // Fetch latest username in case it has changed
         usersRef.document(userId).get()

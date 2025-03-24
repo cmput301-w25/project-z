@@ -30,8 +30,7 @@ public class Mood implements Serializable {
     private Map<String, Object> location;
     private String description;
     private String documentId;
-
-    private Uri imgUri;
+    private String imgUri;
 
     /**
      * Constructs a Mood object with all required fields.
@@ -57,7 +56,7 @@ public class Mood implements Serializable {
         this.createdAt = createdAt;
         this.location = location;
         this.description = description;
-        this.imgUri = uri;
+        this.imgUri = uri.toString();
     }
 
     /**
@@ -155,6 +154,11 @@ public class Mood implements Serializable {
         return description;
     }
 
+    @PropertyName("uri")
+    public String getUri() {
+        return imgUri;
+    }
+
     // Setters
 
     /**
@@ -243,6 +247,10 @@ public class Mood implements Serializable {
     @PropertyName("userId")
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+    @PropertyName("uri")
+    public void setUri(String uri) {
+        this.imgUri = uri;
     }
 }
 
