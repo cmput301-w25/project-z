@@ -1,5 +1,7 @@
 package com.example.z.user;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,8 @@ import java.util.List;
 
 import com.example.z.R;
 import com.example.z.user.SearchUserController;
+import com.example.z.views.ProfileActivity;
+import com.example.z.views.PublicProfileActivity;
 
 public class UserArrayAdapter extends RecyclerView.Adapter<UserArrayAdapter.UserViewHolder> {
 
@@ -30,15 +34,21 @@ public class UserArrayAdapter extends RecyclerView.Adapter<UserArrayAdapter.User
     public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_card, parent, false);
         return new UserViewHolder(view);
+
     }
 
     @Override
     public void onBindViewHolder(UserViewHolder holder, int position) {
         User user = userList.get(position);
         holder.usernameTextView.setText(user.getUsername());
-        // Handle Follow button click
-        holder.followButton.setOnClickListener(v -> {
-            searchUserController.requestToFollow(currentUserId, user.getId());
+
+        // **Make the user card clickable to open ProfileActivity**
+        holder.itemView.setOnClickListener(v -> {
+            Context context = v.getContext();
+            Intent intent = new Intent(context, PublicProfileActivity.class);
+            intent.putExtra("userId", user.getId());  // Pass user ID
+            intent.putExtra("username", user.getUsername());  // Pass username
+            context.startActivity(intent);
         });
     }
 
@@ -55,12 +65,10 @@ public class UserArrayAdapter extends RecyclerView.Adapter<UserArrayAdapter.User
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView usernameTextView;
-        Button followButton;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.usernameUc);
-            followButton = itemView.findViewById(R.id.followButton);
         }
     }
 }

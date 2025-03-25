@@ -162,15 +162,6 @@ public class DatabaseManager {
                         System.err.println("Error accepting follow request: " + e));
     }
 
-    public void denyFollowRequest(String followerId, String followedId) {
-        DocumentReference followRef = followersRef.document(followerId + "_" + followedId);
-
-        followRef.delete()
-                .addOnSuccessListener(aVoid ->
-                        System.out.println("Follow request denied for: " + followerId))
-                .addOnFailureListener(e ->
-                        System.err.println("Error denying follow request: " + e));
-    }
 
     public void getPendingFollowRequests(String userId) {
         followersRef.whereEqualTo("followedId", userId)

@@ -52,17 +52,17 @@
                     android:layout_marginTop="8dp"
                     android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/followButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:backgroundTint="#B30FA3B1"
-                        android:fontFamily="@font/itim_regular"
-                        android:text="@string/request_follow"
-                        android:textColor="#F9F7F3"
-                        android:textSize="12sp"
-                        app:cornerRadius="50dp" />
+<!--                    <Button-->
+<!--                        android:id="@+id/followButton"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:backgroundTint="#B30FA3B1"-->
+<!--                        android:fontFamily="@font/itim_regular"-->
+<!--                        android:text="@string/request_follow"-->
+<!--                        android:textColor="#F9F7F3"-->
+<!--                        android:textSize="12sp"-->
+<!--                        app:cornerRadius="50dp" />-->
 
 
                 </LinearLayout>
