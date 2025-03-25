@@ -9,17 +9,23 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.z.data.DatabaseManager;
 import com.example.z.R;
+import com.example.z.utils.GetEmoji;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -45,6 +51,9 @@ public class MoodFragment extends DialogFragment {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private OnMoodAddedListener moodAddedListener;
+    private String userStringEmoji;
+    private ImageButton btnEmoji;
+    private SwitchCompat privateSwitch;
 
     /**
      * Called to create the dialog for adding a new mood post.
@@ -60,6 +69,9 @@ public class MoodFragment extends DialogFragment {
         edit_mood_emotion = view.findViewById(R.id.spinner_mood);
         edit_mood_description = view.findViewById(R.id.edit_description);
         edit_trigger = view.findViewById(R.id.edit_hashtags);
+
+        btnEmoji = view.findViewById(R.id.btn_emoji_picker);
+        privateSwitch = view.findViewById(R.id.switch_privacy);
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -89,7 +101,8 @@ public class MoodFragment extends DialogFragment {
             dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_dialog_box);
         }
 
-        // Set up button listener
+        // Set up button listeners
+        btnEmoji.setOnClickListener(v -> displayEmojiView());
         postButton.setOnClickListener(v -> validateAndPostMood());
 
         return dialog;
@@ -102,6 +115,26 @@ public class MoodFragment extends DialogFragment {
      */
     public void setMoodAddedListener(OnMoodAddedListener listener) {
         this.moodAddedListener = listener;
+    }
+
+    private void displayEmojiView() {
+
+        BottomSheetDialog bottomSheet = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.emoticon_picker, null);
+        bottomSheet.setContentView(view);
+
+        GridView emojiView = view.findViewById(R.id.emojiView);
+        int[] emojis = GetEmoji.getEmojiList();
+
+        EmojiAdapter adapter = new EmojiAdapter(getContext(), emojis);
+        emojiView.setAdapter(adapter);
+
+        emojiView.setOnItemClickListener(((parent, view1, position, id) -> {
+            userStringEmoji = getResources().getResourceEntryName(emojis[position]);
+            btnEmoji.setImageResource(emojis[position]);
+            bottomSheet.dismiss();
+        }));
+        bottomSheet.show();
     }
 
     /**
@@ -121,7 +154,8 @@ public class MoodFragment extends DialogFragment {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists() && documentSnapshot.contains("username")) {
                         String username = documentSnapshot.getString("username");
-                        validateInputsAndSave(userId, username);
+                        boolean isPrivate = privateSwitch.isChecked();
+                        validateInputsAndSave(userId, username, userStringEmoji, isPrivate);
                     } else {
                         Toast.makeText(getContext(), "Username not found!", Toast.LENGTH_SHORT).show();
                     }
@@ -138,7 +172,7 @@ public class MoodFragment extends DialogFragment {
      * @param userId   The Firebase user ID.
      * @param username The username associated with the user.
      */
-    private void validateInputsAndSave(String userId, String username) {
+    private void validateInputsAndSave(String userId, String username, String userStringEmoji, boolean isPrivate) {
         userMoods selectedMood = (userMoods) edit_mood_emotion.getSelectedItem();
         SocialSituations socialSituation = (SocialSituations) edit_social_situation.getSelectedItem();
         String description = edit_mood_description.getText().toString().trim();
@@ -152,15 +186,15 @@ public class MoodFragment extends DialogFragment {
         }
 
         // Description Validation
-        if (description.length() > 20) {
-            showErrorDialog("Description must be 20 characters max!");
+        if (description.length() > 200) {
+            showErrorDialog("Description must be 200 characters max!");
             return;
         }
 
         DocumentReference moodDocRef = db.collection("moods").document();
         String documentId = moodDocRef.getId();
 
-        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description);
+        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description, userStringEmoji, isPrivate);
 
         // Save Mood
         saveMoodToFirebase(moodDocRef, newMood);
@@ -173,7 +207,7 @@ public class MoodFragment extends DialogFragment {
      * @param mood       The Mood object containing user input.
      */
     private void saveMoodToFirebase(DocumentReference moodDocRef, Mood mood) {
-        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt());
+        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), mood.getEmoticon(), mood.isPrivate());
 
         // Notify UI & Close Dialog
         if (moodAddedListener != null) {
@@ -202,7 +236,7 @@ public class MoodFragment extends DialogFragment {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Error")
                 .setMessage(message)
-                .setIcon(android.R.drawable.ic_dialog_alert) // Adds a red exclamation mark icon
+                .setIcon(android.R.drawable.ic_dialog_alert) // Adds an alert dialog for errors
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }

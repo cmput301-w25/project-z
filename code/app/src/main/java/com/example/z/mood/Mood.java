@@ -28,6 +28,8 @@ public class Mood implements Serializable {
     private Map<String, Object> location;
     private String description;
     private String documentId;
+    private String emoticon;
+    private boolean isPrivate;
 
     /**
      * Constructs a Mood object with all required fields.
@@ -43,7 +45,7 @@ public class Mood implements Serializable {
      * @param description     A short description of the user's mood.
      */
     public Mood(String userId, String documentId, String username, String emotionalState, String trigger,
-                String socialSituation, Date createdAt, Map<String, Object> location, String description) {
+                String socialSituation, Date createdAt, Map<String, Object> location, String description, String emoticon, boolean isPrivate) {
         this.userId = userId;
         this.documentId = documentId;
         this.username = username;
@@ -53,6 +55,8 @@ public class Mood implements Serializable {
         this.createdAt = createdAt;
         this.location = location;
         this.description = description;
+        this.emoticon = emoticon;
+        this.isPrivate = isPrivate;
     }
 
     /**
@@ -150,6 +154,16 @@ public class Mood implements Serializable {
         return description;
     }
 
+    @PropertyName("emoji")
+    public String getEmoticon() {
+        return emoticon;
+    }
+
+    @PropertyName("private post")
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
     // Setters
 
     /**
@@ -238,6 +252,16 @@ public class Mood implements Serializable {
     @PropertyName("userId")
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    @PropertyName("emoji")
+    public void setEmoticon(String emoticon) {
+        this.emoticon = emoticon;
+    }
+
+    @PropertyName("private post")
+    public void setPrivate(boolean isItPrivate) {
+        isPrivate = isItPrivate;
     }
 }
 
