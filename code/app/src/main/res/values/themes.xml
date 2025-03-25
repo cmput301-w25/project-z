@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.Z" parent="Base.Theme.Z" />
+
+    <style name="privateSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">#0A9396</item>
+        <item name="colorSwitchThumbNormal">#EE9B00</item>
+        <item name="android:colorForeground">#42EE9B00</item>
+    </style>
 </resources>
