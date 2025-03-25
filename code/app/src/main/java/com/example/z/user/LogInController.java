@@ -39,15 +39,16 @@ public class LogInController {
      *      The user's password.
      */
     public void loginUser(String email, String password, AccessCallBack callback) {
-        Log.d("LoginController", "Starting login attempt");
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("LoginController", "Firebase auth successful");
+                        // Provide feedback
+                        Log.d("LoginTest", "Login successful!");
                         Toast.makeText(context, "Login successful!", Toast.LENGTH_SHORT).show();
                         callback.onAccessResult(true, "Login successful!");
                     } else {
-                        Log.d("LoginController", "Firebase auth failed: " + task.getException().getMessage());
+                        // Provide feedback
+                        Log.d("LoginTest", "Login failed: " + task.getException().getMessage());
                         Toast.makeText(context, "Wrong email and/or password!", Toast.LENGTH_SHORT).show();
                         callback.onAccessResult(false, "Login failed!");
                     }

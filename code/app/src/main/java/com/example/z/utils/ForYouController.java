@@ -14,14 +14,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller class that handles fetching and recommenation logic for similar moods
+ * Uses Firebase Firestore to store and retrieve mood data.
+ */
 public class ForYouController {
-    private static final int MAX_USER_MOODS = 10;
-    private static final int MAX_SIMILAR_MOODS = 20;
+    private static final int MAX_USER_MOODS = 10;      // Maximum number of user's moods to analyze
+    private static final int MAX_SIMILAR_MOODS = 20;   // Maximum number of similar moods to return
 
     private final String userId;
     private final FirebaseFirestore db;
     private List<Mood> userMoods;
 
+    /**
+     * Constructor for ForYouController.
+     * @param userId
+     *      The ID of the current user.
+     */
     public ForYouController(String userId) {
         this.userId = userId;
         this.db = FirebaseFirestore.getInstance();
@@ -37,12 +46,22 @@ public class ForYouController {
         void onComplete();
     }
 
+    /**
+     * Updates user's mood history from Firestore.
+     * @param callback
+     *      Callback to be called when refresh is complete.
+     */
     public void refreshUserMoods(RefreshCallback callback) {
         fetchUserMoods(() -> {
             callback.onComplete();
         });
     }
 
+    /**
+     * Retrieves similar moods based on user's mood history.
+     * @param callback
+     *      Callback to confirm retrieval or error.
+     */
     public void getSimilarMoods(SimilarMoodsCallback callback) {
         if (userMoods.isEmpty()) {
             // First time loading - fetch user moods first
@@ -55,6 +74,11 @@ public class ForYouController {
         }
     }
 
+    /**
+     * Fetches the user's recent moods from Firestore.
+     * @param callback
+     *      Callback to confirm retrieval or error.
+     */
     private void fetchUserMoods(RefreshCallback callback) {
         db.collection("moods")
                 .whereEqualTo("userId", userId)
@@ -70,11 +94,15 @@ public class ForYouController {
                     callback.onComplete();
                 })
                 .addOnFailureListener(e -> {
-                    // Handle error
                     callback.onComplete();
                 });
     }
 
+    /**
+     * Finds similar moods based on user's mood patterns.
+     * @param callback
+     *      Callback to confirm retrieval or error.
+     */
     private void findSimilarMoods(SimilarMoodsCallback callback) {
         if (userMoods.isEmpty()) {
             // No user moods to base recommendations on
@@ -135,6 +163,13 @@ public class ForYouController {
                 });
     }
 
+    /**
+     * Converts a Firestore document to a Mood object.
+     * @param document
+     *      The Firestore document to convert.
+     * @return
+     *      A new Mood object containing the document data.
+     */
     @NonNull
     private Mood documentToMood(DocumentSnapshot document) {
         String docId = document.getId();
@@ -159,6 +194,13 @@ public class ForYouController {
                 timestamp, location, description);
     }
 
+    /**
+     * Finds the most common value in a frequency map.
+     * @param frequencyMap
+     *      Map containing values and their frequencies.
+     * @return
+     *      The most common value, or null if map is empty.
+     */
     private String getMostCommon(Map<String, Integer> frequencyMap) {
         if (frequencyMap.isEmpty()) {
             return null;

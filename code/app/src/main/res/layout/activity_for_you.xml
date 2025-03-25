@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Main container using ConstraintLayout for flexible positioning -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,6 +8,7 @@
     android:background="@color/black"
     tools:context=".views.ForYouActivity">
 
+    <!-- Top navigation tabs -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
@@ -17,11 +19,13 @@
         app:tabIndicatorColor="@color/white"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- For You tab - shows personalized mood recommendations -->
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="For You" />
 
+        <!-- Following tab - navigates to following feed -->
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,6 +33,7 @@
 
     </com.google.android.material.tabs.TabLayout>
 
+    <!-- Pull-to-refresh container for the mood list -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="0dp"
@@ -38,6 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tab_layout">
 
+        <!-- RecyclerView to display the list of mood cards -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_similar_moods"
             android:layout_width="match_parent"
@@ -48,6 +54,7 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!-- Loading indicator shown while fetching moods -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
@@ -58,6 +65,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tab_layout" />
 
+    <!-- Message shown when no moods are available -->
     <TextView
         android:id="@+id/empty_state_text"
         android:layout_width="0dp"

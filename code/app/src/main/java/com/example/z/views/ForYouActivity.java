@@ -23,6 +23,11 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ForYouActivity displays recommended mood posts of other users based of current user's mood history.
+ * A mood and users discovery page.
+ */
+
 public class ForYouActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MoodArrayAdapter moodAdapter;
@@ -34,10 +39,12 @@ public class ForYouActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private TabLayout.OnTabSelectedListener tabListener;
 
+    /**
+     * Saves the current tab selection when activity is recreated
+     */
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        // Save any necessary state
         outState.putInt("selected_tab", tabLayout.getSelectedTabPosition());
     }
 
@@ -46,44 +53,44 @@ public class ForYouActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_for_you);
 
-        // Initialize UI elements
+        // Initialize UI elements from layout
         recyclerView = findViewById(R.id.recycler_view_similar_moods);
         progressBar = findViewById(R.id.progress_bar);
         emptyStateText = findViewById(R.id.empty_state_text);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         tabLayout = findViewById(R.id.tab_layout);
 
-        // Set up RecyclerView with MoodArrayAdapter
+        // Set up RecyclerView with adapter
         similarMoods = new ArrayList<>();
         moodAdapter = new MoodArrayAdapter(this, similarMoods);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(moodAdapter);
 
-        // Initialize controller
+        // Check if user is logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             forYouController = new ForYouController(userId);
 
-            // Set up swipe refresh
+            // Set up pull-to-refresh functionality
             swipeRefreshLayout.setOnRefreshListener(this::refreshSimilarMoods);
 
-            // Initial load of similar moods
+            // Load initial mood recommendations
             loadSimilarMoods();
 
-            // Store listener in a field for cleanup
+            // Set up tab navigation
             tabListener = new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     switch (tab.getPosition()) {
                         case 0: // "For You" tab
-                            loadSimilarMoods();
+                            loadSimilarMoods();  // Refresh recommendations
                             break;
                         case 1: // "Following" tab
-                            // Start Following Activity
+                            // Navigate to HomeActivity
                             Intent intent = new Intent(ForYouActivity.this, HomeActivity.class);
                             startActivity(intent);
-                            // Reset tab selection to "For You" since we're leaving this activity
+                            // Reset to "For You" tab
                             tabLayout.getTabAt(0).select();
                             break;
                     }
@@ -96,21 +103,28 @@ public class ForYouActivity extends AppCompatActivity {
 
                 @Override
                 public void onTabReselected(TabLayout.Tab tab) {
-                    // Optional: Handle tab reselection (e.g., scroll to top)
+                    if (tab.getPosition() == 0) {  // For You tab
+                        // Scroll to top when reselecting For You tab
+                        recyclerView.smoothScrollToPosition(0);
+                    }
                 }
             };
             tabLayout.addOnTabSelectedListener(tabListener);
         } else {
-            // Handle not logged in state
+            // Show message if user is not logged in
             showEmptyState("Please log in to see personalized content");
         }
 
+        // Restore previous tab selection if activity was recreated
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt("selected_tab", 0);
             tabLayout.selectTab(tabLayout.getTabAt(selectedTab));
         }
     }
 
+    /**
+     * Clean up tab listener when activity is destroyed
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -119,6 +133,9 @@ public class ForYouActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Refreshes user's mood recommendations
+     */
     private void refreshSimilarMoods() {
         forYouController.refreshUserMoods(() -> {
             loadSimilarMoods();
@@ -128,6 +145,9 @@ public class ForYouActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads and displays similar moods based on user's history
+     */
     private void loadSimilarMoods() {
         showLoading();
         forYouController.getSimilarMoods(new ForYouController.SimilarMoodsCallback() {
@@ -159,23 +179,35 @@ public class ForYouActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Shows loading indicator and hides other views
+     */
     private void showLoading() {
         progressBar.setVisibility(View.VISIBLE);
         emptyStateText.setVisibility(View.GONE);
         recyclerView.setVisibility(View.GONE);
     }
 
+    /**
+     * Hides loading indicator and shows RecyclerView
+     */
     private void hideLoading() {
         progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Shows empty state message when no moods available
+     */
     private void showEmptyState(String message) {
         emptyStateText.setText(message);
         emptyStateText.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
     }
 
+    /**
+     * Hides empty state message and shows RecyclerView
+     */
     private void hideEmptyState() {
         emptyStateText.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
