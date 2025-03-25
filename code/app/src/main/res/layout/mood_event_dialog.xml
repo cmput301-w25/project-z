@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_card"
-    android:backgroundTint="#F9F7F3"
+    android:backgroundTint="#E9D8A6"
     android:padding="20dp">
 
     <!-- Mood Date (Moved to Top-Right) -->
@@ -13,14 +12,14 @@
         android:id="@+id/tvMoodDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Jan 01, 2024"
-        android:textColor="#0FA3B1"
-        android:textSize="14sp"
-        android:textStyle="italic"
-        android:fontFamily="@font/itim_regular"
         android:layout_alignParentEnd="true"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="5dp" />
+        android:fontFamily="@font/itim_regular"
+        android:text="Jan 01, 2024"
+        android:textColor="#001219"
+        android:textSize="14sp"
+        android:textStyle="italic" />
 
     <!-- Mood Image (if uploaded) -->
     <ImageView
@@ -43,7 +42,7 @@
         android:layout_marginTop="12dp"
         android:fontFamily="@font/itim_regular"
         android:text="[User] is feeling [emotion]"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -56,7 +55,7 @@
         android:layout_marginTop="8dp"
         android:fontFamily="@font/itim_regular"
         android:text="Full description of mood event..."
-        android:textColor="@color/textColor"
+        android:textColor="#001219"
         android:textSize="18sp" />
 
     <!-- Mood Tags -->
@@ -68,7 +67,7 @@
         android:layout_marginTop="8dp"
         android:fontFamily="@font/itim_regular"
         android:text="#moods"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="16sp" />
 
     <!-- Bottom Buttons: BACK and DELETE -->
@@ -78,8 +77,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tvMoodTags"
         android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:gravity="end"
+        android:orientation="horizontal">
 
         <!-- Back Button -->
         <Button
@@ -87,29 +86,14 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1"
-            android:backgroundTint="#0FA3B1"
+            android:backgroundTint="#001219"
             android:fontFamily="@font/itim_regular"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="BACK"
-            android:textColor="#F9F7F3"
+            android:textColor="#E9D8A6"
             android:textSize="16sp"
-            android:textStyle="bold"/>
-
-        <!-- Delete Button (Moved to Bottom-Right) -->
-        <ImageButton
-            android:id="@+id/btnDeletePost"
-            android:layout_width="50dp"
-            android:layout_height="42dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/rounded_button"
-            android:backgroundTint="#0FA3B1"
-            android:padding="10dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/delete_post"
-            android:visibility="gone"
-            app:tint="#F9F7F3" />
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>

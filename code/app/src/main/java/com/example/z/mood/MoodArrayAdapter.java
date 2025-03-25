@@ -1,15 +1,20 @@
 package com.example.z.mood;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.z.utils.GetEmoji;
+import com.example.z.utils.GetEmojiColor;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,8 +22,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
 /**
  * Adapter for displaying a list of Mood objects in a RecyclerView.
  * This adapter binds mood data to the UI elements inside a mood card item.
@@ -86,6 +94,24 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             holder.dateText.setText("No Date"); // Display fallback text if date is null
         }
 
+        int getEmoji = GetEmoji.getEmojiPosition(mood.getEmoticon());
+
+        if (mood.getEmoticon() != null && getEmoji != 0) {
+            holder.emojiChosen.setImageResource(getEmoji);
+            holder.emojiChosen.setVisibility(View.VISIBLE);
+
+            int getMoodColor = GetEmojiColor.getEmojiColor(mood.getEmotionalState());
+            if (mood.getEmotionalState() != null) {
+                holder.emojiChosen.setColorFilter(getMoodColor, PorterDuff.Mode.SRC_IN); // sets color for emoji
+            }
+            else {
+                holder.emojiChosen.clearColorFilter();
+            }
+        }
+        else {
+            holder.emojiChosen.setVisibility(View.GONE);
+        }
+
         // Handle post click to open the mood details dialog
         holder.itemView.setOnClickListener(v -> {
             ViewMoodDialogFragment moodDialog = new ViewMoodDialogFragment(mood);
@@ -130,6 +156,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
      */
     public static class MoodViewHolder extends RecyclerView.ViewHolder {
         TextView moodText, descriptionText, dateText, moodTag;
+        ImageView emojiChosen;
 
         /**
          * Constructor for MoodViewHolder.
@@ -142,6 +169,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             descriptionText = itemView.findViewById(R.id.tvMoodDescription);
             moodTag = itemView.findViewById(R.id.tvMoodTag);
             dateText = itemView.findViewById(R.id.tvMoodDate);
+            emojiChosen = itemView.findViewById(R.id.imgMood);
         }
     }
 }

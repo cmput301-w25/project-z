@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
-    android:textColor="#F9F7F3"
+    android:textColor="#E9D8A6"
     android:textSize="16sp"
-    android:background="#0FA3B1"
+    android:background="#001219"
     android:gravity="center_vertical"
     android:fontFamily="@font/itim_regular"/>
