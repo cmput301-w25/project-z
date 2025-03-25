@@ -6,16 +6,18 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
+import com.example.z.data.DatabaseManager;
 import com.example.z.mood.Mood;
 import com.example.z.mood.MoodArrayAdapter;
 import com.example.z.mood.MoodFragment;
-import com.example.z.user.SearchUserController;
+import com.example.z.user.UserController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -28,6 +30,7 @@ import java.util.List;
 
 public class PublicProfileActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener{
     private FirebaseFirestore db;
+    private DatabaseManager dbManager;
     private RecyclerView recyclerView;
     private MoodArrayAdapter adapter;
     private List<Mood> moodList = new ArrayList<>();
@@ -35,7 +38,7 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
     private String selectedUserId;
     private String selectedUsername;
     private Button followButton;
-    private SearchUserController searchUserController; // Controller for handling follow requests
+    private UserController userController;
     private String currentUserId;
 
     /**
@@ -50,6 +53,9 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
         setContentView(R.layout.activity_public_profile);
 
         db = FirebaseFirestore.getInstance();
+        dbManager = new DatabaseManager();
+
+        userController = new UserController(dbManager);  // Initialize UserController
 
         // Retrieve user ID and username from intent
         Intent intent = getIntent();
@@ -79,7 +85,7 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
         listenForMoodChanges(); // Listen for mood changes in real-time
         fetchUsername(); // Fetch username for displaying
 
-        // Initialize Follow Button**
+        // Initialize Follow Button
         followButton = findViewById(R.id.followButton);
         setupFollowButton();
 
@@ -123,16 +129,8 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
      * Updates the RecyclerView whenever there is a change in Firestore.
      */
     private void listenForMoodChanges() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Log.e("Firestore", "User not logged in.");
-            return;
-        }
-
-        String userId = user.getUid();
-
         moodListener = db.collection("moods")
-                .whereEqualTo("userId", userId) // Filter moods by the current user
+                .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
                 .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
@@ -153,6 +151,21 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
                         adapter.notifyDataSetChanged(); // Refresh RecyclerView
                     }
                 });
+    }
+
+    /**
+     * Handles follow button click to send a follow request.
+     */
+    private void setupFollowButton() {
+        if (selectedUserId.equals(currentUserId)) {
+            followButton.setVisibility(Button.GONE); // Hide follow button if viewing own profile
+            return;
+        }
+
+        followButton.setOnClickListener(v -> {
+            userController.requestToFollow(currentUserId, selectedUserId);
+            Toast.makeText(this, "Follow request sent!", Toast.LENGTH_SHORT).show();
+        });
     }
 
     /**

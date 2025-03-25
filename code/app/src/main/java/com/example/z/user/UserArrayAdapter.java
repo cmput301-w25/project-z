@@ -14,19 +14,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.z.R;
-import com.example.z.user.SearchUserController;
+import com.example.z.user.UserController;
 import com.example.z.views.ProfileActivity;
 import com.example.z.views.PublicProfileActivity;
 
 public class UserArrayAdapter extends RecyclerView.Adapter<UserArrayAdapter.UserViewHolder> {
 
     private List<User> userList = new ArrayList<>();
-    private SearchUserController searchUserController;
+    private UserController userController;
     private String currentUserId;
 
     // Constructor to initialize controller and userId
-    public UserArrayAdapter(SearchUserController searchUserController, String currentUserId) {
-        this.searchUserController = searchUserController;
+    public UserArrayAdapter(UserController userController, String currentUserId) {
+        this.userController = userController;
         this.currentUserId = currentUserId;
     }
 
@@ -42,7 +42,7 @@ public class UserArrayAdapter extends RecyclerView.Adapter<UserArrayAdapter.User
         User user = userList.get(position);
         holder.usernameTextView.setText(user.getUsername());
 
-        // **Make the user card clickable to open ProfileActivity**
+        // Make the user card clickable to open ProfileActivity
         holder.itemView.setOnClickListener(v -> {
             Context context = v.getContext();
             Intent intent = new Intent(context, PublicProfileActivity.class);

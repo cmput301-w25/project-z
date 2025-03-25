@@ -14,9 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.z.R;
 import com.example.z.data.DatabaseManager;
 import com.example.z.mood.MoodFragment;
-import com.example.z.user.SearchUserController;
+import com.example.z.user.UserController;
 import com.example.z.user.User;
 import com.example.z.user.UserArrayAdapter;
+import com.example.z.user.UserController;
 import com.example.z.utils.OnUserSearchCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -36,7 +37,7 @@ public class SearchActivity extends AppCompatActivity implements OnUserSearchCom
     private Button searchButton;
     private RecyclerView recyclerView;
     private UserArrayAdapter userArrayAdapter;
-    private SearchUserController searchUserController;
+    private UserController userController;
     private String currentUserId;
 
     /**
@@ -61,15 +62,15 @@ public class SearchActivity extends AppCompatActivity implements OnUserSearchCom
 
         // Initialize SearchController
         DatabaseManager dbManager = new DatabaseManager();
-        searchUserController = new SearchUserController(dbManager, this);
+        userController = new UserController(dbManager);
 
-        userArrayAdapter = new UserArrayAdapter(searchUserController, currentUserId);
+        userArrayAdapter = new UserArrayAdapter(userController, currentUserId);
         recyclerView.setAdapter(userArrayAdapter);
 
         // Handle search button click
         searchButton.setOnClickListener(v -> {
             String query = searchBar.getText().toString().trim();
-            searchUserController.searchUsers(query);
+            userController.searchUsers(query, this);
         });
 
         // Find navigation buttons
