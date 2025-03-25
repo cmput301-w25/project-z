@@ -16,6 +16,9 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
  * MainActivity serves as the splash screen and entry point of the app.
  * It handles Firebase authentication, Firestore offline persistence,
  * and redirects the user to the appropriate screen (ProfileActivity or LogInActivity).
+ *
+ *  Outstanding Issues:
+ *      - None
  */
 public class MainActivity extends AppCompatActivity {
 

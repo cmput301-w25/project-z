@@ -2,6 +2,9 @@ package com.example.z.user;
 
 /**
  * Represents a user in the application with an email and username.
+ *
+ *  Outstanding issues:
+ *      - None
  */
 public class User {
     private String email;

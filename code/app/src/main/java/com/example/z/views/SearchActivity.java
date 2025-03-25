@@ -15,6 +15,9 @@ import com.example.z.mood.MoodFragment;
 /**
  * SearchActivity allows users to search for content within the app.
  * It also provides navigation options to different sections of the app.
+ *
+ *  Outstanding Issues:
+ *      - Cannot display search results yet
  */
 public class SearchActivity extends AppCompatActivity {
 

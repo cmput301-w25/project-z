@@ -5,8 +5,8 @@
 
     <ImageButton
         android:id="@+id/nav_home"
-        android:layout_width="66dp"
-        android:layout_height="59dp"
+        android:layout_width="45dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/home_button"
@@ -17,8 +17,8 @@
 
     <ImageButton
         android:id="@+id/nav_profile"
-        android:layout_width="66dp"
-        android:layout_height="59dp"
+        android:layout_width="45dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/profile_button"
         android:contentDescription="Profile"
@@ -30,8 +30,8 @@
 
     <ImageButton
         android:id="@+id/nav_add"
-        android:layout_width="70dp"
-        android:layout_height="65dp"
+        android:layout_width="45dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/add_mood_button"
         android:contentDescription="Add"
@@ -42,8 +42,8 @@
 
     <ImageButton
         android:id="@+id/nav_notifications"
-        android:layout_width="66dp"
-        android:layout_height="59dp"
+        android:layout_width="45dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/notification_button"
         android:contentDescription="Notifications"
@@ -55,8 +55,8 @@
 
     <ImageButton
         android:id="@+id/nav_search"
-        android:layout_width="66dp"
-        android:layout_height="59dp"
+        android:layout_width="45dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/search_button"

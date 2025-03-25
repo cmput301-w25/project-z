@@ -2,6 +2,9 @@ package com.example.z.utils;
 
 /**
  * Represents different social situations a user may be in when recording their mood.
+ *
+ * Outstanding issues:
+ *      - None
  */
 public enum SocialSituations {
     /**

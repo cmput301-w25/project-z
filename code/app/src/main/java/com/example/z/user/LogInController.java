@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
  * It interacts with Firebase Authentication to log in users.
  *
  * Outstanding Issues:
- * - No error handling for network issues.
+ * - None
  */
 public class LogInController {
     private Context context;

@@ -14,6 +14,9 @@ import java.util.Map;
 
 /**
  * Manages interactions with Firestore, including saving and editing mood entries.
+ *
+ *  Outstanding Issues:
+ *      - None
  */
 public class DatabaseManager {
     private FirebaseFirestore db;
@@ -42,7 +45,7 @@ public class DatabaseManager {
      * @param datePosted      The timestamp when the mood was created.
      */
     public void saveMood(String userId, DocumentReference moodDocRef, String username, String moodType,
-                         String description, String socialSituation, String trigger, Date datePosted) {
+                         String description, String socialSituation, String trigger, Date datePosted, String emoji, boolean isPrivate) {
         Map<String, Object> mood = new HashMap<>();
         mood.put("userId", userId);
         mood.put("username", username);
@@ -51,6 +54,8 @@ public class DatabaseManager {
         mood.put("situation", socialSituation);
         mood.put("trigger", trigger);
         mood.put("timestamp", datePosted);
+        mood.put("emoji", emoji);
+        mood.put("private post", isPrivate);
 
         moodDocRef.set(mood)
                 .addOnSuccessListener(aVoid ->
@@ -73,7 +78,7 @@ public class DatabaseManager {
      * @param onFailureListener Callback for failure during update.
      */
     public void editMood(String moodId, String userId, String moodType, String description,
-                         String socialSituation, String trigger, Date updatedAt,
+                         String socialSituation, String trigger, Date updatedAt, String emoji, boolean isPrivate,
                          OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         DocumentReference moodRef = moodsRef.document(moodId);
 
@@ -83,6 +88,8 @@ public class DatabaseManager {
         updatedData.put("type", moodType);
         updatedData.put("situation", socialSituation);
         updatedData.put("timestamp", updatedAt);
+        updatedData.put("emoji", emoji);
+        updatedData.put("private post", isPrivate);
 
         // Fetch latest username in case it has changed
         usersRef.document(userId).get()

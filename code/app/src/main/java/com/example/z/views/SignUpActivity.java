@@ -13,6 +13,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.z.R;
 import com.example.z.user.SignUpController;
 
+
+/**
+ * SignUpActivity is responsible for handling user registration.
+ * It provides a UI for users to input their email, username, and password.
+ * It delegates the sign-up logic to the SignUpController.
+ *
+ *  Outstanding Issues:
+ *      - Maybe more input validation and feedback required for minor edge cases
+ */
+
 public class SignUpActivity extends AppCompatActivity {
     private EditText etEmail, etUsername, etPassword;
     private Button btnSignup;
@@ -20,14 +30,6 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView tvLogin;
     private SignUpController signUpController;
 
-    /**
-     * SignUpActivity is responsible for handling user registration.
-     * It provides a UI for users to input their email, username, and password.
-     * It delegates the sign-up logic to the SignUpController.
-     *
-     * Outstanding Issues:
-     * - No input validation for email format.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

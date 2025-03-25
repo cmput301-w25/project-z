@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/profile_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+    <ImageView
+        android:id="@+id/postImage"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentTop="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/rounded_background"
+        app:tint="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/postImage"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:text="[User]"
+        android:fontFamily="@font/itim_regular"
+        android:textColor="@color/textColor"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/postContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username"
+        android:layout_margin="16dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="@android:color/transparent"
+        android:text="Post content goes here..."
+        android:textColor="@color/backgroundColor"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/commentsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/postContent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:text="Comments"
+        android:fontFamily="@font/itim_regular"
+        android:textColor="@color/textColor"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewComments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/commentInputContainer"
+        android:layout_below="@id/commentsTitle"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp" />
+
+    <RelativeLayout
+        android:id="@+id/commentInputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_above="@id/bottomNavBar"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#E9D8A6"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/commentInput"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/btnAddComment"
+            android:background="@drawable/rounded_edittext"
+            android:backgroundTint="@color/textColor"
+            android:hint="Write a comment..."
+            android:inputType="text"
+            android:padding="8dp"
+            android:textColor="#001219"
+            android:textSize="14sp"
+            app:hintTextColor="#001219" />
+
+        <Button
+            android:id="@+id/btnAddComment"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/textColor"
+            android:text="Comment"
+            android:textColor="#001219"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/bottomNavBar"
+        layout="@layout/bottom_bar_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp" />
+
+</RelativeLayout>
+

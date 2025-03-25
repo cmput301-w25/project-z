@@ -9,7 +9,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#660FA3B1"
+        app:cardBackgroundColor="#E9D8A6"
         app:cardCornerRadius="25dp"
         app:cardElevation="0dp">
 
@@ -25,7 +25,8 @@
                 android:layout_height="97dp"
                 android:layout_gravity="center_vertical"
                 android:adjustViewBounds="true"
-                android:background="@drawable/profile_button"
+                android:background="@drawable/rounded_background"
+                android:backgroundTint="#9B2226"
                 android:contentDescription="@string/profile_accessibility"
                 android:cropToPadding="true"
                 android:scaleType="centerCrop" />
@@ -43,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/itim_regular"
                     android:text="@string/user_request"
-                    android:textColor="#F9F7F3"
+                    android:textColor="#001219"
                     android:textSize="18sp" />
 
                 <LinearLayout
@@ -57,10 +58,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:backgroundTint="#B30FA3B1"
+                        android:backgroundTint="#001219"
                         android:fontFamily="@font/itim_regular"
                         android:text="@string/accept_request"
-                        android:textColor="#F9F7F3"
+                        android:textColor="#E9D8A6"
                         android:textSize="12sp"
                         app:cornerRadius="50dp" />
 
@@ -70,10 +71,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:backgroundTint="#B30FA3B1"
+                        android:backgroundTint="#001219"
                         android:fontFamily="@font/itim_regular"
                         android:text="@string/decline_request"
-                        android:textColor="#F9F7F3"
+                        android:textColor="#E9D8A6"
                         android:textSize="12sp"
                         app:cornerRadius="50dp" />
                 </LinearLayout>
