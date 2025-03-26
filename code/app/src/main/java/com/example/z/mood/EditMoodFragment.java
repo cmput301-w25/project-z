@@ -7,18 +7,23 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.z.data.DatabaseManager;
 import com.example.z.R;
+import com.example.z.utils.GetEmoji;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -60,6 +65,13 @@ public class EditMoodFragment extends DialogFragment {
     private FirebaseAuth auth;
     private String moodId;
     private OnMoodUpdatedListener moodUpdatedListener;
+    private ImageButton btnEmoji;
+    private String userStringEmoji;
+    private boolean isPrivate;
+    private SwitchCompat privacy_switch;
+    private ImageButton btnDelete;
+    private Mood mood;
+
 
     /**
      * Creates a new instance of the EditMoodFragment with pre-filled data from an existing mood.
@@ -70,11 +82,7 @@ public class EditMoodFragment extends DialogFragment {
     public static EditMoodFragment newInstance(Mood mood) {
         EditMoodFragment fragment = new EditMoodFragment();
         Bundle args = new Bundle();
-        args.putString("moodId", mood.getDocumentId());
-        args.putString("description", mood.getDescription());
-        args.putString("trigger", mood.getTrigger());
-        args.putString("moodType", mood.getEmotionalState());
-        args.putString("socialSituation", mood.getSocialSituation());
+        args.putSerializable("mood", mood);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,7 +117,10 @@ public class EditMoodFragment extends DialogFragment {
         edit_mood_emotion = view.findViewById(R.id.spinner_mood);
         edit_mood_description = view.findViewById(R.id.edit_description);
         edit_trigger = view.findViewById(R.id.edit_hashtags);
+        privacy_switch = view.findViewById(R.id.switch_privacy);
         btnSave = view.findViewById(R.id.btn_post);
+        btnEmoji = view.findViewById(R.id.btn_emoji_picker);
+        btnDelete = view.findViewById(R.id.btnDeletePost);
 
         // Load spinners with predefined values
         ArrayAdapter<SocialSituations> socialAdapter = new ArrayAdapter<>(
@@ -126,39 +137,85 @@ public class EditMoodFragment extends DialogFragment {
 
         // Retrieve and pre-fill mood details if available
         if (getArguments() != null) {
-            moodId = getArguments().getString("moodId");
-            edit_mood_description.setText(getArguments().getString("description"));
-            edit_trigger.setText(getArguments().getString("trigger"));
-            btnSave.setText("Save Changes");
+            mood = (Mood) getArguments().getSerializable("mood");
+            if (mood != null) {
+                moodId = mood.getDocumentId();
+                edit_mood_description.setText(mood.getDescription());
+                edit_trigger.setText(mood.getTrigger());
+                userStringEmoji = mood.getEmoticon();
+                isPrivate = mood.isPrivate();
+                btnSave.setText("Save Changes");
 
-            String prevMood = getArguments().getString("moodType");
-            String prevSocialSituation = getArguments().getString("socialSituation");
+                String prevMood = mood.getEmotionalState();
+                String prevSocialSituation = mood.getSocialSituation();
 
-            // Set previous selection for Mood Spinner
-            if (prevMood != null) {
-                for (int i = 0; i < edit_mood_emotion.getCount(); i++) {
-                    if (edit_mood_emotion.getItemAtPosition(i).toString().equals(prevMood)) {
-                        edit_mood_emotion.setSelection(i);
-                        break;
+                privacy_switch.setChecked(isPrivate);
+
+                if (userStringEmoji != null) {
+                    int emojiId = GetEmoji.getEmojiPosition(userStringEmoji);
+                    if (emojiId != 0) {
+                        btnEmoji.setImageResource(emojiId);
                     }
                 }
-            }
 
-            // Set previous selection for Social Situation Spinner
-            if (prevSocialSituation != null) {
-                for (int i = 0; i < edit_social_situation.getCount(); i++) {
-                    if (edit_social_situation.getItemAtPosition(i).toString().equals(prevSocialSituation)) {
-                        edit_social_situation.setSelection(i);
-                        break;
+                // Set previous selection for Mood Spinner
+                if (prevMood != null) {
+                    for (int i = 0; i < edit_mood_emotion.getCount(); i++) {
+                        if (edit_mood_emotion.getItemAtPosition(i).toString().equals(prevMood)) {
+                            edit_mood_emotion.setSelection(i);
+                            break;
+                        }
+                    }
+                }
+
+                // Set previous selection for Social Situation Spinner
+                if (prevSocialSituation != null) {
+                    for (int i = 0; i < edit_social_situation.getCount(); i++) {
+                        if (edit_social_situation.getItemAtPosition(i).toString().equals(prevSocialSituation)) {
+                            edit_social_situation.setSelection(i);
+                            break;
+                        }
                     }
                 }
             }
         }
 
+        // Show Delete button only if the logged-in user owns this post
+        String currentUserId = auth.getCurrentUser().getUid();
+        if (!mood.getUserId().equals(currentUserId)) {
+            btnDelete.setVisibility(View.GONE);
+        } else {
+            btnDelete.setVisibility(View.VISIBLE);
+        }
+
+        // Handle Delete Button click event
+        btnDelete.setOnClickListener(v -> deleteMood());
+
+        btnEmoji.setOnClickListener(v -> displayEmojiView());
         // Set save button click listener
         btnSave.setOnClickListener(v -> validateAndSaveEdit());
 
         return dialog;
+    }
+
+    private void displayEmojiView() {
+
+        BottomSheetDialog bottomSheet = new BottomSheetDialog(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.emoticon_picker, null);
+        bottomSheet.setContentView(view);
+
+        GridView emojiView = view.findViewById(R.id.emojiView);
+        int[] emojis = GetEmoji.getEmojiList();
+
+        EmojiAdapter adapter = new EmojiAdapter(getContext(), emojis);
+        emojiView.setAdapter(adapter);
+
+        emojiView.setOnItemClickListener(((parent, view1, position, id) -> {
+            userStringEmoji = getResources().getResourceEntryName(emojis[position]);
+            btnEmoji.setImageResource(emojis[position]);
+            bottomSheet.dismiss();
+        }));
+        bottomSheet.show();
     }
 
     /**
@@ -172,6 +229,7 @@ public class EditMoodFragment extends DialogFragment {
         String updatedDescription = edit_mood_description.getText().toString().trim();
         String updatedTrigger = edit_trigger.getText().toString().trim();
         Date updatedAt = new Date();
+        isPrivate = privacy_switch.isChecked();
 
         // Validate Mood Selection
         if (selectedMood == null || selectedMood.toString().equalsIgnoreCase("Select")) {
@@ -180,8 +238,8 @@ public class EditMoodFragment extends DialogFragment {
         }
 
         // Validate Description Length
-        if (updatedDescription.length() > 20) {
-            showErrorDialog("Description must be 20 characters max!");
+        if (updatedDescription.length() > 200) {
+            showErrorDialog("Description must be 200 characters max!");
             return;
         }
 
@@ -195,7 +253,7 @@ public class EditMoodFragment extends DialogFragment {
 
         // Update mood entry in Firestore using DatabaseManager
         databaseManager.editMood(moodId, userId, selectedMood.toString(), updatedDescription,
-                socialSituation.toString(), updatedTrigger, updatedAt,
+                socialSituation.toString(), updatedTrigger, updatedAt, userStringEmoji, isPrivate,
                 aVoid -> {
                     if (moodUpdatedListener != null) {
                         moodUpdatedListener.onMoodUpdated();
@@ -232,6 +290,20 @@ public class EditMoodFragment extends DialogFragment {
                 .setIcon(android.R.drawable.ic_dialog_alert) // Adds a red exclamation mark icon
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    /**
+     * Deletes the mood post from Firestore if the user is the owner.
+     * Displays a toast message indicating success or failure.
+     */
+    private void deleteMood() {
+        db.collection("moods").document(mood.getDocumentId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Post deleted", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to delete post", Toast.LENGTH_SHORT).show());
     }
 }
 
