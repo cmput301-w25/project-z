@@ -1,5 +1,7 @@
 package com.example.z.views;
 
+import static android.content.Intent.getIntent;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -87,7 +89,13 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
 
         // Initialize Follow Button
         followButton = findViewById(R.id.followButton);
-        setupFollowButton();
+        updateFollowButton(currentUserId, selectedUserId);
+
+        // Check follow status
+        //DatabaseManager dbManager = new DatabaseManager();
+        //dbManager.getFollowStatus(currentUserId, selectedUserId, status -> {
+        //    updateFollowButton(status, currentUserId, selectedUserId);
+        //});
 
         // Navigation buttons
         ImageButton createMood = findViewById(R.id.nav_add);
@@ -153,18 +161,42 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
                 });
     }
 
-    /**
-     * Handles follow button click to send a follow request.
-     */
-    private void setupFollowButton() {
-        if (selectedUserId.equals(currentUserId)) {
-            followButton.setVisibility(Button.GONE); // Hide follow button if viewing own profile
-            return;
-        }
+//    /**
+//     * Handles follow button click to send a follow request.
+//     */
+//    private void setupFollowButton() {
+//        if (selectedUserId.equals(currentUserId)) {
+//            followButton.setVisibility(Button.GONE); // Hide follow button if viewing own profile
+//            return;
+//        }
+//
+//        followButton.setOnClickListener(v -> {
+//            userController.requestToFollow(currentUserId, selectedUserId);
+//            Toast.makeText(this, "Follow request sent!", Toast.LENGTH_SHORT).show();
+//        });
+//    }
 
-        followButton.setOnClickListener(v -> {
-            userController.requestToFollow(currentUserId, selectedUserId);
-            Toast.makeText(this, "Follow request sent!", Toast.LENGTH_SHORT).show();
+    private void updateFollowButton(String currentUserId, String selectedUserId) {
+        DatabaseManager dbManager = new DatabaseManager();
+        Button followButton = findViewById(R.id.followButton);
+
+        // Listen for real-time updates
+        dbManager.listenForFollowStatusChanges(currentUserId, selectedUserId, status -> {
+            if ("accepted".equals(status)) {
+                followButton.setText("Following");
+                followButton.setEnabled(false);
+            } else if ("pending".equals(status)) {
+                followButton.setText("Request Pending");
+                followButton.setEnabled(false);
+            } else {
+                followButton.setText("Follow");
+                followButton.setEnabled(true);
+                followButton.setOnClickListener(v -> {
+                    dbManager.requestToFollow(currentUserId, selectedUserId);
+                    followButton.setText("Request Pending");
+                    followButton.setEnabled(false);
+                });
+            }
         });
     }
 

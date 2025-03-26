@@ -3,6 +3,7 @@ package com.example.z.data;
 import static android.app.PendingIntent.getActivity;
 
 import com.example.z.user.User;
+import com.example.z.utils.OnFollowStatusListener;
 import com.example.z.utils.OnUserSearchCompleteListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -154,6 +155,43 @@ public class DatabaseManager {
                         System.out.println("Follow request sent to: " + followedId))
                 .addOnFailureListener(e ->
                         System.err.println("Error sending follow request: " + e));
+    }
+
+    public void getFollowStatus(String followerId, String followedId, OnFollowStatusListener listener) {
+        DocumentReference followRequestRef = followersRef.document(followerId + "_" + followedId);
+
+        followRequestRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String status = documentSnapshot.getString("status");
+                        if (status != null) {
+                            listener.onFollowStatusRetrieved(status); // Pass status to listener
+                            return;
+                        }
+                    }
+                    listener.onFollowStatusRetrieved("not_following"); // Default case if no record
+                })
+                .addOnFailureListener(e -> {
+                    System.err.println("Error fetching follow status: " + e);
+                    listener.onFollowStatusRetrieved("error");
+                });
+    }
+
+    public void listenForFollowStatusChanges(String followerId, String followedId, OnFollowStatusListener listener) {
+        followersRef.document(followerId + "_" + followedId)
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        System.err.println("Error listening for follow status changes: " + error);
+                        return;
+                    }
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        String status = documentSnapshot.getString("status");
+                        listener.onFollowStatusRetrieved(status);
+                    } else {
+                        listener.onFollowStatusRetrieved(null);
+                    }
+                });
     }
 
     public void acceptFollowRequest(String followerId, String followedId) {
