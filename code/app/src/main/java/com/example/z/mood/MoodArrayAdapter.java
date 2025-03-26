@@ -90,7 +90,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
 //            Glide.with(this.context).load(mood.getImg().toString()).into(holder.imgMood);
         }
 /*/
-        
+
         Date moodDate = mood.getCreatedAt();
         if (moodDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault());
