@@ -93,7 +93,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void loadMoodEvents() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         db.collection("moods").get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
                 Mood mood = doc.toObject(Mood.class);
@@ -113,5 +112,53 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         }).addOnFailureListener(e -> Log.e("MapActivity", "Error loading mood events", e));
     }
+
+    /*
+    private void loadRecentMood() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        db.collection("following")
+            .whereEqualTo("followerId", currentUserId)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                    String followeeId = doc.getString("followeeId");
+
+                    if (followeeId != null) {
+                        db.collection("moods")
+                            .whereEqualTo("userId", followeeId)
+                            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener(moodSnapshots -> {
+                                for (DocumentSnapshot moodDoc : moodSnapshots) {
+                                    Mood mood = moodDoc.toObject(Mood.class);
+
+                                    if (mood != null && mood.getLocation() != null) {
+                                        Double lat = (Double) mood.getLocation().get("latitude");
+                                        Double lng = (Double) mood.getLocation().get("longitude");
+
+                                        if (lat != null && lng != null) {
+                                            LatLng location = new LatLng(lat, lng);
+                                            mMap.addMarker(new MarkerOptions()
+                                                    .position(location)
+                                                    .title(mood.getEmotionalState())
+                                                    .snippet("@" + mood.getUsername()));
+                                        }
+                                    }
+                                }
+                            });
+                    }
+                }
+            }).addOnFailureListener(e -> Log.e("MapActivity", "Error loading followees' recent moods", e));
+    }
+
+
+    */
+
+
+
+
 
 }
