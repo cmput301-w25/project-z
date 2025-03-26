@@ -211,7 +211,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
 
     private void openFilterDialog() {
         FilterFragment filterFragment = new FilterFragment(FilterMoods, RecentMood, SearchText, this);
-        filterFragment.show(getSupportFragmentManager(), "filterDialog");
+        filterFragment.show(getSupportFragmentManager(), "FilterFragment");
 
     }
 
