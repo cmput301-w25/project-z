@@ -42,6 +42,7 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
     private Button followButton;
     private UserController userController;
     private String currentUserId;
+    private String followStatus;
 
     /**
      * Called when the activity is created.
@@ -84,18 +85,15 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
         adapter = new MoodArrayAdapter(this, moodList);
         recyclerView.setAdapter(adapter);
 
-        listenForMoodChanges(); // Listen for mood changes in real-time
+
         fetchUsername(); // Fetch username for displaying
 
         // Initialize Follow Button
         followButton = findViewById(R.id.followButton);
+        followStatus = "notFollowing";
         updateFollowButton(currentUserId, selectedUserId);
 
-        // Check follow status
-        //DatabaseManager dbManager = new DatabaseManager();
-        //dbManager.getFollowStatus(currentUserId, selectedUserId, status -> {
-        //    updateFollowButton(status, currentUserId, selectedUserId);
-        //});
+        listenForMoodChanges(); // Listen for mood changes in real-time
 
         // Navigation buttons
         ImageButton createMood = findViewById(R.id.nav_add);
@@ -137,44 +135,57 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
      * Updates the RecyclerView whenever there is a change in Firestore.
      */
     private void listenForMoodChanges() {
-        moodListener = db.collection("moods")
-                .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
-                .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
-                .addSnapshotListener((snapshots, error) -> {
-                    if (error != null) {
-                        Log.e("Firestore", "Error listening for mood changes", error);
-                        return;
-                    }
-
-                    if (snapshots != null) {
-                        moodList.clear();
-
-                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                            Mood mood = doc.toObject(Mood.class);
-                            if (mood != null) {
-                                mood.setDocumentId(doc.getId());
-                                moodList.add(mood);
-                            }
+        if ("following".equals(followStatus)) {
+            Log.d("PublicProfileActivity", "User is following, fetching all moods (public and private).");
+            moodListener = db.collection("moods")
+                    .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
+                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
+                    .addSnapshotListener((snapshots, error) -> {
+                        if (error != null) {
+                            Log.e("Firestore", "Error listening for mood changes", error);
+                            return;
                         }
-                        adapter.notifyDataSetChanged(); // Refresh RecyclerView
-                    }
-                });
-    }
 
-//    /**
-//     * Handles follow button click to send a follow request.
-//     */
-//    private void setupFollowButton() {
-//        if (selectedUserId.equals(currentUserId)) {
-//            followButton.setVisibility(Button.GONE); // Hide follow button if viewing own profile
-//            return;
-//        }
-//
-//        followButton.setOnClickListener(v -> {
-//            userController.requestToFollow(currentUserId, selectedUserId);
-//            Toast.makeText(this, "Follow request sent!", Toast.LENGTH_SHORT).show();
-//        });
-//    }
+                        if (snapshots != null) {
+                            moodList.clear();
+
+                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                                Mood mood = doc.toObject(Mood.class);
+                                if (mood != null) {
+                                    mood.setDocumentId(doc.getId());
+                                    moodList.add(mood);
+                                }
+                            }
+                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
+                        }
+                    });
+        } else {
+            Log.d("PublicProfileActivity", "User is NOT following, fetching only public moods.");
+            moodListener = db.collection("moods")
+                    .whereEqualTo("userId", selectedUserId) // Filter moods by the selected user
+                    .whereEqualTo("`private post`", false) // Only fetch public moods
+                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
+                    .addSnapshotListener((snapshots, error) -> {
+                        if (error != null) {
+                            Log.e("Firestore", "Error listening for mood changes", error);
+                            return;
+                        }
+
+                        if (snapshots != null) {
+                            moodList.clear();
+
+                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                                Mood mood = doc.toObject(Mood.class);
+                                if (mood != null) {
+                                    mood.setDocumentId(doc.getId());
+                                    moodList.add(mood);
+                                }
+                            }
+                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
+                        }
+                    });
+        }
+    }
 
     private void updateFollowButton(String currentUserId, String selectedUserId) {
         DatabaseManager dbManager = new DatabaseManager();
@@ -183,6 +194,7 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
         // Listen for real-time updates
         dbManager.listenForFollowStatusChanges(currentUserId, selectedUserId, status -> {
             if ("accepted".equals(status)) {
+                followStatus = "folllowing";
                 followButton.setText("Following");
                 followButton.setEnabled(false);
             } else if ("pending".equals(status)) {
