@@ -112,7 +112,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             holder.emojiChosen.setVisibility(View.GONE);
         }
 
-        // Handle post click to open the mood details dialog
+        // Handle post click to open the mood details 
         holder.itemView.setOnClickListener(v -> {
             ViewMoodDialogFragment moodDialog = new ViewMoodDialogFragment(mood);
             moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");

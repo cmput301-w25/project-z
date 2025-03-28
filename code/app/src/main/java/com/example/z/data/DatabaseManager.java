@@ -2,6 +2,7 @@ package com.example.z.data;
 
 import static android.app.PendingIntent.getActivity;
 
+import com.example.z.comments.Comment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -22,6 +23,7 @@ public class DatabaseManager {
     private FirebaseFirestore db;
     private CollectionReference usersRef;
     private CollectionReference moodsRef;
+    private CollectionReference commentsRef;
 
     /**
      * Initializes the Firestore database and references the "users" and "moods" collections.
@@ -30,6 +32,21 @@ public class DatabaseManager {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         moodsRef = db.collection("moods");
+        commentsRef = db.collection(("comments"));
+    }
+
+    public void saveComment(Comment newComment, OnCommentSavedListener listener) {
+
+        DocumentReference commentDocRef = commentsRef.document(newComment.getCommentId());
+
+        commentDocRef.set(newComment)
+                .addOnSuccessListener(docRef -> listener.onSuccess())
+                .addOnFailureListener(listener::onFailure);
+    }
+
+    public interface OnCommentSavedListener {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 
     /**
