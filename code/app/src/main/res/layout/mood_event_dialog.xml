@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_card"
+    android:backgroundTint="#E9D8A6"
+    android:padding="20dp">
+
+    <!-- Mood Date (Moved to Top-Right) -->
+    <TextView
+        android:id="@+id/tvMoodDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="Jan 01, 2024"
+        android:textColor="#001219"
+        android:textSize="14sp"
+        android:textStyle="italic" />
+
+    <!-- Mood Image (if uploaded) -->
+    <ImageView
+        android:id="@+id/imgMoodPost"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/tvMoodDate"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:background="@drawable/rounded_card"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <!-- User Mood Text -->
+    <TextView
+        android:id="@+id/tvMoodUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgMoodPost"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="[User] is feeling [emotion]"
+        android:textColor="#001219"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Mood Description -->
+    <TextView
+        android:id="@+id/tvMoodDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvMoodUser"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="Full description of mood event..."
+        android:textColor="#001219"
+        android:textSize="18sp" />
+
+    <!-- Mood Tags -->
+    <TextView
+        android:id="@+id/tvMoodTags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvMoodDescription"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="#moods"
+        android:textColor="#001219"
+        android:textSize="16sp" />
+
+    <!-- Bottom Buttons: BACK and DELETE -->
+    <LinearLayout
+        android:id="@+id/bottomButtonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvMoodTags"
+        android:layout_marginTop="16dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:backgroundTint="#001219"
+            android:fontFamily="@font/itim_regular"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="BACK"
+            android:textColor="#E9D8A6"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>
+
+

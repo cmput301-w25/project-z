@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/search_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#001219"
+    android:orientation="vertical"
+    android:padding="0dp">
+
+    <!-- Search Bar -->
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="15dp"
+        android:backgroundTint="#E9D8A6"
+        android:fontFamily="@font/itim_regular"
+        android:hint="Search for a name..."
+        android:inputType="text"
+        android:padding="12dp"
+        android:textColor="#E9D8A6"
+        android:textColorHint="#E9D8A6" />
+
+    <!-- Search Button -->
+    <Button
+        android:id="@+id/search_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:backgroundTint="#E9D8A6"
+        android:fontFamily="@font/itim_regular"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="Search"
+        android:textColor="#001219"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Search Results Title -->
+    <TextView
+        android:id="@+id/tvSearchResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="SEARCH RESULTS"
+        android:textColor="#E9D8A6"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- RecyclerView for Search Results -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_search"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" />
+
+    <!-- Bottom Navigation Bar (Reused) -->
+    <include
+        android:id="@+id/bottomNavBar"
+        layout="@layout/bottom_bar_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="8dp" />
+</LinearLayout>

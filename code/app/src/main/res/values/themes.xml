@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Z" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Z" parent="Base.Theme.Z" />
+
+    <style name="privateSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">#0A9396</item>
+        <item name="colorSwitchThumbNormal">#EE9B00</item>
+        <item name="android:colorForeground">#42EE9B00</item>
+    </style>
+</resources>
