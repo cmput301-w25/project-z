@@ -60,7 +60,7 @@ public class MoodFragment extends DialogFragment {
     private FirebaseFirestore db;
     private OnMoodAddedListener moodAddedListener;
     private FusedLocationProviderClient fusedLocationClient;
-    private Location lastKnownLocation;
+    private Location currentLocation;
 
     private Double latitude = null;
     private Double longitude = null;
@@ -188,18 +188,18 @@ public class MoodFragment extends DialogFragment {
         DocumentReference moodDocRef = db.collection("moods").document();
         String documentId = moodDocRef.getId();
 
-        if (lastKnownLocation != null) {
-            latitude = lastKnownLocation.getLatitude();
-            longitude = lastKnownLocation.getLongitude();
+        if (currentLocation != null) {
+            latitude = currentLocation.getLatitude();
+            longitude = currentLocation.getLongitude();
         } else {
             latitude = null;
             longitude = null;
         }
 
         if (latitude == null || longitude == null) {
-            if (lastKnownLocation != null) {
-                latitude = lastKnownLocation.getLatitude();
-                longitude = lastKnownLocation.getLongitude();
+            if (currentLocation != null) {
+                latitude = currentLocation.getLatitude();
+                longitude = currentLocation.getLongitude();
             } else if (locationRequested) {
                 Toast.makeText(getContext(), "Waiting for location to be retrieved...", Toast.LENGTH_SHORT).show();
                 return;
@@ -266,7 +266,7 @@ public class MoodFragment extends DialogFragment {
             fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                     .addOnSuccessListener(requireActivity(), location -> {
                         if (location != null) {
-                            lastKnownLocation = location;
+                            currentLocation = location;
                             Toast.makeText(getContext(), "Location attached!", Toast.LENGTH_SHORT).show();
                         }
                     });

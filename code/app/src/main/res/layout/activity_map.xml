@@ -19,17 +19,23 @@
         android:layout_alignParentStart="true" />
 
     <!-- Filter -->
-    <Spinner
-        android:id="@+id/spinnerMapFilter"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@id/tvMapTitle"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="#0FA3B1"
-        android:popupBackground="@drawable/rounded_card" />
 
     <!-- Google Map Fragment -->
+
+    <ImageButton
+        android:id="@+id/btnFilter2"
+        android:layout_width="48dp"
+        android:layout_height="35dp"
+        android:layout_alignTop="@id/tvMapTitle"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="filter button"
+        android:scaleType="centerInside"
+        android:src="@drawable/filter_button" />
+
+
+
     <FrameLayout
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
