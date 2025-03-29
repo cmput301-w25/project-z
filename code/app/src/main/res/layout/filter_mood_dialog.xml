@@ -4,28 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_card"
-    android:backgroundTint="#F9F7F3"
+    android:backgroundTint="#E9D8A6"
     android:orientation="vertical"
     android:padding="20dp">
 
-    <!-- Title -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/itim_regular"
         android:text="Filter Moods"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="18sp"
         android:textStyle="bold"/>
 
-    <!-- Time Filter (Recent Moods) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/itim_regular"
         android:text="Time Range"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
@@ -36,10 +34,8 @@
         android:layout_marginTop="5dp"
         android:fontFamily="@font/itim_regular"
         android:text="Show moods from last 7 days"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="14sp"/>
-
-    <!-- Mood Type Selection -->
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,7 +43,7 @@
         android:layout_marginTop="10dp"
         android:fontFamily="@font/itim_regular"
         android:text="Select Moods"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
@@ -63,7 +59,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Anger"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -72,7 +68,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Confusion"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -81,7 +77,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Disgust"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -90,7 +86,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Fear"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -99,7 +95,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Happiness"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -108,7 +104,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Sadness"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -117,7 +113,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Shame"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
 
         <CheckBox
@@ -126,19 +122,17 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/itim_regular"
             android:text="Surprise"
-            android:textColor="#0FA3B1"
+            android:textColor="#001219"
             android:textSize="14sp"/>
     </LinearLayout>
 
-
-    <!-- Search Description -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/itim_regular"
         android:text="Search by Description"
-        android:textColor="#0FA3B1"
+        android:textColor="#001219"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
@@ -148,16 +142,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1"
+        android:backgroundTint="#001219"
         android:fontFamily="@font/itim_regular"
         android:gravity="top"
         android:hint="Enter keywords..."
         android:inputType="text"
         android:padding="12dp"
-        android:textColor="#F9F7F3"
-        android:textColorHint="#F9F7F3"/>
+        android:textColor="#E9D8A6"
+        android:textColorHint="#E9D8A6"/>
 
-    <!-- Apply & Cancel Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -170,10 +163,10 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
-            android:backgroundTint="#0FA3B1"
+            android:backgroundTint="#001219"
             android:fontFamily="@font/itim_regular"
             android:text="Clear Filters"
-            android:textColor="#F9F7F3"
+            android:textColor="#E9D8A6"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
@@ -182,13 +175,11 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
-            android:backgroundTint="#0FA3B1"
+            android:backgroundTint="#001219"
             android:fontFamily="@font/itim_regular"
             android:text="Apply"
-            android:textColor="#F9F7F3"
+            android:textColor="#E9D8A6"
             android:textSize="16sp"
             android:textStyle="bold"/>
-
     </LinearLayout>
-
 </LinearLayout>
