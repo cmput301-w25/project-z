@@ -18,6 +18,11 @@ import com.example.z.R;
 
 import java.util.Map;
 
+/**
+ * Fragment for adding filters to displayed moods.
+ * Users can select filters that will correspond to what is displayed.
+ */
+
 public class FilterFragment extends DialogFragment {
     private Map<String, Boolean> FilterMoods;
     private boolean RecentMood;
@@ -26,6 +31,14 @@ public class FilterFragment extends DialogFragment {
     private Button btnApply;
     private Button btnClear;
 
+    /**
+     * Updates the variables for already selected filters
+     *
+     * @param FilterMoods the updated moods selected
+     * @param RecentMood Updates filter to check if RecentMoods is already selected
+     * @param SearchText Updates the search will pre defined string if there is
+     * @param listener Handles filter changes
+     */
     public FilterFragment(Map<String, Boolean> FilterMoods, boolean RecentMood, String SearchText, FilterListener listener) {
         this.FilterMoods = FilterMoods;
         this.RecentMood = RecentMood;
@@ -33,6 +46,12 @@ public class FilterFragment extends DialogFragment {
         this.listener = listener;
     }
 
+    /**
+     * Creates and initializes the dialog for adding filters.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     * @return A dialog containing the filter mood form.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -107,7 +126,13 @@ public class FilterFragment extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Interface to notify when a filter has been applied.
+     */
     public interface FilterListener {
+        /**
+         * Called when a filter is successfully applied.
+         */
         void onFilterApplied(Map<String, Boolean> FilterMoods, boolean RecentMood, String SearchText);
     }
 }

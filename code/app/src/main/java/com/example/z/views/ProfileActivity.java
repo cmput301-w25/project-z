@@ -117,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
     /**
      * Listens for real-time mood changes for the logged-in user.
      * Updates the RecyclerView whenever there is a change in Firestore.
+     * Updates the RecyclerView whenever a filter is applied.
      */
     private void listenForMoodChanges() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
