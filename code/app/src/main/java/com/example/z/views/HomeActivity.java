@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
+import com.example.z.filter.FilterFragment;
 import com.example.z.mood.Mood;
 import com.example.z.mood.MoodArrayAdapter;
 import com.example.z.mood.MoodFragment;
@@ -22,7 +23,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * HomeActivity serves as the main feed where users can navigate to other pages
@@ -31,7 +35,7 @@ import java.util.List;
  *  Outstanding Issues:
  *      - Cannot see other users moods yet
  */
-public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener{
+public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener, FilterFragment.FilterListener{
 
     private FirebaseFirestore db;
     private RecyclerView recyclerView;
@@ -39,6 +43,9 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
     private List<Mood> moodList = new ArrayList<>();
     private ListenerRegistration moodListener;
     private String username;
+    private Map<String, Boolean> FilterMoods = new HashMap<>();
+    private boolean RecentMood;
+    private String SearchText = "";
 
     /**
      * Called when the activity is created.
@@ -59,10 +66,8 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
         adapter = new MoodArrayAdapter(this, moodList);
         recyclerView.setAdapter(adapter);
 
-
         listenForMoodChanges(); // Listen for mood changes in real-time
         fetchUsername(); // Fetch username for displaying
-        Log.d("HomeActivity", "onCreate called");
 
         // Find navigation buttons
         ImageButton profile = findViewById(R.id.nav_profile);
@@ -70,13 +75,14 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
         ImageButton search = findViewById(R.id.nav_search);
         ImageButton addPostButton = findViewById(R.id.nav_add);
         ImageButton map = findViewById(R.id.btnMap);
+        ImageButton filter = findViewById(R.id.btnFilter);
 
         // Set click listeners for navigation
         profile.setOnClickListener(v -> navigateTo(ProfileActivity.class));
         notifications.setOnClickListener(v -> navigateTo(NotificationActivity.class));
         search.setOnClickListener(v -> navigateTo(SearchActivity.class));
         map.setOnClickListener(v -> navigateTo(MapActivity.class));
-
+        filter.setOnClickListener(v -> openFilterDialog());
         addPostButton.setOnClickListener(v -> addMoodEvent());
     }
 
@@ -114,6 +120,13 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
         String userId = user.getUid();
         List<String> following = new ArrayList<>();
 
+        List<String> moods_selected = new ArrayList<>();
+        for (Map.Entry<String, Boolean> selected : FilterMoods.entrySet()) {
+            if (selected.getValue()) {
+                moods_selected.add(selected.getKey());
+            }
+        }
+
         db.collection("followers")
                 .whereEqualTo("followerID", userId).get()
                 .addOnSuccessListener(snapshot -> {
@@ -125,9 +138,19 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                     }
 
                     if (!following.isEmpty()) {
-                        moodListener = db.collection("moods")
-                                .whereIn("userId", following)
-                                .orderBy("timestamp", Query.Direction.DESCENDING)
+                        Query query = db.collection("moods")
+                                .whereIn("userId", following);
+
+                        if (!moods_selected.isEmpty()) {
+                            query = query.whereIn("type", moods_selected);
+                        }
+
+                        if (RecentMood) {
+                            Date Recent = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
+                            query = query.whereGreaterThan("timestamp", Recent);
+                        }
+
+                        moodListener = query.orderBy("timestamp", Query.Direction.DESCENDING)
                                 .limit(3)
                                 .addSnapshotListener((snapshots, error) -> {
                                     if (error != null) {
@@ -141,8 +164,15 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                                         for (DocumentSnapshot doc : snapshots.getDocuments()) {
                                             Mood mood = doc.toObject(Mood.class);
                                             if (mood != null) {
-                                                mood.setDocumentId(doc.getId());
-                                                moodList.add(mood);
+                                                if (!SearchText.isEmpty()) {
+                                                    if (mood.getDescription().contains(SearchText)) {
+                                                        mood.setDocumentId(doc.getId());
+                                                        moodList.add(mood);
+                                                    } else {
+                                                        mood.setDocumentId(doc.getId());
+                                                        moodList.add(mood);
+                                                    }
+                                                }
                                             }
                                         }
                                         adapter.notifyDataSetChanged(); // Refresh RecyclerView
@@ -181,8 +211,22 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
      * @param newMood The newly added mood.
      */
     public void onMoodAdded(Mood newMood) {
-        moodList.add(0, newMood); // Add new mood to the top of the list
-        adapter.notifyItemInserted(0); // Refresh RecyclerView
+    }
+
+    private void openFilterDialog() {
+        FilterFragment filterFragment = new FilterFragment(FilterMoods, RecentMood, SearchText, this);
+        filterFragment.show(getSupportFragmentManager(), "FilterFragment");
+    }
+
+    /**
+     * This is a temporary empty implementation just to test the dialog.
+     */
+    @Override
+    public void onFilterApplied(Map<String, Boolean> FilterMoods, boolean RecentMood, String SearchText) {
+        this.FilterMoods = FilterMoods;
+        this.RecentMood = RecentMood;
+        this.SearchText = SearchText;
+        listenForMoodChanges();
     }
 }
 
