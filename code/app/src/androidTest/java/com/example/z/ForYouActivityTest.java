@@ -91,9 +91,11 @@ public class ForYouActivityTest {
     }
 
     private void createTestMoods(CollectionReference moodsRef, String userId) {
-        // Create some test moods
-        Mood mood1 = new Mood(userId, "mood1", "testuser", "Happy", "Good day", "Social", new Date(), null, "Test mood 1");
-        Mood mood2 = new Mood(userId, "mood2", "testuser", "Sad", "Bad day", "Alone", new Date(), null, "Test mood 2");
+        // Create some test moods with emoticons and privacy settings
+        Mood mood1 = new Mood(userId, "mood1", "testuser", "Happy", "Good day", "Social", 
+                new Date(), null, "Test mood 1", "😊", false);
+        Mood mood2 = new Mood(userId, "mood2", "testuser", "Sad", "Bad day", "Alone", 
+                new Date(), null, "Test mood 2", "😢", false);
 
         moodsRef.document("mood1").set(mood1);
         moodsRef.document("mood2").set(mood2);

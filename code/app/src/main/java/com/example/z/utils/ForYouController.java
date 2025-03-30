@@ -179,6 +179,8 @@ public class ForYouController {
         String trigger = document.getString("trigger");
         String situation = document.getString("situation");
         String description = document.getString("description");
+        String emoticon = document.getString("emoji");
+        boolean isPrivate = document.getBoolean("private post") != null ? document.getBoolean("private post") : false;
         Date timestamp = null;
 
         if (document.getTimestamp("timestamp") != null) {
@@ -191,7 +193,7 @@ public class ForYouController {
         }
 
         return new Mood(docUserId, docId, username, type, trigger, situation,
-                timestamp, location, description);
+                timestamp, location, description, emoticon, isPrivate);
     }
 
     /**
