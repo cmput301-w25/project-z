@@ -4,7 +4,7 @@
     android:id="@+id/search_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="#001219"
     android:orientation="vertical"
     android:padding="0dp">
 
@@ -14,14 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_margin="15dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="#0FA3B1"
+        android:backgroundTint="#E9D8A6"
         android:fontFamily="@font/itim_regular"
         android:hint="Search for a name..."
         android:inputType="text"
         android:padding="12dp"
-        android:textColor="#F9F7F3"
-        android:textColorHint="#F9F7F3" />
+        android:textColor="#E9D8A6"
+        android:textColorHint="#E9D8A6" />
 
     <!-- Search Button -->
     <Button
@@ -30,12 +29,12 @@
         android:layout_height="50dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:backgroundTint="#0FA3B1"
+        android:backgroundTint="#E9D8A6"
         android:fontFamily="@font/itim_regular"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:text="Search"
-        android:textColor="#F9F7F3"
+        android:textColor="#001219"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -49,7 +48,7 @@
         android:layout_marginRight="15dp"
         android:fontFamily="@font/itim_regular"
         android:text="SEARCH RESULTS"
-        android:textColor="#0FA3B1"
+        android:textColor="#E9D8A6"
         android:textSize="24sp"
         android:textStyle="bold" />
 

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="#001219"
     android:padding="20dp">
 
     <!-- Title -->
@@ -10,68 +12,94 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User Sign Up"
-        android:textSize="32sp"
+        android:layout_alignStart="@id/etEmail"
+        android:layout_marginTop="175dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="Sign Up"
         android:textColor="@color/textColor"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp" />
+        android:textSize="32sp" />
 
-    <!-- Email Field -->
+    <!-- Email Input Field -->
     <EditText
         android:id="@+id/etEmail"
-        android:layout_width="0dp"
+        android:layout_width="280dp"
         android:layout_height="55dp"
         android:layout_below="@id/tvTitle"
-        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/rounded_edittext"
-        android:hint="Email"
-        android:padding="12dp"
+        android:fontFamily="@font/itim_regular"
+        android:hint="Email Address"
+        android:inputType="textEmailAddress"
+        android:padding="14dp"
+        android:textColor="#001219"
         android:textSize="16sp"
-        android:inputType="textEmailAddress" />
+        app:hintTextColor="#001219" />
 
-    <!-- Username Field -->
+    <!-- Username Input Field -->
     <EditText
         android:id="@+id/etUsername"
-        android:layout_width="0dp"
+        android:layout_width="280dp"
         android:layout_height="55dp"
         android:layout_below="@id/etEmail"
-        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/rounded_edittext"
+        android:fontFamily="@font/itim_regular"
         android:hint="Username"
-        android:padding="12dp"
+        android:inputType="text"
+        android:padding="14dp"
+        android:textColor="#001219"
         android:textSize="16sp"
-        android:inputType="text" />
+        app:hintTextColor="#001219" />
 
-    <!-- Password Field -->
+    <!-- Password Input Field -->
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="0dp"
+        android:layout_width="280dp"
         android:layout_height="55dp"
         android:layout_below="@id/etUsername"
-        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/rounded_edittext"
+        android:fontFamily="@font/itim_regular"
         android:hint="Password"
-        android:padding="12dp"
+        android:inputType="textPassword"
+        android:padding="14dp"
+        android:textColor="#001219"
         android:textSize="16sp"
-        android:inputType="textPassword" />
+        app:hintTextColor="#001219" />
 
     <!-- Signup Button -->
     <Button
         android:id="@+id/btnSignup"
-        android:layout_width="0dp"
+        android:layout_width="220dp"
         android:layout_height="55dp"
         android:layout_below="@id/etPassword"
         android:layout_centerHorizontal="true"
-        android:layout_marginHorizontal="100dp"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/rounded_button"
-        android:text="Signup"
-        android:textColor="@android:color/white"
-        android:textSize="18sp" />
+        android:layout_marginTop="35dp"
+        android:backgroundTint="@color/textColor"
+        android:elevation="4dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="Sign Up"
+        android:textColor="#001219"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Already have an account text -->
+    <TextView
+        android:id="@+id/tvLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnSignup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:text="Already have an account? Log in"
+        android:textSize="16sp"
+        android:textColor="@color/textColor"
+        android:fontFamily="@font/itim_regular"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true"/>
 </RelativeLayout>
+

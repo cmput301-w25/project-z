@@ -3,7 +3,7 @@
     android:id="@+id/notification_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="#001219"
     android:orientation="vertical">
 
     <!-- NOTIFICATIONS HEADER -->
@@ -17,7 +17,7 @@
         android:gravity="start"
         android:text="@string/notifications"
         android:textAlignment="viewStart"
-        android:textColor="#0FA3B1"
+        android:textColor="#E9D8A6"
         android:textSize="24sp" />
 
     <!-- RecyclerView for Notifications -->
