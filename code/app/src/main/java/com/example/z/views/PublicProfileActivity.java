@@ -100,14 +100,14 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
         ImageButton home = findViewById(R.id.nav_home);
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
-        ImageButton map = findViewById(R.id.btnMapMoods);
+        //ImageButton map = findViewById(R.id.btnMapMoods);
 
         // Set click listeners for navigation
         createMood.setOnClickListener(v -> addMoodEvent());
         home.setOnClickListener(v -> switchActivity(HomeActivity.class));
         search.setOnClickListener(v -> switchActivity(SearchActivity.class));
         notifications.setOnClickListener(v -> switchActivity(NotificationActivity.class));
-        map.setOnClickListener(v -> switchActivity(MapActivity.class));
+        //map.setOnClickListener(v -> switchActivity(MapActivity.class));
     }
 
     /**
@@ -122,7 +122,7 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
 
                         // Update UI with username
                         TextView usernamePlaceholder = findViewById(R.id.username);
-                        usernamePlaceholder.setText(String.format("Welcome, %s!", selectedUsername));
+                        usernamePlaceholder.setText(String.format("%s", selectedUsername));
                     } else {
                         Log.e("Firestore", "Username not found for userId: " + selectedUserId);
                     }
@@ -135,56 +135,80 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
      * Updates the RecyclerView whenever there is a change in Firestore.
      */
     private void listenForMoodChanges() {
-        if ("following".equals(followStatus)) {
-            Log.d("PublicProfileActivity", "User is following, fetching all moods (public and private).");
-            moodListener = db.collection("moods")
-                    .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
-                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
-                    .addSnapshotListener((snapshots, error) -> {
-                        if (error != null) {
-                            Log.e("Firestore", "Error listening for mood changes", error);
-                            return;
-                        }
+        moodListener = db.collection("moods")
+                .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
+                .whereEqualTo("private post", false) // Only fetch public moods
+                .orderBy("private post")
+                .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e("Firestore", "Error listening for mood changes", error);
+                        return;
+                    }
 
-                        if (snapshots != null) {
-                            moodList.clear();
+                    if (snapshots != null) {
+                        moodList.clear();
 
-                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                                Mood mood = doc.toObject(Mood.class);
-                                if (mood != null) {
-                                    mood.setDocumentId(doc.getId());
-                                    moodList.add(mood);
-                                }
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            Mood mood = doc.toObject(Mood.class);
+                            if (mood != null) {
+                                mood.setDocumentId(doc.getId());
+                                moodList.add(mood);
                             }
-                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
                         }
-                    });
-        } else {
-            Log.d("PublicProfileActivity", "User is NOT following, fetching only public moods.");
-            moodListener = db.collection("moods")
-                    .whereEqualTo("userId", selectedUserId) // Filter moods by the selected user
-                    .whereEqualTo("`private post`", false) // Only fetch public moods
-                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
-                    .addSnapshotListener((snapshots, error) -> {
-                        if (error != null) {
-                            Log.e("Firestore", "Error listening for mood changes", error);
-                            return;
-                        }
-
-                        if (snapshots != null) {
-                            moodList.clear();
-
-                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                                Mood mood = doc.toObject(Mood.class);
-                                if (mood != null) {
-                                    mood.setDocumentId(doc.getId());
-                                    moodList.add(mood);
-                                }
-                            }
-                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
-                        }
-                    });
-        }
+                        adapter.notifyDataSetChanged(); // Refresh RecyclerView
+                    }
+                });
+//        if ("following".equals(followStatus)) {
+//            Log.d("PublicProfileActivity", "User is following, fetching all moods (public and private).");
+//            moodListener = db.collection("moods")
+//                    .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
+//                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
+//                    .addSnapshotListener((snapshots, error) -> {
+//                        if (error != null) {
+//                            Log.e("Firestore", "Error listening for mood changes", error);
+//                            return;
+//                        }
+//
+//                        if (snapshots != null) {
+//                            moodList.clear();
+//
+//                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+//                                Mood mood = doc.toObject(Mood.class);
+//                                if (mood != null) {
+//                                    mood.setDocumentId(doc.getId());
+//                                    moodList.add(mood);
+//                                }
+//                            }
+//                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
+//                        }
+//                    });
+//        } else {
+//            Log.d("PublicProfileActivity", "User is NOT following, fetching only public moods.");
+//            moodListener = db.collection("moods")
+//                    .whereEqualTo("userId", selectedUserId) // Filter moods by the selected user
+//                    .whereEqualTo("`private post`", false) // Only fetch public moods
+//                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
+//                    .addSnapshotListener((snapshots, error) -> {
+//                        if (error != null) {
+//                            Log.e("Firestore", "Error listening for mood changes", error);
+//                            return;
+//                        }
+//
+//                        if (snapshots != null) {
+//                            moodList.clear();
+//
+//                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+//                                Mood mood = doc.toObject(Mood.class);
+//                                if (mood != null) {
+//                                    mood.setDocumentId(doc.getId());
+//                                    moodList.add(mood);
+//                                }
+//                            }
+//                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
+//                        }
+//                    });
+//        }
     }
 
     private void updateFollowButton(String currentUserId, String selectedUserId) {

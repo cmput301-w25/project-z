@@ -17,6 +17,7 @@ import com.example.z.utils.GetEmoji;
 import com.example.z.utils.GetEmojiColor;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
+import com.example.z.views.PublicProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -115,7 +116,14 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
         // Handle post click to open the mood details dialog
         holder.itemView.setOnClickListener(v -> {
             ViewMoodDialogFragment moodDialog = new ViewMoodDialogFragment(mood);
-            moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            //moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            if (context instanceof ProfileActivity) {
+                moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            } else if (context instanceof PublicProfileActivity) {
+                moodDialog.show(((PublicProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            } else {
+                System.err.println("Error: Unknown context in MoodArrayAdapter");
+            }
         });
 
         // Allow editing only if the mood belongs to the current user

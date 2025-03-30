@@ -7,52 +7,74 @@
     android:background="@color/backgroundColor"
     android:padding="0dp">
 
-    <!-- User Avatar -->
-    <ImageView
-        android:id="@+id/profileImage"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="16dp"
-        android:backgroundTint="#0FA3B1"
-        android:scaleType="centerCrop"
-        android:src="@drawable/profile_button" />
-
-    <!-- Username -->
-    <TextView
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/profileImage"
-        android:layout_marginTop="25dp"
-        android:layout_toEndOf="@id/profileImage"
-        android:fontFamily="@font/itim_regular"
-        android:text="[User]"
-        android:textColor="@color/textColor"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <!-- User Handle -->
-
-    <!-- Bio Section -->
-    <TextView
-        android:id="@+id/userBio"
+    <RelativeLayout
+        android:id="@+id/profileContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/username"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_toEndOf="@+id/username"
-        android:background="@drawable/rounded_button"
+        android:layout_margin="16dp"
+        android:layout_alignParentTop="true">
+
+        <RelativeLayout
+            android:id="@+id/profileSection"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="#0FA3B1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile_button" />
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileImage"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:text="[User]"
+                android:fontFamily="@font/itim_regular"
+                android:textColor="@color/textColor"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/userBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/profileSection"
+            android:layout_toEndOf="@id/profileSection"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#E9D8A6"
+            android:padding="12dp"
+            android:text="Bio goes here..."
+            android:textColor="@color/backgroundColor"
+            android:textSize="16sp"
+            android:textStyle="italic" />
+
+        <Button
+        android:id="@+id/followButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/userBio"
+        android:layout_alignParentEnd="true"
+        android:layout_weight="1"
         android:backgroundTint="#E9D8A6"
-        android:padding="12dp"
-        android:text="Bio goes here..."
+        android:fontFamily="@font/itim_regular"
+        android:text="@string/request_follow"
         android:textColor="@color/backgroundColor"
         android:textSize="16sp"
-        android:textStyle="italic"
-        />
+        app:cornerRadius="50dp" />
+
+    </RelativeLayout>
 
 
 <!--    <Button-->
@@ -72,20 +94,6 @@
 <!--        android:textColor="#F9F7F3"-->
 <!--        android:textSize="16sp"-->
 <!--        android:textStyle="italic"/>-->
-    <Button
-        android:id="@+id/followButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
-        android:layout_below="@id/userBio"
-        android:layout_alignParentEnd="true"
-        android:layout_weight="1"
-        android:backgroundTint="#E9D8A6"
-        android:fontFamily="@font/itim_regular"
-        android:text="@string/request_follow"
-        android:textColor="@color/backgroundColor"
-        android:textSize="16sp"
-        app:cornerRadius="50dp" />
 
 
     <!-- Moods Title -->
@@ -94,40 +102,14 @@
         android:id="@+id/moodTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/followButton"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_below="@id/profileContainer"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/itim_regular"
-        android:text="MOODS"
+        android:text="YOUR MOODS"
         android:textColor="@color/textColor"
         android:textSize="24sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
-    <!-- Filter Button -->
-    <ImageButton
-        android:id="@+id/btnFilterMoods"
-        android:layout_width="48dp"
-        android:layout_height="35dp"
-        android:layout_alignTop="@id/moodTitle"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="Filter button"
-        android:scaleType="centerInside"
-        android:src="@drawable/filter_button" />
-
-    <!-- Map Button -->
-    <ImageButton
-        android:id="@+id/btnMapMoods"
-        android:layout_width="35dp"
-        android:layout_height="30dp"
-        android:layout_alignTop="@id/moodTitle"
-        android:layout_marginEnd="12dp"
-        android:layout_toStartOf="@id/btnFilterMoods"
-        android:background="@android:color/transparent"
-        android:contentDescription="Map button"
-        android:scaleType="centerInside"
-        android:src="@drawable/map_marker" />
 
     <!-- RecyclerView for User Moods -->
     <androidx.recyclerview.widget.RecyclerView

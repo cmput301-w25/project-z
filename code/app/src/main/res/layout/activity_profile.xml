@@ -43,19 +43,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/followButton"
-                android:layout_width="95dp"
-                android:layout_height="42dp"
-                android:layout_below="@id/username"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="6dp"
-                android:backgroundTint="#E9D8A6"
-                android:fontFamily="@font/itim_regular"
-                android:text="Follow"
-                android:textColor="@color/backgroundColor"
-                android:textSize="16sp"
-                android:textStyle="bold" />
         </RelativeLayout>
 
         <TextView

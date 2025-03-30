@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -149,6 +150,7 @@ public class DatabaseManager {
         followRequest.put("followerId", followerId);
         followRequest.put("followedId", followedId);
         followRequest.put("status", "pending");
+        followRequest.put("createdAt", FieldValue.serverTimestamp());
 
         followRequestRef.set(followRequest)
                 .addOnSuccessListener(aVoid ->
