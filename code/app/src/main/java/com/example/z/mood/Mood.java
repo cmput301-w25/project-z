@@ -17,7 +17,7 @@ import java.util.Map;
  * Represents a mood entry in the application.
  * This class is used to store and retrieve mood-related data from Firestore.
  *
- *  Outstanding issues:
+ * Outstanding Issues:
  *      - None
  */
 public class Mood implements Serializable {
@@ -46,10 +46,13 @@ public class Mood implements Serializable {
      * @param createdAt       The timestamp when the mood was created.
      * @param location        The optional location data associated with the mood.
      * @param description     A short description of the user's mood.
+     * @param img             A URL or Base64 string representing the mood image.
+     * @param emoticon        The emoji associated with the mood.
+     * @param isPrivate       Indicates if the mood post is private.
      */
     public Mood(String userId, String documentId, String username, String emotionalState, String trigger,
-                String socialSituation, Date createdAt, Map<String, Object> location, String description, String img,String emoticon, boolean isPrivate) {
-
+                String socialSituation, Date createdAt, Map<String, Object> location, String description,
+                String img, String emoticon, boolean isPrivate) {
 
         this.userId = userId;
         this.documentId = documentId;
@@ -144,7 +147,7 @@ public class Mood implements Serializable {
     /**
      * Gets the location data associated with this mood.
      *
-     * @return The location data (can be null).
+     * @return The location data as a Map (can be null).
      */
     public Map<String, Object> getLocation() {
         return location;
@@ -160,20 +163,34 @@ public class Mood implements Serializable {
         return description;
     }
 
+    /**
+     * Gets the image associated with this mood.
+     *
+     * @return The image URL or Base64 string.
+     */
     @PropertyName("img")
     public String getImg() {
         return img;
     }
 
+    /**
+     * Gets the emoji associated with this mood.
+     *
+     * @return The emoji string.
+     */
     @PropertyName("emoji")
     public String getEmoticon() {
         return emoticon;
     }
 
+    /**
+     * Checks if the mood post is private.
+     *
+     * @return true if the mood is private, false otherwise.
+     */
     @PropertyName("private post")
     public boolean isPrivate() {
         return isPrivate;
-
     }
 
     // Setters
@@ -231,7 +248,7 @@ public class Mood implements Serializable {
     /**
      * Sets the location data associated with this mood.
      *
-     * @param location The location data.
+     * @param location The location data as a Map.
      */
     public void setLocation(Map<String, Object> location) {
         this.location = location;
@@ -266,21 +283,36 @@ public class Mood implements Serializable {
         this.userId = userId;
     }
 
+    /**
+     * Sets the image associated with this mood.
+     *
+     * @param uri The image URL or Base64 string.
+     */
     @PropertyName("img")
     public void setImg(String uri) {
         this.img = uri;
     }
 
+    /**
+     * Sets the emoji associated with this mood.
+     *
+     * @param emoticon The emoji string.
+     */
     @PropertyName("emoji")
     public void setEmoticon(String emoticon) {
         this.emoticon = emoticon;
     }
 
+    /**
+     * Sets whether the mood post is private or public.
+     *
+     * @param isItPrivate true if the post should be private, false otherwise.
+     */
     @PropertyName("private post")
     public void setPrivate(boolean isItPrivate) {
         isPrivate = isItPrivate;
-
     }
 }
+
 
 

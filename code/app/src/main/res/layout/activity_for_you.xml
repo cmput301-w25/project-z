@@ -39,6 +39,7 @@
         layout="@layout/bottom_bar_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <!-- Pull-to-refresh container for the mood list -->
@@ -78,6 +79,7 @@
         android:id="@+id/empty_state_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/itim_regular"
         android:gravity="center"
         android:padding="16dp"
         android:text="No similar moods found"

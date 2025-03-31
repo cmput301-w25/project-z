@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.Button;
@@ -41,6 +42,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * PostActivity displays a detailed view of a Mood post, including its description, time posted,
+ * and user comments. Users can add comments, view existing comments, and navigate through the app.
+ */
 public class PostActivity extends AppCompatActivity {
     private Mood mood;
     private FirebaseFirestore db;
@@ -55,7 +60,12 @@ public class PostActivity extends AppCompatActivity {
     private ListenerRegistration listenerRegistration;
     private DatabaseManager databaseManager;
 
-
+    /**
+     * Called when the activity is created. Initializes UI components, retrieves the mood data,
+     * sets up the comments RecyclerView, and loads existing comments.
+     *
+     * @param savedInstanceState The saved instance state from a previous activity instance.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,12 +117,20 @@ public class PostActivity extends AppCompatActivity {
                 mood.getSocialSituation()
         );
 
-        String postContent = String.format(
-                "%s\n#%s\n\nPosted on: %s",
-                mood.getDescription(),
-                mood.getTrigger(),
-                new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault()).format(mood.getCreatedAt())
-        );
+        StringBuilder postContent = new StringBuilder();
+        postContent.append(mood.getDescription()).append("\n");
+
+        if (mood.getTrigger() != null && !mood.getTrigger().trim().isEmpty()) {
+            postContent.append("#").append(mood.getTrigger()).append("\n\n");
+        }
+
+        String dynamicTime = DateUtils.getRelativeTimeSpanString(
+                mood.getCreatedAt().getTime(),
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS
+        ).toString();
+
+        postContent.append("Posted: ").append(dynamicTime);
 
         postHeading.setText(headingContent);
         postDetails.setText(postContent);
@@ -144,6 +162,10 @@ public class PostActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Loads existing comments from Firestore for the selected mood post.
+     * Updates the RecyclerView when new comments are detected.
+     */
     public void loadOldComments() {
         listenerRegistration = db.collection("comments")
                 .whereEqualTo("mood_id", mood.getDocumentId())
@@ -167,6 +189,10 @@ public class PostActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Adds a new comment to the selected mood post in Firestore.
+     * The comment is saved with the user's ID, username, timestamp, and optional emoji.
+     */
     private void addComment() {
 
         String editToString = userComment.getText().toString().trim();

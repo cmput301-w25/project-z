@@ -131,6 +131,7 @@
         android:layout_below="@id/tvActivity"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
+        android:fontFamily="@font/itim_regular"
         android:gravity="center"
         android:padding="16dp"
         android:text="No moods found"

@@ -73,7 +73,7 @@ import java.util.Map;
  * The mood is saved to Firestore and updates the UI accordingly.
  *
  *  Outstanding issues:
- *      - Cannot add picture/image
+ *      - None
  */
 public class MoodFragment extends DialogFragment {
     private Spinner edit_social_situation;
@@ -175,6 +175,9 @@ public class MoodFragment extends DialogFragment {
         this.moodAddedListener = listener;
     }
 
+    /**
+     * Opens an emoji picker and allows the user to select an emoji.
+     */
     private void displayEmojiView() {
 
         BottomSheetDialog bottomSheet = new BottomSheetDialog(requireContext());
@@ -324,7 +327,9 @@ public class MoodFragment extends DialogFragment {
                 .show();
     }
 
-
+    /**
+     * Handles location requests, image selection from the gallery, and capturing photos.
+     */
     private void requestUserLocation() {
         locationRequested = true;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -343,11 +348,20 @@ public class MoodFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Opens the device's gallery to allow the user to select an image.
+     * The selected image's URI will be retrieved.
+     */
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE);
     }
 
+    /**
+     * Captures a photo using the device's camera and saves it as a file.
+     * If the camera is available, it will request the necessary permissions.
+     * The captured photo's URI will be retrieved.
+     */
     private void capturePhoto() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -366,6 +380,14 @@ public class MoodFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Handles the result from an activity launched via {@code startActivityForResult}.
+     * This method processes the selected or captured image.
+     *
+     * @param requestCode The request code passed when starting the activity.
+     * @param resultCode  The result code returned from the activity.
+     * @param data        The intent containing result data (if available).
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -380,9 +402,6 @@ public class MoodFragment extends DialogFragment {
             }
         }
         try {
-//            InputStream imageStream = getActivity().getContentResolver().openInputStream(imgUri);
-//            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-//            imageView.setImageBitmap(selectedImage);
             img = ImgUtil.compressToBase64(imgPath);
             ImgUtil.displayBase64Image(img, imageView);
         } catch (Exception e) {
@@ -390,6 +409,11 @@ public class MoodFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Creates a temporary image file for storing a captured photo.
+     *
+     * @return The created file, or null if an error occurs.
+     */
     private File createImageFile() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = "JPEG_" + timeStamp + "_";
@@ -402,6 +426,13 @@ public class MoodFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Handles permission request results, specifically for camera access.
+     *
+     * @param requestCode  The request code associated with the permission request.
+     * @param permissions  The requested permissions.
+     * @param grantResults The results for each requested permission.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -410,11 +441,9 @@ public class MoodFragment extends DialogFragment {
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent, TAKE_PHOTO);
             } else {
-                // 用户拒绝权限，提示或关闭功能
                 Toast.makeText(getActivity(), "Camera not granted!", Toast.LENGTH_SHORT).show();
             }
         }
     }
-
 }
 

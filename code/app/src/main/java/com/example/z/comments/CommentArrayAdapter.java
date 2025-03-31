@@ -24,16 +24,33 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Adapter for displaying comments in a RecyclerView.
+ * Handles binding comment data to UI elements and managing comment deletion.
+ */
 public class CommentArrayAdapter extends RecyclerView.Adapter<CommentArrayAdapter.CommentViewHolder> {
 
     private List<Comment> userComments;
     private Context context;
 
+    /**
+     * Constructs a CommentArrayAdapter.
+     *
+     * @param context      The context where the adapter is used.
+     * @param userComments The list of comments to be displayed.
+     */
     public CommentArrayAdapter(Context context, List<Comment> userComments) {
         this.context = context;
         this.userComments = userComments;
     }
 
+    /**
+     * Inflates the comment layout and creates a ViewHolder for it.
+     *
+     * @param parent   The parent ViewGroup.
+     * @param viewType The view type.
+     * @return A new CommentViewHolder instance.
+     */
     @Nonnull
     @Override
     public CommentViewHolder onCreateViewHolder(@Nonnull ViewGroup parent, int viewType) {
@@ -41,6 +58,12 @@ public class CommentArrayAdapter extends RecyclerView.Adapter<CommentArrayAdapte
         return new CommentViewHolder(view);
     }
 
+    /**
+     * Binds a comment to the UI components of the ViewHolder.
+     *
+     * @param holder   The ViewHolder to bind data to.
+     * @param position The position of the comment in the list.
+     */
     @Override
     public void onBindViewHolder(@Nonnull CommentViewHolder holder, int position) {
         Comment comment = userComments.get(position);
@@ -48,54 +71,65 @@ public class CommentArrayAdapter extends RecyclerView.Adapter<CommentArrayAdapte
         holder.commentDetails.setText(comment.getCommentDetails());
         holder.timestamp.setText(comment.getTimestamp());
 
+        // Handle displaying emoji if available
         if (comment.getEmoji() != null) {
             int emojiPosition = GetEmoji.getEmojiPosition(comment.getEmoji());
             int getEmojiColor = (comment.getEmotionalState() != null)
                     ? GetEmojiColor.getEmojiColor(comment.getEmotionalState())
                     : 0;
+
             if (emojiPosition != 0) {
                 holder.emoji.setImageResource(emojiPosition);
                 holder.emoji.setVisibility(View.VISIBLE);
 
                 if (getEmojiColor != 0) {
                     holder.emoji.setColorFilter(getEmojiColor, PorterDuff.Mode.SRC_IN);
-                }
-                else {
+                } else {
                     holder.emoji.clearColorFilter();
                 }
-            }
-            else {
+            } else {
                 holder.emoji.setVisibility(View.GONE);
             }
-        }
-        else {
+        } else {
             holder.emoji.setVisibility(View.GONE);
         }
 
+        // Handle long click for comment deletion
         holder.itemView.setOnLongClickListener(v -> {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null && comment.getUserId().equals(user.getUid())) {
                 displayDeleteDialog(comment, position);
-            }
-            else {
+            } else {
                 Toast.makeText(context, "This comment does not belong to you!", Toast.LENGTH_SHORT).show();
             }
             return true;
         });
-
     }
 
+    /**
+     * Returns the total number of comments in the dataset.
+     *
+     * @return The size of the userComments list.
+     */
     @Override
     public int getItemCount() {
         return userComments.size();
     }
 
+    /**
+     * ViewHolder class for holding comment item views.
+     */
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView username;
         TextView commentDetails;
         TextView timestamp;
         ImageView emoji;
 
+        /**
+         * Constructor for CommentViewHolder.
+         *
+         * @param itemView The item view containing the UI elements.
+         */
         public CommentViewHolder(View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.commentUsername);
@@ -105,6 +139,12 @@ public class CommentArrayAdapter extends RecyclerView.Adapter<CommentArrayAdapte
         }
     }
 
+    /**
+     * Displays a confirmation dialog for deleting a comment.
+     *
+     * @param comment  The comment to be deleted.
+     * @param position The position of the comment in the list.
+     */
     private void displayDeleteDialog(Comment comment, int position) {
         new AlertDialog.Builder(context)
                 .setTitle("Delete Comment")
@@ -114,6 +154,12 @@ public class CommentArrayAdapter extends RecyclerView.Adapter<CommentArrayAdapte
                 .show();
     }
 
+    /**
+     * Deletes a comment from Firestore and refreshes the comment list in PostActivity.
+     *
+     * @param comment  The comment to be deleted.
+     * @param position The position of the comment in the list.
+     */
     private void deleteComment(Comment comment, int position) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("comments").document(comment.getCommentId())
@@ -123,6 +169,8 @@ public class CommentArrayAdapter extends RecyclerView.Adapter<CommentArrayAdapte
                         ((PostActivity) context).loadOldComments();
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(context, "Could not delete comment!", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e ->
+                        Toast.makeText(context, "Could not delete comment!", Toast.LENGTH_SHORT).show());
     }
 }
+

@@ -105,7 +105,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         moodFragment.show(getSupportFragmentManager(), "AddMoodFragment");
     }
 
-
+    /**
+     * Callback method triggered when the Google Map is ready to be used.
+     * Initializes the map with a default view and loads mood events.
+     *
+     * @param googleMap The GoogleMap object ready for use.
+     */
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -114,6 +119,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         loadMoodEvents();
     }
 
+    /**
+     * Displays a dialog that allows the user to filter moods displayed on the map.
+     * Options include:
+     * - "My Moods": Loads only the moods posted by the current user.
+     * - "Following Moods": Loads the most recent mood of users the current user follows.
+     * - "Following Moods within 5km": Loads only nearby moods from followed users.
+     */
     private void filterDialog() {
         String[] options = {"My Moods", "Following Moods", "Following Moods within 5km"};
 
@@ -131,8 +143,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .show();
     }
 
-
-
+    /**
+     * Loads and displays the moods posted by the currently logged-in user on the map.
+     * The moods are retrieved from Firestore, and markers are added to the map for each mood with a location.
+     */
     private void loadMoodEvents() {
         mMap.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -159,7 +173,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }).addOnFailureListener(e -> Log.e("MapActivity", "Error loading mood events", e));
     }
 
-
+    /**
+     * Loads and displays the most recent mood of users the current user follows.
+     * If {@code within5km} is true, it filters moods to only display those within a 5km radius of the user.
+     *
+     * @param within5km If true, only moods within 5km of the user's location are displayed.
+     */
     private void loadRecentMood(boolean within5km) {
         mMap.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -204,6 +223,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }).addOnFailureListener(e -> Log.e("MapActivity", "Error loading recent moods", e));
     }
 
+    /**
+     * Checks if a given mood location is within 5km of the user's current location.
+     *
+     * @param moodLocation The location of the mood being checked.
+     * @return True if the mood is within 5km, false otherwise.
+     */
     private boolean isWithin5km(LatLng moodLocation) {
         float[] result = new float[1];
         Location.distanceBetween(
@@ -215,7 +240,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return result[0] <= 5000;
         }
 
-
+    /**
+     * Requests the user's current location.
+     * If permission is granted, the user's location is retrieved, stored, and moods within 5km are displayed.
+     * If permission is not granted, the user is prompted to allow location access.
+     */
     private void requestUserLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -237,6 +266,4 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         });
             }
         }
-
-
 }

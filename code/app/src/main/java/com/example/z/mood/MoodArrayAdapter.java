@@ -3,6 +3,7 @@ package com.example.z.mood;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,7 @@ import java.util.Locale;
  * Adapter for displaying a list of Mood objects in a RecyclerView.
  * This adapter binds mood data to the UI elements inside a mood card item.
  *
- *  Outstanding issues:
+ * Outstanding Issues:
  *      - None
  */
 public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.MoodViewHolder> {
@@ -73,46 +74,57 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
     public void onBindViewHolder(@NonNull MoodViewHolder holder, int position) {
         Mood mood = moodList.get(position);
 
-        // Ensure views are not null before setting text
+        // Set mood title
         if (holder.moodText != null) {
             holder.moodText.setText(String.format("%s is feeling %s", mood.getUsername(), mood.getEmotionalState()));
         }
 
+        // Set description
         if (holder.descriptionText != null) {
             holder.descriptionText.setText(mood.getDescription());
         }
 
+        // Show mood trigger only if it exists
         if (holder.moodTag != null) {
-            holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
+            if (mood.getTrigger() != null && !mood.getTrigger().trim().isEmpty()) {
+                holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
+                holder.moodTag.setVisibility(View.VISIBLE);
+            } else {
+                holder.moodTag.setVisibility(View.GONE);
+            }
         }
 
+        // Display dynamic time (e.g., "5 minutes ago")
         Date moodDate = mood.getCreatedAt();
         if (moodDate != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault());
-            holder.dateText.setText(dateFormat.format(moodDate));
+            String dynamicTime = DateUtils.getRelativeTimeSpanString(
+                    mood.getCreatedAt().getTime(),
+                    System.currentTimeMillis(),
+                    DateUtils.MINUTE_IN_MILLIS
+            ).toString();
+            holder.dateText.setText(dynamicTime);
         } else {
             holder.dateText.setText("No Date"); // Display fallback text if date is null
         }
 
+        // Retrieve and display the selected emoji
         int getEmoji = GetEmoji.getEmojiPosition(mood.getEmoticon());
-
         if (mood.getEmoticon() != null && getEmoji != 0) {
             holder.emojiChosen.setImageResource(getEmoji);
             holder.emojiChosen.setVisibility(View.VISIBLE);
 
+            // Set mood color for emoji (if available)
             int getMoodColor = GetEmojiColor.getEmojiColor(mood.getEmotionalState());
             if (mood.getEmotionalState() != null) {
-                holder.emojiChosen.setColorFilter(getMoodColor, PorterDuff.Mode.SRC_IN); // sets color for emoji
-            }
-            else {
+                holder.emojiChosen.setColorFilter(getMoodColor, PorterDuff.Mode.SRC_IN);
+            } else {
                 holder.emojiChosen.clearColorFilter();
             }
-        }
-        else {
+        } else {
             holder.emojiChosen.setVisibility(View.GONE);
         }
 
-        // Handle post click to open the mood details 
+        // Open mood details when clicked
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, PostActivity.class);
             intent.putExtra("mood", mood);
@@ -174,6 +186,7 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
         }
     }
 }
+
 
 
 

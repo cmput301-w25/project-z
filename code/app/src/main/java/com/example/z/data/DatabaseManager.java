@@ -36,9 +36,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Manages interactions with Firestore, including saving and editing mood entries.
+ * Manages interactions with Firestore, including saving, editing, and retrieving mood entries,
+ * user details, comments, and follow requests.
  *
- *  Outstanding Issues:
+ * Outstanding Issues:
  *      - None
  */
 public class DatabaseManager {
@@ -62,6 +63,12 @@ public class DatabaseManager {
         commentsRef = db.collection(("comments"));
     }
 
+    /**
+     * Saves a new comment to Firestore.
+     *
+     * @param newComment The comment object to be saved.
+     * @param listener   Callback to handle success or failure.
+     */
     public void saveComment(Comment newComment, OnCommentSavedListener listener) {
 
         DocumentReference commentDocRef = commentsRef.document(newComment.getCommentId());
@@ -71,6 +78,9 @@ public class DatabaseManager {
                 .addOnFailureListener(listener::onFailure);
     }
 
+    /**
+     * Listener for handling comment save events.
+     */
     public interface OnCommentSavedListener {
         void onSuccess();
         void onFailure(Exception e);
@@ -87,6 +97,11 @@ public class DatabaseManager {
      * @param socialSituation The social situation during the mood event.
      * @param trigger         The trigger that caused the mood.
      * @param datePosted      The timestamp when the mood was created.
+     * @param img             The optional image associated with the mood.
+     * @param latitude        The optional latitude of the mood's location.
+     * @param longitude       The optional longitude of the mood's location.
+     * @param emoji           The emoji representing the user's mood.
+     * @param isPrivate       Whether the mood post is private or public.
      */
     public void saveMood(String userId, DocumentReference moodDocRef, String username, String moodType,
                          String description, String socialSituation, String trigger, Date datePosted, String img, Double latitude, Double longitude, String emoji, boolean isPrivate) {
@@ -127,6 +142,9 @@ public class DatabaseManager {
      * @param socialSituation  The updated social situation.
      * @param trigger          The updated trigger.
      * @param updatedAt        The new timestamp when the mood was edited.
+     * @param img              The updated image (optional).
+     * @param emoji            The updated emoji.
+     * @param isPrivate        Whether the mood post is private or public.
      * @param onSuccessListener Callback for successful update.
      * @param onFailureListener Callback for failure during update.
      */

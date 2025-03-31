@@ -3,22 +3,29 @@ package com.example.z.notifications;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
 import com.example.z.data.DatabaseManager;
+import com.example.z.mood.Mood;
 import com.example.z.user.User;
 import com.example.z.user.UserArrayAdapter;
+import com.example.z.utils.GetEmoji;
+import com.example.z.utils.GetEmojiColor;
 import com.example.z.utils.OnUsernameFetchedListener;
 import com.example.z.views.PublicProfileActivity;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +85,7 @@ public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationA
             }
         });
 
-        //holder.usernameTextView.setText(notification.getFollowedUsername() );
+        getMood(notification.getFollowerId(), holder);
 
         // Handle Accept Button Click
         holder.acceptButton.setOnClickListener(v -> handleFollowRequest(notification, "accepted", position));
@@ -95,6 +102,33 @@ public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationA
     @Override
     public int getItemCount() {
         return notificationList.size();
+    }
+
+    private void getMood(String userId, NotificationViewHolder holder) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("moods")
+                .whereEqualTo("userId", userId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot moodDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        Mood mood = moodDoc.toObject(Mood.class);
+                        if (mood != null) {
+                            int getEmoji = GetEmoji.getEmojiPosition(mood.getEmoticon());
+                            int emojiColour = GetEmojiColor.getEmojiColor(mood.getEmotionalState());
+
+                            holder.emoji.setImageResource(getEmoji);
+                            holder.emoji.setColorFilter(emojiColour, PorterDuff.Mode.SRC_IN);
+                            holder.emoji.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    else {
+                        holder.emoji.setVisibility(View.VISIBLE);
+                    }
+                })
+                .addOnFailureListener(e -> holder.emoji.setVisibility(View.GONE));
     }
 
     /**
@@ -138,6 +172,7 @@ public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationA
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
         TextView usernameTextView;
         Button acceptButton, rejectButton;
+        ImageView emoji;
 
         /**
          * Constructs a NotificationViewHolder and initializes the view components.
@@ -149,6 +184,7 @@ public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationA
             usernameTextView = itemView.findViewById(R.id.notificationText);
             acceptButton = itemView.findViewById(R.id.acceptButton);
             rejectButton = itemView.findViewById(R.id.declineButton);
+            emoji = itemView.findViewById(R.id.profilePicture);
         }
     }
 }

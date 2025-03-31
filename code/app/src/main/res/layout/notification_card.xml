@@ -21,12 +21,12 @@
 
             <ImageView
                 android:id="@+id/profilePicture"
-                android:layout_width="108dp"
-                android:layout_height="97dp"
+                android:layout_width="96dp"
+                android:layout_height="91dp"
                 android:layout_gravity="center_vertical"
                 android:adjustViewBounds="true"
                 android:background="@drawable/rounded_background"
-                android:backgroundTint="#9B2226"
+                android:backgroundTint="@android:color/transparent"
                 android:contentDescription="@string/profile_accessibility"
                 android:cropToPadding="true"
                 android:scaleType="centerCrop" />
@@ -62,7 +62,7 @@
                         android:fontFamily="@font/itim_regular"
                         android:text="@string/accept_request"
                         android:textColor="#E9D8A6"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         app:cornerRadius="50dp" />
 
                     <Button
@@ -75,7 +75,7 @@
                         android:fontFamily="@font/itim_regular"
                         android:text="@string/decline_request"
                         android:textColor="#E9D8A6"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         app:cornerRadius="50dp" />
                 </LinearLayout>
             </LinearLayout>
