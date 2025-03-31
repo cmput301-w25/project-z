@@ -13,7 +13,7 @@
 
 ## Project Description
 
-[Track your moods as well as your friends moods in this app! Share moods, support eaech other and look back on your emotions.]
+Track your moods as well as your friends moods in this app! Share moods, support eaech other and look back on your emotions.
 
 ## Key Features
 
