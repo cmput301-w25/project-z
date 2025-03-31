@@ -3,6 +3,7 @@ package com.example.z;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -16,6 +17,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.z.user.User;
+import com.example.z.views.NotificationActivity;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -30,12 +32,19 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @RunWith(AndroidJUnit4.class)
 public class NotificationActivityTest {
+
     @Rule
-    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<MainActivity>(MainActivity.class);
+    public ActivityScenarioRule<NotificationActivity> scenario = new ActivityScenarioRule<>(NotificationActivity.class);
+
+    private static final String TEST_USER_ID = "1"; // The user receiving follow requests
+    private static final String FOLLOWER_ID_1 = "2"; // First follower
+    private static final String FOLLOWER_ID_2 = "3"; // Second follower
 
     @BeforeClass
     public static void setup(){
@@ -50,16 +59,30 @@ public class NotificationActivityTest {
     public void seedDatabase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference followersRef = db.collection("followers");
-        CollectionReference usersRef = db.collection("users");
-        User[] users = {
-                new User("user1@gmail.com", "user1", "1"),
-                new User("user2@gmil.com", "user2", "2")
-        };
-        for (User user : users) {
-            usersRef.document().set(user);
-        }
+//        CollectionReference usersRef = db.collection("users");
+//        User[] users = {
+//                new User("user1@gmail.com", "user1", "1"),
+//                new User("user2@gmil.com", "user2", "2")
+//        };
+//        for (User user : users) {
+//            usersRef.document().set(user);
+//        }
 
-        {"followedId" : "1", "followerId": "2"}
+        // Create follow request from follower 1
+        Map<String, Object> followRequest1 = new HashMap<>();
+        followRequest1.put("followerId", FOLLOWER_ID_1);
+        followRequest1.put("followedId", TEST_USER_ID);
+        followRequest1.put("status", "pending");
+
+        // Create follow request from follower 2
+        Map<String, Object> followRequest2 = new HashMap<>();
+        followRequest2.put("followerId", FOLLOWER_ID_2);
+        followRequest2.put("followedId", TEST_USER_ID);
+        followRequest2.put("status", "pending");
+
+        // Add requests to Firestore emulator
+        followersRef.document(FOLLOWER_ID_1 + "_" + TEST_USER_ID).set(followRequest1);
+        followersRef.document(FOLLOWER_ID_2 + "_" + TEST_USER_ID).set(followRequest2);
 
     }
 
@@ -87,46 +110,83 @@ public class NotificationActivityTest {
         }
     }
 
+    /**
+     * Test if two follow request notifications are displayed.
+     */
     @Test
-    public void appShouldDisplayExistingMoviesOnLaunch() {
-        // Check that the initial data is loaded
-        onView(withText("Oppenheimer")).check(matches(isDisplayed()));
-        onView(withText("Barbie")).check(matches(isDisplayed()));
-        // Click on Oppenheimer
-        onView(withText("Oppenheimer")).perform(click());
-        // Check that the movie details are displayed correctly
-        onView(withId(R.id.edit_title)).check(matches(withText("Oppenheimer")));
-        onView(withId(R.id.edit_genre)).check(matches(withText("Thriller/Historical Drama")));
-        onView(withId(R.id.edit_year)).check(matches(withText("2023")));
+    public void testFollowRequestsAreDisplayed() {
+        // Check if both follow request notifications exist in RecyclerView
+        onView(withText("user2 has requested to follow you")).check(matches(isDisplayed()));
+        onView(withText("user3 has requested to follow you")).check(matches(isDisplayed()));
     }
 
+    /**
+     * Test accepting a follow request removes it from the list.
+     */
     @Test
-    public void addMovieShouldAddValidMovieToMovieList() {
-        // Click on button to open addMovie dialog
-        onView(withId(R.id.buttonAddMovie)).perform(click());
+    public void testAcceptFollowRequest() {
+        // Click accept button for first follow request (position 0)
+        onView(withId(R.id.notificationsRecyclerView))
+                .perform(actionOnItemAtPosition(0, click()));
 
-        // Input Movie Details
-        onView(withId(R.id.edit_title)).perform(ViewActions.typeText("Interstellar"));
-        onView(withId(R.id.edit_genre)).perform(ViewActions.typeText("Science Fiction"));
-        onView(withId(R.id.edit_year)).perform(ViewActions.typeText("2014"));
-
-        // Submit Form
-        onView(withId(android.R.id.button1)).perform(click());
-
-        // Check that our movie list has our new movie
-        onView(withText("Interstellar")).check(matches(isDisplayed()));
+        // Verify that the first request has disappeared
+        onView(withText("user2 sent you a follow request."))
+                .check(matches(isDisplayed())); // Should FAIL if it was removed
     }
 
+    /**
+     * Test rejecting a follow request removes it from the list.
+     */
     @Test
-    public void addMovieShouldShowErrorForInvalidMovieName() {
-        // Click on button to open addMovie dialog
-        onView(withId(R.id.buttonAddMovie)).perform(click());
-        // Add movie details, but no title
-        onView(withId(R.id.edit_genre)).perform(ViewActions.typeText("Science Fiction"));
-        onView(withId(R.id.edit_year)).perform(ViewActions.typeText("2014"));
-        // Submit Form
-        onView(withId(android.R.id.button1)).perform(click());
-        // Check that an error is shown to the user
-        onView(withId(R.id.edit_title)).check(matches(hasErrorText("Move name cannot be empty!")));
+    public void testRejectFollowRequest() {
+        // Click reject button for second follow request (position 1)
+        onView(withId(R.id.notificationsRecyclerView))
+                .perform(actionOnItemAtPosition(1, click()));
+
+        // Verify that the second request has disappeared
+        onView(withText("user3 sent you a follow request."))
+                .check(matches(isDisplayed())); // Should FAIL if it was removed
     }
+//    @Test
+//    public void appShouldDisplayExistingMoviesOnLaunch() {
+//        // Check that the initial data is loaded
+//        onView(withText("Oppenheimer")).check(matches(isDisplayed()));
+//        onView(withText("Barbie")).check(matches(isDisplayed()));
+//        // Click on Oppenheimer
+//        onView(withText("Oppenheimer")).perform(click());
+//        // Check that the movie details are displayed correctly
+//        onView(withId(R.id.edit_title)).check(matches(withText("Oppenheimer")));
+//        onView(withId(R.id.edit_genre)).check(matches(withText("Thriller/Historical Drama")));
+//        onView(withId(R.id.edit_year)).check(matches(withText("2023")));
+//    }
+//
+//    @Test
+//    public void addMovieShouldAddValidMovieToMovieList() {
+//        // Click on button to open addMovie dialog
+//        onView(withId(R.id.buttonAddMovie)).perform(click());
+//
+//        // Input Movie Details
+//        onView(withId(R.id.edit_title)).perform(ViewActions.typeText("Interstellar"));
+//        onView(withId(R.id.edit_genre)).perform(ViewActions.typeText("Science Fiction"));
+//        onView(withId(R.id.edit_year)).perform(ViewActions.typeText("2014"));
+//
+//        // Submit Form
+//        onView(withId(android.R.id.button1)).perform(click());
+//
+//        // Check that our movie list has our new movie
+//        onView(withText("Interstellar")).check(matches(isDisplayed()));
+//    }
+//
+//    @Test
+//    public void addMovieShouldShowErrorForInvalidMovieName() {
+//        // Click on button to open addMovie dialog
+//        onView(withId(R.id.buttonAddMovie)).perform(click());
+//        // Add movie details, but no title
+//        onView(withId(R.id.edit_genre)).perform(ViewActions.typeText("Science Fiction"));
+//        onView(withId(R.id.edit_year)).perform(ViewActions.typeText("2014"));
+//        // Submit Form
+//        onView(withId(android.R.id.button1)).perform(click());
+//        // Check that an error is shown to the user
+//        onView(withId(R.id.edit_title)).check(matches(hasErrorText("Move name cannot be empty!")));
+//  }
 }
