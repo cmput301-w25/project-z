@@ -1,7 +1,6 @@
 package com.example.z.mood;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.z.utils.GetEmoji;
 import com.example.z.utils.GetEmojiColor;
 import com.example.z.views.ProfileActivity;
@@ -22,10 +20,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Adapter for displaying a list of Mood objects in a RecyclerView.
@@ -85,6 +81,12 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
         if (holder.moodTag != null) {
             holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
         }
+
+       /* if (holder.imgMood != null && mood.getImg() != null) {
+            ImgUtil.displayBase64Image(mood.getImg(), holder.imgMood);
+//            Glide.with(this.context).load(mood.getImg().toString()).into(holder.imgMood);
+        }
+/*/
 
         Date moodDate = mood.getCreatedAt();
         if (moodDate != null) {

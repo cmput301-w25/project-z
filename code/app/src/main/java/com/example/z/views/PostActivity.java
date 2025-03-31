@@ -5,8 +5,10 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +18,7 @@ import androidx.core.content.res.ResourcesCompat;
 import com.example.z.R;
 import com.example.z.mood.Mood;
 import com.example.z.mood.MoodFragment;
+import com.example.z.utils.ImgUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -59,6 +62,7 @@ public class PostActivity extends AppCompatActivity {
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
         ImageButton addPostButton = findViewById(R.id.nav_add);
+        ImageView img = findViewById(R.id.postImage);
 
         // Get mood to view
         mood = (Mood) getIntent().getSerializableExtra("mood");
@@ -85,7 +89,12 @@ public class PostActivity extends AppCompatActivity {
 
         postHeading.setText(headingContent);
         postDetails.setText(postContent);
-
+        if (mood.getImg() != null) {
+            img.setVisibility(View.VISIBLE);
+            ImgUtil.displayBase64Image(mood.getImg(), img);
+        } else {
+            img.setVisibility(View.GONE);
+        }
         // Set click listeners for navigation
         home.setOnClickListener(v -> navigateTo(HomeActivity.class));
         profile.setOnClickListener(v -> navigateTo(ProfileActivity.class));
