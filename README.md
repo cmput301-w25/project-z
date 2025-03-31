@@ -17,15 +17,15 @@ Track your moods as well as your friends moods in this app! Share moods, support
 
 ## Key Features
 
-- [For You Page]: Find users with similar posts!
-- [Map locations]: Find where your friends' moods are located!
-- [Follow]: Follow your friends and share moods!
+- For You Page: Find users with similar posts!
+- Map locations: Find where your friends' moods are located!
+- Follow: Follow your friends and share moods!
 
 ## Setup Instructions
 
-1. [Download the code from project Z main]
-2. [Run the build]
-3. [Enjoy!]
+1. Download the code from project Z main
+2. Run the build
+3. Enjoy!
 
 ## Documentation
 
@@ -34,3 +34,7 @@ Track your moods as well as your friends moods in this app! Share moods, support
 - UI Mockups - [https://github.com/cmput301-w25/project-z/wiki/UI-Mockup]
 - UML Diagrams - [https://github.com/cmput301-w25/project-z/wiki/UML-Class-Diagrams]
 - Meeting Notes - [https://github.com/cmput301-w25/project-z/wiki/Z-Meeting-Notes]
+
+## Collaborators
+
+Used AI (Chat GPT) for debugging as well as UI testing. Also used for in-code comments. 
