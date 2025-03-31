@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
+import com.example.z.filter.FilterFragment;
 import com.example.z.mood.Mood;
 import com.example.z.mood.MoodArrayAdapter;
 import com.example.z.mood.MoodFragment;
@@ -20,9 +21,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ProfileActivity displays the user's profile and their posted moods.
@@ -31,13 +36,16 @@ import java.util.List;
  *  Outstanding Issues:
  *      - Cannot add personal info yet
  */
-public class ProfileActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener {
+public class ProfileActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener, FilterFragment.FilterListener {
     private FirebaseFirestore db;
     private RecyclerView recyclerView;
     private MoodArrayAdapter adapter;
     private List<Mood> moodList = new ArrayList<>();
     private ListenerRegistration moodListener;
     private String username;
+    private Map<String, Boolean> FilterMoods = new HashMap<>();
+    private boolean RecentMood;
+    private String SearchText = "";
 
     /**
      * Called when the activity is created.
@@ -67,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
         ImageButton map = findViewById(R.id.btnMapMoods);
+        ImageButton filter = findViewById(R.id.btnFilterMoods);
 
         // Set click listeners for navigation
         createMood.setOnClickListener(v -> addMoodEvent());
@@ -74,6 +83,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
         search.setOnClickListener(v -> switchActivity(SearchActivity.class));
         notifications.setOnClickListener(v -> switchActivity(NotificationActivity.class));
         map.setOnClickListener(v -> switchActivity(MapActivity.class));
+        filter.setOnClickListener(v -> openFilterDialog());
     }
 
     /**
@@ -88,6 +98,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
         }
 
         String userId = user.getUid();
+
 
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -107,6 +118,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
     /**
      * Listens for real-time mood changes for the logged-in user.
      * Updates the RecyclerView whenever there is a change in Firestore.
+     * Updates the RecyclerView whenever a filter is applied.
      */
     private void listenForMoodChanges() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -117,9 +129,27 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
 
         String userId = user.getUid();
 
-        moodListener = db.collection("moods")
-                .whereEqualTo("userId", userId) // Filter moods by the current user
-                .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
+        List<String> moods_selected = new ArrayList<>();
+        for (Map.Entry<String, Boolean> selected : FilterMoods.entrySet()) {
+            if (selected.getValue()) {
+                moods_selected.add(selected.getKey());
+                Log.d("mood", "listenForMoodChanges: true");
+            }
+        }
+        Query query = db.collection("moods")
+                .whereEqualTo("userId", userId); // Filter moods by the current user
+
+        if (!moods_selected.isEmpty()) {
+            query = query.whereIn("type", moods_selected);
+            Log.d("mood2", "listenForMoodChanges: " + moods_selected);
+        }
+
+        if (RecentMood) {
+            Date Recent = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
+            query = query.whereGreaterThan("timestamp", Recent);
+        }
+
+        moodListener = query.orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
                         Log.e("Firestore", "Error listening for mood changes", error);
@@ -132,8 +162,15 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
                         for (DocumentSnapshot doc : snapshots.getDocuments()) {
                             Mood mood = doc.toObject(Mood.class);
                             if (mood != null) {
-                                mood.setDocumentId(doc.getId());
-                                moodList.add(mood);
+                                if (!SearchText.isEmpty()) {
+                                    if (mood.getDescription().contains(SearchText)){
+                                        mood.setDocumentId(doc.getId());
+                                        moodList.add(mood);
+                                    }
+                                }else {
+                                    mood.setDocumentId(doc.getId());
+                                    moodList.add(mood);
+                                }
                             }
                         }
                         adapter.notifyDataSetChanged(); // Refresh RecyclerView
@@ -159,6 +196,7 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
     public void onMoodAdded(Mood newMood) {
         moodList.add(0, newMood); // Add new mood to the top of the list
         adapter.notifyItemInserted(0); // Refresh RecyclerView
+        listenForMoodChanges();
     }
 
     /**
@@ -171,5 +209,29 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Smooth transition
         finish(); // Prevents returning to the previous activity
+    }
+
+    /**
+     * Opens the FilterFragment dialog to allow the user to apply filters.
+     */
+    private void openFilterDialog() {
+        FilterFragment filterFragment = new FilterFragment(FilterMoods, RecentMood, SearchText, this);
+        filterFragment.show(getSupportFragmentManager(), "FilterFragment");
+    }
+
+
+    /**
+     * Updates the FilterFragment dialog to fill the checkboxes and applies the filters to show moods
+     *
+     * @param FilterMoods List of moods to filter from
+     * @param RecentMood Shows list of moods from the past 7 days
+     * @param SearchText String that the user is trying to search within a mood
+     */
+    @Override
+    public void onFilterApplied(Map<String, Boolean> FilterMoods, boolean RecentMood, String SearchText) {
+        this.FilterMoods = FilterMoods;
+        this.RecentMood = RecentMood;
+        this.SearchText = SearchText;
+        listenForMoodChanges();
     }
 }

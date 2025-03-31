@@ -1,7 +1,6 @@
 package com.example.z.mood;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,20 +11,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.z.utils.GetEmoji;
 import com.example.z.utils.GetEmojiColor;
+import com.example.z.views.HomeActivity;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
+import com.example.z.views.PublicProfileActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Adapter for displaying a list of Mood objects in a RecyclerView.
@@ -112,10 +110,19 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             holder.emojiChosen.setVisibility(View.GONE);
         }
 
-        // Handle post click to open the mood details dialog
+        // Handle post click to open the mood details 
         holder.itemView.setOnClickListener(v -> {
             ViewMoodDialogFragment moodDialog = new ViewMoodDialogFragment(mood);
-            moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            //moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            if (context instanceof ProfileActivity) {
+                moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            } else if (context instanceof PublicProfileActivity) {
+                moodDialog.show(((PublicProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            } else if (context instanceof HomeActivity) {
+                moodDialog.show(((HomeActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            } else {
+                System.err.println("Error: Unknown context in MoodArrayAdapter");
+            }
         });
 
         // Allow editing only if the mood belongs to the current user

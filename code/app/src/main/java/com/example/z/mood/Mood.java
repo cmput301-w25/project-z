@@ -1,5 +1,7 @@
 package com.example.z.mood;
 
+import android.net.Uri;
+
 import com.google.firebase.firestore.PropertyName;
 
 import java.io.Serializable;
@@ -28,6 +30,7 @@ public class Mood implements Serializable {
     private Map<String, Object> location;
     private String description;
     private String documentId;
+    private String img;
     private String emoticon;
     private boolean isPrivate;
 
@@ -45,7 +48,9 @@ public class Mood implements Serializable {
      * @param description     A short description of the user's mood.
      */
     public Mood(String userId, String documentId, String username, String emotionalState, String trigger,
-                String socialSituation, Date createdAt, Map<String, Object> location, String description, String emoticon, boolean isPrivate) {
+                String socialSituation, Date createdAt, Map<String, Object> location, String description, String img,String emoticon, boolean isPrivate) {
+
+
         this.userId = userId;
         this.documentId = documentId;
         this.username = username;
@@ -55,6 +60,7 @@ public class Mood implements Serializable {
         this.createdAt = createdAt;
         this.location = location;
         this.description = description;
+        this.img = img;
         this.emoticon = emoticon;
         this.isPrivate = isPrivate;
     }
@@ -154,6 +160,11 @@ public class Mood implements Serializable {
         return description;
     }
 
+    @PropertyName("img")
+    public String getImg() {
+        return img;
+    }
+
     @PropertyName("emoji")
     public String getEmoticon() {
         return emoticon;
@@ -162,6 +173,7 @@ public class Mood implements Serializable {
     @PropertyName("private post")
     public boolean isPrivate() {
         return isPrivate;
+
     }
 
     // Setters
@@ -254,6 +266,11 @@ public class Mood implements Serializable {
         this.userId = userId;
     }
 
+    @PropertyName("img")
+    public void setImg(String uri) {
+        this.img = uri;
+    }
+
     @PropertyName("emoji")
     public void setEmoticon(String emoticon) {
         this.emoticon = emoticon;
@@ -262,6 +279,7 @@ public class Mood implements Serializable {
     @PropertyName("private post")
     public void setPrivate(boolean isItPrivate) {
         isPrivate = isItPrivate;
+
     }
 }
 

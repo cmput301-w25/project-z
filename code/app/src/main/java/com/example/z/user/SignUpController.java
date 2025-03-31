@@ -106,7 +106,7 @@ public class SignUpController {
         String userId = mAuth.getCurrentUser().getUid();
 
         // Create a User object
-        User user = new User(email, username);
+        User user = new User(email, username, userId);
 
         // Save to Firestore
         db.collection("users")
