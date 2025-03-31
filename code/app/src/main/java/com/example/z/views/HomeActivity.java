@@ -199,7 +199,7 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                         for (String followerId: following) {
                             Query query = db.collection("moods")
                                     .whereEqualTo("userId", followerId)
-                                    .whereEqualTo("private post", true);
+                                    .whereEqualTo("private post", false);
 
                             if (!moods_selected.isEmpty()) {
                                 query = query.whereIn("type", moods_selected);
