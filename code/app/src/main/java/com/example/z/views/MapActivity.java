@@ -229,7 +229,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         if (location != null) {
                             currentUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
                             Log.d("MapActivity", "Location attached: " + currentUserLocation);
-
+                            mMap.clear();
                             loadRecentMood(true);
                         } else {
                             Log.w("MapActivity", "Location not available. Skipping 5km filter.");

@@ -211,14 +211,21 @@ public class ProfileActivity extends AppCompatActivity implements MoodFragment.O
         finish(); // Prevents returning to the previous activity
     }
 
+    /**
+     * Opens the FilterFragment dialog to allow the user to apply filters.
+     */
     private void openFilterDialog() {
         FilterFragment filterFragment = new FilterFragment(FilterMoods, RecentMood, SearchText, this);
         filterFragment.show(getSupportFragmentManager(), "FilterFragment");
-
     }
 
+
     /**
-     * This is a temporary empty implementation just to test the dialog.
+     * Updates the FilterFragment dialog to fill the checkboxes and applies the filters to show moods
+     *
+     * @param FilterMoods List of moods to filter from
+     * @param RecentMood Shows list of moods from the past 7 days
+     * @param SearchText String that the user is trying to search within a mood
      */
     @Override
     public void onFilterApplied(Map<String, Boolean> FilterMoods, boolean RecentMood, String SearchText) {

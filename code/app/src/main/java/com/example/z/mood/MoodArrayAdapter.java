@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.z.utils.GetEmoji;
 import com.example.z.utils.GetEmojiColor;
+import com.example.z.views.HomeActivity;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
 import com.example.z.views.PublicProfileActivity;
@@ -83,12 +84,6 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
             holder.moodTag.setText(String.format("#%s", mood.getTrigger()));
         }
 
-       /* if (holder.imgMood != null && mood.getImg() != null) {
-            ImgUtil.displayBase64Image(mood.getImg(), holder.imgMood);
-//            Glide.with(this.context).load(mood.getImg().toString()).into(holder.imgMood);
-        }
-/*/
-
         Date moodDate = mood.getCreatedAt();
         if (moodDate != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault());
@@ -123,6 +118,8 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
                 moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
             } else if (context instanceof PublicProfileActivity) {
                 moodDialog.show(((PublicProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
+            } else if (context instanceof HomeActivity) {
+                moodDialog.show(((HomeActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
             } else {
                 System.err.println("Error: Unknown context in MoodArrayAdapter");
             }
