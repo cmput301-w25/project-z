@@ -27,9 +27,6 @@ import java.util.List;
 /**
  * SearchActivity allows users to search for content within the app.
  * It also provides navigation options to different sections of the app.
- *
- *  Outstanding Issues:
- *      - Cannot display search results yet
  */
 public class SearchActivity extends AppCompatActivity implements OnUserSearchCompleteListener{
 
@@ -90,11 +87,21 @@ public class SearchActivity extends AppCompatActivity implements OnUserSearchCom
         addPostButton.setOnClickListener(v -> openAddPostDialog());
     }
 
+    /**
+     * Called when the search is successful and returns a list of users.
+     *
+     * @param users A list of users that match the search query.
+     */
     @Override
     public void onSuccess(List<User> users) {
         userArrayAdapter.updateUserList(users);
     }
 
+    /**
+     * Called when the search fails.
+     *
+     * @param e The exception that caused the failure.
+     */
     @Override
     public void onFailure(Exception e) {
         Toast.makeText(this, "Error fetching users: " + e.getMessage(), Toast.LENGTH_SHORT).show();

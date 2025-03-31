@@ -30,6 +30,11 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for displaying a public user's profile, including their moods,
+ * username, and a follow button. It supports real-time updates of the user's mood
+ * list and allows users to follow/unfollow the displayed user.
+ */
 public class PublicProfileActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener{
     private FirebaseFirestore db;
     private DatabaseManager dbManager;
@@ -159,58 +164,16 @@ public class PublicProfileActivity extends AppCompatActivity implements MoodFrag
                         adapter.notifyDataSetChanged(); // Refresh RecyclerView
                     }
                 });
-//        if ("following".equals(followStatus)) {
-//            Log.d("PublicProfileActivity", "User is following, fetching all moods (public and private).");
-//            moodListener = db.collection("moods")
-//                    .whereEqualTo("userId", selectedUserId) // Filter moods by the current user
-//                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
-//                    .addSnapshotListener((snapshots, error) -> {
-//                        if (error != null) {
-//                            Log.e("Firestore", "Error listening for mood changes", error);
-//                            return;
-//                        }
-//
-//                        if (snapshots != null) {
-//                            moodList.clear();
-//
-//                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
-//                                Mood mood = doc.toObject(Mood.class);
-//                                if (mood != null) {
-//                                    mood.setDocumentId(doc.getId());
-//                                    moodList.add(mood);
-//                                }
-//                            }
-//                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
-//                        }
-//                    });
-//        } else {
-//            Log.d("PublicProfileActivity", "User is NOT following, fetching only public moods.");
-//            moodListener = db.collection("moods")
-//                    .whereEqualTo("userId", selectedUserId) // Filter moods by the selected user
-//                    .whereEqualTo("`private post`", false) // Only fetch public moods
-//                    .orderBy("timestamp", Query.Direction.DESCENDING) // Order by most recent
-//                    .addSnapshotListener((snapshots, error) -> {
-//                        if (error != null) {
-//                            Log.e("Firestore", "Error listening for mood changes", error);
-//                            return;
-//                        }
-//
-//                        if (snapshots != null) {
-//                            moodList.clear();
-//
-//                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
-//                                Mood mood = doc.toObject(Mood.class);
-//                                if (mood != null) {
-//                                    mood.setDocumentId(doc.getId());
-//                                    moodList.add(mood);
-//                                }
-//                            }
-//                            adapter.notifyDataSetChanged(); // Refresh RecyclerView
-//                        }
-//                    });
-//        }
     }
 
+    /**
+     * Updates the follow button's text and state based on the current follow status.
+     * If the user is not following, the follow button is enabled. If a request is pending,
+     * or if the user is already following, the button is updated accordingly.
+     *
+     * @param currentUserId The current logged-in user's ID.
+     * @param selectedUserId The selected user's ID.
+     */
     private void updateFollowButton(String currentUserId, String selectedUserId) {
         DatabaseManager dbManager = new DatabaseManager();
         Button followButton = findViewById(R.id.followButton);
