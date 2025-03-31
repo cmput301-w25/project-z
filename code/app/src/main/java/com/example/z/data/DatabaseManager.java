@@ -62,7 +62,8 @@ public class DatabaseManager {
      * @param datePosted      The timestamp when the mood was created.
      */
     public void saveMood(String userId, DocumentReference moodDocRef, String username, String moodType,
-                         String description, String socialSituation, String trigger, Date datePosted, String emoji, boolean isPrivate) {
+                         String description, String socialSituation, String trigger, Date datePosted, Double latitude, Double longitude, String emoji, boolean isPrivate) {
+
         Map<String, Object> mood = new HashMap<>();
         mood.put("userId", userId);
         mood.put("username", username);
@@ -73,6 +74,13 @@ public class DatabaseManager {
         mood.put("timestamp", datePosted);
         mood.put("emoji", emoji);
         mood.put("private post", isPrivate);
+
+        if (latitude != null && longitude != null) {
+            Map<String, Object> locationMap = new HashMap<>();
+            locationMap.put("latitude", latitude);
+            locationMap.put("longitude", longitude);
+            mood.put("location", locationMap);
+        }
 
         moodDocRef.set(mood)
                 .addOnSuccessListener(aVoid ->

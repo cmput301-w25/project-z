@@ -1,5 +1,14 @@
 package com.example.z.mood;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
@@ -15,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
@@ -26,12 +37,15 @@ import com.example.z.utils.GetEmoji;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.gms.location.Priority;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -54,6 +68,13 @@ public class MoodFragment extends DialogFragment {
     private String userStringEmoji;
     private ImageButton btnEmoji;
     private SwitchCompat privateSwitch;
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location currentLocation;
+
+    private Double latitude = null;
+    private Double longitude = null;
+
+    private boolean locationRequested = false;
 
     /**
      * Called to create the dialog for adding a new mood post.
@@ -64,7 +85,9 @@ public class MoodFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         View view = LayoutInflater.from(getContext()).inflate(R.layout.add_mood_event_alert_dialog, null);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         edit_social_situation = view.findViewById(R.id.spinner_social_situation);
         edit_mood_emotion = view.findViewById(R.id.spinner_mood);
         edit_mood_description = view.findViewById(R.id.edit_description);
@@ -72,6 +95,9 @@ public class MoodFragment extends DialogFragment {
 
         btnEmoji = view.findViewById(R.id.btn_emoji_picker);
         privateSwitch = view.findViewById(R.id.switch_privacy);
+
+        ImageButton btnAttachLocation = view.findViewById(R.id.btn_attach_location);
+        btnAttachLocation.setOnClickListener(v -> requestUserLocation());
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -191,10 +217,34 @@ public class MoodFragment extends DialogFragment {
             return;
         }
 
+
+
         DocumentReference moodDocRef = db.collection("moods").document();
         String documentId = moodDocRef.getId();
 
-        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, null, description, userStringEmoji, isPrivate);
+        if (currentLocation != null) {
+            latitude = currentLocation.getLatitude();
+            longitude = currentLocation.getLongitude();
+        } else {
+            latitude = null;
+            longitude = null;
+        }
+
+        if (latitude == null || longitude == null) {
+            if (currentLocation != null) {
+                latitude = currentLocation.getLatitude();
+                longitude = currentLocation.getLongitude();
+            } else if (locationRequested) {
+                Toast.makeText(getContext(), "Waiting for location to be retrieved...", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        Map<String, Object> location = new HashMap<>();
+        location.put("latitude", latitude);
+        location.put("longitude", longitude);
+
+        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, location, description, userStringEmoji, isPrivate);
 
         // Save Mood
         saveMoodToFirebase(moodDocRef, newMood);
@@ -207,7 +257,7 @@ public class MoodFragment extends DialogFragment {
      * @param mood       The Mood object containing user input.
      */
     private void saveMoodToFirebase(DocumentReference moodDocRef, Mood mood) {
-        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), mood.getEmoticon(), mood.isPrivate());
+        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), latitude, longitude, mood.getEmoticon(), mood.isPrivate());
 
         // Notify UI & Close Dialog
         if (moodAddedListener != null) {
@@ -240,5 +290,27 @@ public class MoodFragment extends DialogFragment {
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
+
+    private void requestUserLocation() {
+        locationRequested = true;
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        } else {
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                    .addOnSuccessListener(requireActivity(), location -> {
+                        if (location != null) {
+                            currentLocation = location;
+                            Toast.makeText(getContext(), "Location attached!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
+
+
 }
 
