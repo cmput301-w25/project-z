@@ -1,6 +1,7 @@
 package com.example.z.mood;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.z.utils.GetEmoji;
 import com.example.z.utils.GetEmojiColor;
 import com.example.z.views.HomeActivity;
+import com.example.z.views.PostActivity;
 import com.example.z.views.ProfileActivity;
 import com.example.z.R;
 import com.example.z.views.PublicProfileActivity;
@@ -112,17 +114,9 @@ public class MoodArrayAdapter extends RecyclerView.Adapter<MoodArrayAdapter.Mood
 
         // Handle post click to open the mood details 
         holder.itemView.setOnClickListener(v -> {
-            ViewMoodDialogFragment moodDialog = new ViewMoodDialogFragment(mood);
-            //moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
-            if (context instanceof ProfileActivity) {
-                moodDialog.show(((ProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
-            } else if (context instanceof PublicProfileActivity) {
-                moodDialog.show(((PublicProfileActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
-            } else if (context instanceof HomeActivity) {
-                moodDialog.show(((HomeActivity) context).getSupportFragmentManager(), "MoodDetailsDialog");
-            } else {
-                System.err.println("Error: Unknown context in MoodArrayAdapter");
-            }
+            Intent intent = new Intent(context, PostActivity.class);
+            intent.putExtra("mood", mood);
+            context.startActivity(intent);
         });
 
         // Allow editing only if the mood belongs to the current user
