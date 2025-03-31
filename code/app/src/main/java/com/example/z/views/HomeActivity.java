@@ -3,18 +3,22 @@ package com.example.z.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.z.R;
 import com.example.z.filter.FilterFragment;
 import com.example.z.mood.Mood;
 import com.example.z.mood.MoodArrayAdapter;
 import com.example.z.mood.MoodFragment;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -27,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * HomeActivity serves as the main feed where users can navigate to other pages
@@ -46,6 +51,9 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
     private Map<String, Boolean> FilterMoods = new HashMap<>();
     private boolean RecentMood;
     private String SearchText = "";
+    private TabLayout tabLayout;
+    private TabLayout.OnTabSelectedListener tabListener;
+    private TextView emptyStateText;
 
     /**
      * Called when the activity is created.
@@ -60,14 +68,12 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
 
         db = FirebaseFirestore.getInstance();
 
-        // Set up RecyclerView for displaying user moods
+        // Initialize views
         recyclerView = findViewById(R.id.recyclerViewMainFeed);
+        emptyStateText = findViewById(R.id.empty_state_text);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MoodArrayAdapter(this, moodList);
         recyclerView.setAdapter(adapter);
-
-        listenForMoodChanges(); // Listen for mood changes in real-time
-        fetchUsername(); // Fetch username for displaying
 
         // Find navigation buttons
         ImageButton profile = findViewById(R.id.nav_profile);
@@ -76,6 +82,52 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
         ImageButton addPostButton = findViewById(R.id.nav_add);
         ImageButton map = findViewById(R.id.btnMap);
         ImageButton filter = findViewById(R.id.btnFilter);
+        tabLayout = findViewById(R.id.tab_layout);
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+
+        // Set up SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            listenForMoodChanges();
+            swipeRefreshLayout.setRefreshing(false);
+        });
+
+        tabListener = new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) { // "For You" tab
+                    // Navigate to ForYouActivity
+                    Intent intent = new Intent(HomeActivity.this, ForYouActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Smooth transition effect
+                    finish();
+                } else if (tab.getPosition() == 1) { // "Following" tab
+                    // Stay on current activity and refresh
+                    listenForMoodChanges();
+                    fetchUsername();
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // Not needed
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1) {
+                    recyclerView.smoothScrollToPosition(0);
+                }
+            }
+        };
+
+        tabLayout.addOnTabSelectedListener(tabListener);
+        
+        // Set initial tab to Following
+        tabLayout.getTabAt(1).select();
+        
+        // Load initial data
+        listenForMoodChanges();
+        fetchUsername();
 
         // Set click listeners for navigation
         profile.setOnClickListener(v -> navigateTo(ProfileActivity.class));
@@ -86,6 +138,10 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
         addPostButton.setOnClickListener(v -> addMoodEvent());
     }
 
+    /**
+     * Fetches the current user's username from Firestore and updates the welcome message.
+     * If the user is not logged in or the username is not found, logs an error.
+     */
     private void fetchUsername() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -110,10 +166,14 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                 .addOnFailureListener(e -> Log.e("Firestore", "Error fetching username", e));
     }
 
+    /**
+     * Listens for mood changes from followed users and updates the feed accordingly.
+     */
     private void listenForMoodChanges() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             Log.e("Firestore", "User not logged in.");
+            showEmptyState("Please log in to see your feed");
             return;
         }
 
@@ -141,7 +201,6 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                                     .whereEqualTo("userId", followerId)
                                     .whereEqualTo("private post", true);
 
-
                             if (!moods_selected.isEmpty()) {
                                 query = query.whereIn("type", moods_selected);
                             }
@@ -156,12 +215,12 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                                     .addSnapshotListener((snapshots, error) -> {
                                         if (error != null) {
                                             Log.e("Firestore", "Error listening for mood changes", error);
+                                            showEmptyState("Error loading feed: " + error.getMessage());
                                             return;
                                         }
 
                                         if (snapshots != null) {
                                             Log.d("Firestore", "Mood documents found: " + snapshots.size());
-
 
                                             for (DocumentSnapshot doc : snapshots.getDocuments()) {
                                                 Mood mood = doc.toObject(Mood.class);
@@ -175,7 +234,6 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                                                     }else{
                                                         mood.setDocumentId(doc.getId());
                                                         moods_list.add(mood);
-
                                                     }
                                                 }
                                             }
@@ -185,20 +243,48 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                                                 moods_list.sort((m1, m2) -> m2.getCreatedAt().compareTo(m1.getCreatedAt()));
                                                 moodList.addAll(moods_list);
                                                 adapter.notifyDataSetChanged();
+                                                
+                                                if (moodList.isEmpty()) {
+                                                    showEmptyState("No moods found. Try following more users!");
+                                                } else {
+                                                    hideEmptyState();
+                                                }
                                             }
                                         }
                                     });
                         }
+                    } else {
+                        showEmptyState("No moods found. Try following some users!");
                     }
                 })
-                .addOnFailureListener(e -> Log.e("Firestore", "Error fetching followers", e));
-
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error fetching followers", e);
+                    showEmptyState("Error loading feed: " + e.getMessage());
+                });
     }
 
     /**
-     * Navigates to the specified activity.
-     *
-     * @param targetActivity The destination activity class.
+     * Shows empty state message when no moods available
+     */
+    private void showEmptyState(String message) {
+        emptyStateText.setText(message);
+        emptyStateText.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+    }
+
+    /**
+     * Hides empty state message and shows RecyclerView
+     */
+    private void hideEmptyState() {
+        emptyStateText.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Navigates to a specified activity with a smooth transition animation.
+     * 
+     * @param targetActivity
+     *      The destination activity class
      */
     private void navigateTo(Class<?> targetActivity) {
         Intent intent = new Intent(this, targetActivity);
@@ -216,18 +302,33 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
     }
 
     /**
-     * @param newMood The newly added mood.
+     * Callback method called when a new mood is added through the MoodFragment.
+     * Currently empty as the feed is automatically updated through the Firestore listener.
+     * 
+     * @param newMood
+     *      The newly added mood object
      */
     public void onMoodAdded(Mood newMood) {
     }
 
+    /**
+     * Opens the FilterFragment dialog to allow the user to filter their feed.
+     */
     private void openFilterDialog() {
         FilterFragment filterFragment = new FilterFragment(FilterMoods, RecentMood, SearchText, this);
         filterFragment.show(getSupportFragmentManager(), "FilterFragment");
     }
 
     /**
-     * This is a temporary empty implementation just to test the dialog.
+     * Callback method called when filters are applied through the FilterFragment.
+     * Updates the current filter state and refreshes the feed with the new filters.
+     * 
+     * @param FilterMoods
+     *      Map of mood types and their selected state
+     * @param RecentMood
+     *      Whether to show only recent moods (within last 7 days)
+     * @param SearchText
+     *      Text to filter moods by description
      */
     @Override
     public void onFilterApplied(Map<String, Boolean> FilterMoods, boolean RecentMood, String SearchText) {
@@ -236,6 +337,19 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
         this.SearchText = SearchText;
         listenForMoodChanges();
     }
+
+    /**
+     * Clean up tab listener when activity is destroyed
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (tabLayout != null) {
+            tabLayout.removeOnTabSelectedListener(tabListener);
+        }
+    }
+
+
 }
 
 

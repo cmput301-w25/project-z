@@ -42,6 +42,7 @@
         <activity android:name="com.example.z.views.FollowingActivity"/>
         <activity android:name="com.example.z.views.MapActivity"/>
         <activity android:name="com.example.z.views.NotificationActivity"/>
+        <activity android:name="com.example.z.views.ForYouActivity" />
         <activity android:name="com.example.z.image.Image" />
         <activity android:name="com.example.z.image.FirstActivity" />
         <activity android:name="com.example.z.image.SecondActivity" />
