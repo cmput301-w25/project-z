@@ -3,6 +3,7 @@ package com.example.z.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.z.R;
 import com.example.z.mood.MoodArrayAdapter;
 import com.example.z.mood.Mood;
+import com.example.z.mood.MoodFragment;
 import com.example.z.utils.ForYouController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,12 +30,11 @@ import java.util.List;
  * A mood and users discovery page.
  */
 
-public class ForYouActivity extends AppCompatActivity {
+public class ForYouActivity extends AppCompatActivity implements MoodFragment.OnMoodAddedListener {
     private RecyclerView recyclerView;
     private MoodArrayAdapter moodAdapter;
     private List<Mood> similarMoods;
     private ForYouController forYouController;
-    private ProgressBar progressBar;
     private TextView emptyStateText;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TabLayout tabLayout;
@@ -55,7 +56,6 @@ public class ForYouActivity extends AppCompatActivity {
 
         // Initialize UI elements from layout
         recyclerView = findViewById(R.id.recycler_view_similar_moods);
-        progressBar = findViewById(R.id.progress_bar);
         emptyStateText = findViewById(R.id.empty_state_text);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         tabLayout = findViewById(R.id.tab_layout);
@@ -65,6 +65,17 @@ public class ForYouActivity extends AppCompatActivity {
         moodAdapter = new MoodArrayAdapter(this, similarMoods);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(moodAdapter);
+
+        // Set Up Naviagtion Bar
+        ImageButton profile = findViewById(R.id.nav_profile);
+        ImageButton search = findViewById(R.id.nav_search);
+        ImageButton addPostButton = findViewById(R.id.nav_add);
+        ImageButton notifications = findViewById(R.id.nav_notifications);
+
+        profile.setOnClickListener(v -> navigateTo(ProfileActivity.class));
+        search.setOnClickListener(v -> navigateTo(SearchActivity.class));
+        notifications.setOnClickListener(v -> navigateTo(NotificationActivity.class));
+        addPostButton.setOnClickListener(v -> openAddPostDialog());
 
         // Check if user is logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -90,9 +101,8 @@ public class ForYouActivity extends AppCompatActivity {
                             // Navigate to HomeActivity
                             Intent intent = new Intent(ForYouActivity.this, HomeActivity.class);
                             startActivity(intent);
-                            // Reset to "For You" tab
-                            tabLayout.getTabAt(0).select();
-                            break;
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Smooth transition effect
+                            finish(); // Close this activity
                     }
                 }
 
@@ -104,12 +114,16 @@ public class ForYouActivity extends AppCompatActivity {
                 @Override
                 public void onTabReselected(TabLayout.Tab tab) {
                     if (tab.getPosition() == 0) {  // For You tab
-                        // Scroll to top when reselecting For You tab
+                        // Scroll to top when re-selecting For You tab
                         recyclerView.smoothScrollToPosition(0);
                     }
                 }
             };
             tabLayout.addOnTabSelectedListener(tabListener);
+
+            // Set initial tab selection
+            tabLayout.getTabAt(0).select();
+
         } else {
             // Show message if user is not logged in
             showEmptyState("Please log in to see personalized content");
@@ -120,6 +134,39 @@ public class ForYouActivity extends AppCompatActivity {
             int selectedTab = savedInstanceState.getInt("selected_tab", 0);
             tabLayout.selectTab(tabLayout.getTabAt(selectedTab));
         }
+    }
+
+    /**
+     * Navigates to the specified activity.
+     *
+     * @param targetActivity The activity class to navigate to.
+     */
+    private void navigateTo(Class<?> targetActivity) {
+        Intent intent = new Intent(this, targetActivity);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Smooth transition effect
+    }
+
+    /**
+     * Opens the MoodFragment dialog to allow the user to add a new mood post.
+     */
+    private void openAddPostDialog() {
+        MoodFragment moodFragment = new MoodFragment();
+        moodFragment.setMoodAddedListener(this);
+        moodFragment.show(getSupportFragmentManager(), "AddMoodFragment");
+    }
+
+    /**
+     * Callback method called when a new mood is added through the MoodFragment.
+     * Currently empty as the feed is automatically updated through the Firestore listener.
+     * 
+     * @param newMood
+     *      The newly added mood object
+     */
+    @Override
+    public void onMoodAdded(Mood newMood) {
+        // The feed will be automatically updated through the Firestore listener
+        // No need for additional implementation here
     }
 
     /**
@@ -149,7 +196,6 @@ public class ForYouActivity extends AppCompatActivity {
      * Loads and displays similar moods based on user's history
      */
     private void loadSimilarMoods() {
-        showLoading();
         forYouController.getSimilarMoods(new ForYouController.SimilarMoodsCallback() {
             @Override
             public void onSuccess(List<Mood> moods) {
@@ -164,7 +210,6 @@ public class ForYouActivity extends AppCompatActivity {
                     } else {
                         hideEmptyState();
                     }
-                    hideLoading();
                 });
             }
 
@@ -173,27 +218,9 @@ public class ForYouActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     swipeRefreshLayout.setRefreshing(false);
                     showEmptyState("Error loading recommendations: " + e.getMessage());
-                    hideLoading();
                 });
             }
         });
-    }
-
-    /**
-     * Shows loading indicator and hides other views
-     */
-    private void showLoading() {
-        progressBar.setVisibility(View.VISIBLE);
-        emptyStateText.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.GONE);
-    }
-
-    /**
-     * Hides loading indicator and shows RecyclerView
-     */
-    private void hideLoading() {
-        progressBar.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -212,4 +239,5 @@ public class ForYouActivity extends AppCompatActivity {
         emptyStateText.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
     }
+
 }

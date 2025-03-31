@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Controller class that handles fetching and recommenation logic for similar moods
+ * Controller class that handles fetching and recommendation logic for similar moods
  * Uses Firebase Firestore to store and retrieve mood data.
  */
 public class ForYouController {
@@ -180,6 +180,7 @@ public class ForYouController {
         String situation = document.getString("situation");
         String description = document.getString("description");
         String emoticon = document.getString("emoji");
+        String img = document.getString("img");
         boolean isPrivate = document.getBoolean("private post") != null ? document.getBoolean("private post") : false;
         Date timestamp = null;
 
@@ -191,9 +192,8 @@ public class ForYouController {
         if (document.contains("location")) {
             location = (Map<String, Object>) document.get("location");
         }
-
         return new Mood(docUserId, docId, username, type, trigger, situation,
-                timestamp, location, description, emoticon, isPrivate);
+                timestamp, location, description, img, emoticon, isPrivate);
     }
 
     /**
