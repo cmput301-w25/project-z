@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -103,6 +105,23 @@ public class Image extends AppCompatActivity {
                 // Handle photo captured from the camera
                 Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
+                try {
+                    ExifInterface exif = new ExifInterface(String.valueOf(imageBitmap));
+                    int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_NORMAL);
+                    int rotate = 0;
+                    switch(orientation) {
+                        case  ExifInterface.ORIENTATION_ROTATE_270:
+                            rotate-=90;break;
+                        case  ExifInterface.ORIENTATION_ROTATE_180:
+                            rotate-=90;break;
+                        case  ExifInterface.ORIENTATION_ROTATE_90:
+                            rotate-=90;break;
+                    }
+                    Log.d("Fragment", "EXIF info for file " + imageBitmap + ": " + rotate);
+                } catch (IOException e) {
+                    Log.d("Fragment", "Could not get EXIF info for file " + imageBitmap + ": " + e);
+                }
                 imageView.setImageBitmap(imageBitmap);
             }
         }
