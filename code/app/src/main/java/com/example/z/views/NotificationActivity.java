@@ -28,9 +28,6 @@ import java.util.List;
  * NotificationActivity allows users to view their notifications.
  * Users can navigate to different sections of the app and create a new mood post.
  *
- *  Outstanding Issues:
- *      - Cannot display notifications yet
- *      - Cannot follow others yet
  */
 public class NotificationActivity extends AppCompatActivity {
     private FirebaseFirestore db;

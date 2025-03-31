@@ -123,6 +123,13 @@ public class DatabaseManager {
                 .addOnFailureListener(onFailureListener);
     }
 
+    /**
+     * Searches for users by their username, excluding the logged-in user.
+     * The search is case-insensitive and supports partial matching.
+     *
+     * @param username The username to search for.
+     * @param listener The listener to handle the result of the search.
+     */
     public void searchUsersByUsername(String username, OnUserSearchCompleteListener listener) {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         usersRef
@@ -147,6 +154,13 @@ public class DatabaseManager {
                 .addOnFailureListener(listener::onFailure);
     }
 
+    /**
+     * Sends a follow request from one user to another.
+     * The request is stored with a "pending" status in the Firestore database.
+     *
+     * @param followerId The ID of the user who is sending the follow request.
+     * @param followedId The ID of the user who is being followed.
+     */
     public void requestToFollow(String followerId, String followedId) {
         DocumentReference followRequestRef = followersRef.document(followerId + "_" + followedId);
 
@@ -163,28 +177,14 @@ public class DatabaseManager {
                         System.err.println("Error sending follow request: " + e));
     }
 
-    public void getFollowStatus(String followerId, String followedId, OnFollowStatusListener listener) {
-        DocumentReference followRequestRef = followersRef.document(followerId + "_" + followedId);
-
-        followRequestRef.get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String status = documentSnapshot.getString("status");
-                        if (status != null) {
-                            listener.onFollowStatusRetrieved(status); // Pass status to listener
-                            return;
-                        }
-                    }
-                    listener.onFollowStatusRetrieved("not_following"); // Default case if no record
-                })
-                .addOnFailureListener(e -> {
-                    System.err.println("Error fetching follow status: " + e);
-                    listener.onFollowStatusRetrieved("error");
-                });
-    }
-
-
-
+    /**
+     * Listens for changes to the follow status between two users.
+     * The listener is triggered when the follow status changes.
+     *
+     * @param followerId The ID of the user who is following.
+     * @param followedId The ID of the user being followed.
+     * @param listener   The listener to handle follow status changes.
+     */
     public void listenForFollowStatusChanges(String followerId, String followedId, OnFollowStatusListener listener) {
         followersRef.document(followerId + "_" + followedId)
                 .addSnapshotListener((documentSnapshot, error) -> {
@@ -202,16 +202,13 @@ public class DatabaseManager {
                 });
     }
 
-    public void acceptFollowRequest(String followerId, String followedId) {
-        DocumentReference followRef = followersRef.document(followerId + "_" + followedId);
-
-        followRef.update("status", "accepted")
-                .addOnSuccessListener(aVoid ->
-                        System.out.println("Follow request accepted for: " + followerId))
-                .addOnFailureListener(e ->
-                        System.err.println("Error accepting follow request: " + e));
-    }
-
+    /**
+     * Retrieves the username of a user by their user ID.
+     * The retrieved username is passed to the provided listener.
+     *
+     * @param userId   The ID of the user whose username is being retrieved.
+     * @param listener The listener to handle the fetched username.
+     */
     public static void getUsernameById(String userId, OnUsernameFetchedListener listener) {
         FirebaseFirestore.getInstance().collection("users").document(userId)
                 .get().addOnSuccessListener(documentSnapshot -> {
@@ -222,7 +219,13 @@ public class DatabaseManager {
                 });
     }
 
-
+    /**
+     * Retrieves the pending follow requests for a user.
+     * The follow requests are fetched from Firestore and passed to the listener.
+     *
+     * @param userId   The ID of the user whose pending follow requests are being fetched.
+     * @param listener The listener to handle the fetched follow requests.
+     */
     public void getPendingFollowRequests(String userId, OnFollowRequestsFetchedListener listener) {
         followersRef.whereEqualTo("followedId", userId)
                 .whereEqualTo("status", "pending")
@@ -249,8 +252,5 @@ public class DatabaseManager {
                     listener.onFetched(new ArrayList<>()); // Return empty list on failure
                 });
     }
-
-
-
 }
 
