@@ -105,7 +105,7 @@
         android:layout_below="@id/profileContainer"
         android:layout_marginStart="16dp"
         android:fontFamily="@font/itim_regular"
-        android:text="YOUR MOODS"
+        android:text="MOODS"
         android:textColor="@color/textColor"
         android:textSize="24sp"
         android:textStyle="bold" />
