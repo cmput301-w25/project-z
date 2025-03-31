@@ -16,6 +16,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.z.user.User;
+import com.example.z.views.ForYouActivity;
 import com.example.z.views.LogInActivity;
 import com.example.z.views.ProfileActivity;
 import com.example.z.views.SignUpActivity;
@@ -74,7 +75,7 @@ public class SignUpActivtyTest {
 
         auth.createUserWithEmailAndPassword("valid@example.com", "valid123")
                 .addOnCompleteListener(task -> {
-                    User user = new User("valid@example.com", "username1");
+                    User user = new User("valid@example.com", "username1", "jjsduw342");
                     userTestRef.document().set(user)
                             .addOnCompleteListener(firestoreTask -> {
                                 authLatch.countDown();
@@ -142,7 +143,7 @@ public class SignUpActivtyTest {
             e.printStackTrace();
         }
 
-        // Verify that ProfileActivity is launched
+        // Verify that ForYou is launched
         Intents.intended(IntentMatchers.hasComponent(ProfileActivity.class.getName()));
     }
 

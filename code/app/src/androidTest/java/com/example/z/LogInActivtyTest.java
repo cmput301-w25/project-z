@@ -17,11 +17,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.z.user.User;
 import com.example.z.views.LogInActivity;
+import com.example.z.views.ForYouActivity;
 import com.example.z.views.ProfileActivity;
 import com.example.z.views.SignUpActivity;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentReference;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -35,15 +40,11 @@ public class LogInActivtyTest {
     public ActivityScenarioRule<LogInActivity> activityRule = new ActivityScenarioRule<>(LogInActivity.class);
 
     @BeforeClass
-    public static void setup(){
+    public static void setup() {
         Intents.init();
-
-        // Specific address for emulated device to access our localHost
         String androidLocalhost = "10.0.2.2";
-        int portNumber = 8080;
-
-        FirebaseFirestore.getInstance().useEmulator(androidLocalhost, portNumber);
-        FirebaseAuth.getInstance().useEmulator(androidLocalhost, 9099); // Default port for Auth Emulator
+        FirebaseFirestore.getInstance().useEmulator(androidLocalhost, 8080);
+        FirebaseAuth.getInstance().useEmulator(androidLocalhost, 9099);
     }
 
     @Before
@@ -53,7 +54,7 @@ public class LogInActivtyTest {
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.createUserWithEmailAndPassword("valid@example.com", "valid123");
-        User user = new User("valid@example.com", "valid123");
+        User user = new User("valid@example.com", "valid123", "hoyoibh626");
     }
 
     @Test
@@ -96,7 +97,7 @@ public class LogInActivtyTest {
         Log.d("TEST", "Login button clicked");
 
         // Verify that the ProfileActivity is launched
-        Intents.intended(IntentMatchers.hasComponent(ProfileActivity.class.getName()));
+        Intents.intended(IntentMatchers.hasComponent(ForYouActivity.class.getName()));
     }
 
     @Test

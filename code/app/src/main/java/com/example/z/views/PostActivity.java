@@ -4,31 +4,68 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.TypedValue;
+import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
+import com.example.z.comments.Comment;
+import com.example.z.comments.CommentArrayAdapter;
+import com.example.z.data.DatabaseManager;
 import com.example.z.mood.Mood;
 import com.example.z.mood.MoodFragment;
+import com.example.z.utils.ImgUtil;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+/**
+ * PostActivity displays a detailed view of a Mood post, including its description, time posted,
+ * and user comments. Users can add comments, view existing comments, and navigate through the app.
+ */
 public class PostActivity extends AppCompatActivity {
     private Mood mood;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private TextView postDetails;
     private TextView postHeading;
+    private EditText userComment;
+    private Button commentButton;
+    private RecyclerView recyclerView;
+    private CommentArrayAdapter adapter;
+    private List<Comment> commentList;
+    private ListenerRegistration listenerRegistration;
+    private DatabaseManager databaseManager;
 
+    /**
+     * Called when the activity is created. Initializes UI components, retrieves the mood data,
+     * sets up the comments RecyclerView, and loads existing comments.
+     *
+     * @param savedInstanceState The saved instance state from a previous activity instance.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,10 +74,13 @@ public class PostActivity extends AppCompatActivity {
         // Initialize Firebase
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        databaseManager = new DatabaseManager();
 
         // Bind UI elements
         postDetails = findViewById(R.id.postContent);
         postHeading = findViewById(R.id.username);
+        userComment = findViewById(R.id.commentInput);
+        commentButton = findViewById(R.id.btnAddComment);
 
         // Change post font, color, size, etc
         postHeading.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
@@ -59,6 +99,7 @@ public class PostActivity extends AppCompatActivity {
         ImageButton notifications = findViewById(R.id.nav_notifications);
         ImageButton search = findViewById(R.id.nav_search);
         ImageButton addPostButton = findViewById(R.id.nav_add);
+        ImageView img = findViewById(R.id.postImage);
 
         // Get mood to view
         mood = (Mood) getIntent().getSerializableExtra("mood");
@@ -76,16 +117,39 @@ public class PostActivity extends AppCompatActivity {
                 mood.getSocialSituation()
         );
 
-        String postContent = String.format(
-                "%s\n#%s\n\nPosted on: %s",
-                mood.getDescription(),
-                mood.getTrigger(),
-                new SimpleDateFormat("MMM dd, yyyy - HH:mm", Locale.getDefault()).format(mood.getCreatedAt())
-        );
+        StringBuilder postContent = new StringBuilder();
+        postContent.append(mood.getDescription()).append("\n");
+
+        if (mood.getTrigger() != null && !mood.getTrigger().trim().isEmpty()) {
+            postContent.append("#").append(mood.getTrigger()).append("\n\n");
+        }
+
+        String dynamicTime = DateUtils.getRelativeTimeSpanString(
+                mood.getCreatedAt().getTime(),
+                System.currentTimeMillis(),
+                DateUtils.MINUTE_IN_MILLIS
+        ).toString();
+
+        postContent.append("Posted: ").append(dynamicTime);
 
         postHeading.setText(headingContent);
         postDetails.setText(postContent);
 
+        // Initialize recycler view
+        recyclerView = findViewById(R.id.recyclerViewComments);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        commentList = new ArrayList<>();
+        adapter = new CommentArrayAdapter(this, commentList);
+        recyclerView.setAdapter(adapter);
+
+        loadOldComments();
+
+        if (mood.getImg() != null) {
+            img.setVisibility(View.VISIBLE);
+            ImgUtil.displayBase64Image(mood.getImg(), img);
+        } else {
+            img.setVisibility(View.GONE);
+        }
         // Set click listeners for navigation
         home.setOnClickListener(v -> navigateTo(HomeActivity.class));
         profile.setOnClickListener(v -> navigateTo(ProfileActivity.class));
@@ -94,7 +158,103 @@ public class PostActivity extends AppCompatActivity {
 
         // Open dialog to add a new mood post
         addPostButton.setOnClickListener(v -> openAddPostDialog());
+        commentButton.setOnClickListener(v -> addComment());
+
     }
+
+    /**
+     * Loads existing comments from Firestore for the selected mood post.
+     * Updates the RecyclerView when new comments are detected.
+     */
+    public void loadOldComments() {
+        listenerRegistration = db.collection("comments")
+                .whereEqualTo("mood_id", mood.getDocumentId())
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e("Firestore Error", "Error loading comments", error);
+                        return;
+                    }
+                    if (snapshots != null) {
+                        commentList.clear();
+                        for (DocumentSnapshot document : snapshots.getDocuments()) {
+                            Comment comment = document.toObject(Comment.class);
+                            if (comment != null) {
+                                comment.setCommentId(document.getId());
+                                commentList.add(comment);
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
+    /**
+     * Adds a new comment to the selected mood post in Firestore.
+     * The comment is saved with the user's ID, username, timestamp, and optional emoji.
+     */
+    private void addComment() {
+
+        String editToString = userComment.getText().toString().trim();
+        if (TextUtils.isEmpty(editToString)) {
+            return;
+        }
+
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        String userId = user.getUid();
+        String timestamp = new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date());
+
+        db.collection("users").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists() && documentSnapshot.contains("username")) {
+                        String commenter = documentSnapshot.getString("username");
+
+                        db.collection("moods")
+                                .whereEqualTo("userId", userId)
+                                .orderBy("timestamp", Query.Direction.DESCENDING)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    String userRecentEmoji = "happy_1";
+                                    String userRecentEmotionalState = "happy";
+                                    if (!querySnapshot.isEmpty()) {
+                                        DocumentSnapshot recentMood = querySnapshot.getDocuments().get(0);
+                                        if (recentMood.contains("emoji")) {
+                                            userRecentEmoji = recentMood.getString("emoji");
+                                        }
+                                        if (recentMood.contains("type")) {
+                                            userRecentEmotionalState = recentMood.getString("type");
+                                        }
+                                    }
+
+                                    DocumentReference commentDocRef = db.collection("comments").document();
+                                    String documentId = commentDocRef.getId();
+
+                                    Comment userCommentObject = new Comment(userId, commenter, editToString, timestamp, userRecentEmoji, mood.getDocumentId(), userRecentEmotionalState, documentId);
+
+                                    databaseManager.saveComment(userCommentObject, new DatabaseManager.OnCommentSavedListener() {
+                                        @Override
+                                        public void onSuccess() {
+                                            userComment.setText("");
+                                        }
+
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(PostActivity.this, "Could not post comment!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                });
+                    }
+                    else {
+                        Toast.makeText(PostActivity.this, "Username not found", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 
     /**
      * Navigates to the specified activity.
@@ -113,5 +273,13 @@ public class PostActivity extends AppCompatActivity {
     private void openAddPostDialog() {
         MoodFragment moodFragment = new MoodFragment();
         moodFragment.show(getSupportFragmentManager(), "AddMoodFragment");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
+        }
     }
 }

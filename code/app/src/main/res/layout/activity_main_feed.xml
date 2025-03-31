@@ -1,18 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/home_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#001219"
     android:padding="0dp">
 
+    <!-- Top navigation tabs -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#001219"
+        app:tabTextColor="@color/textColor"
+        app:tabSelectedTextColor="@color/textColor"
+        app:tabIndicatorColor="@color/textColor"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- For You tab - shows personalized mood recommendations -->
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="For You" />
+
+        <!-- Following tab - navigates to following feed -->
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Following" />
+
+    </com.google.android.material.tabs.TabLayout>
+
     <!-- User Avatar -->
     <ImageView
         android:id="@+id/userAvatar"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/tab_layout"
         android:layout_margin="16dp"
         android:scaleType="centerCrop"
         android:src="@drawable/profile_button" />
@@ -70,17 +95,51 @@
         android:scaleType="centerInside"
         android:src="@drawable/map_marker" />
 
-    <!-- RecyclerView (Mood Card List) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewMainFeed"
+    <!-- Main Content Area -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNavBar"
         android:layout_below="@id/tvActivity"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp" />
+        android:layout_above="@id/bottomNavBar">
 
-    <!-- Bottom Navigation Bar (Reused) -->
+        <!-- RecyclerView (Mood Card List) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewMainFeed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Loading indicator shown while fetching moods (not used)-->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvActivity"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
+    <!-- Message shown when no moods are available -->
+    <TextView
+        android:id="@+id/empty_state_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvActivity"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/itim_regular"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="No moods found"
+        android:textColor="@color/textColor"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <!-- Bottom Navigation Bar -->
     <include
         android:id="@+id/bottomNavBar"
         layout="@layout/bottom_bar_nav"

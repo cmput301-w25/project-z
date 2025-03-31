@@ -1,23 +1,42 @@
 package com.example.z.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
+import com.example.z.data.DatabaseManager;
+import com.example.z.mood.Mood;
+import com.example.z.mood.MoodArrayAdapter;
 import com.example.z.mood.MoodFragment;
+import com.example.z.notifications.Notification;
+import com.example.z.notifications.NotificationArrayAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * NotificationActivity allows users to view their notifications.
  * Users can navigate to different sections of the app and create a new mood post.
  *
- *  Outstanding Issues:
- *      - Cannot display notifications yet
- *      - Cannot follow others yet
  */
 public class NotificationActivity extends AppCompatActivity {
+    private FirebaseFirestore db;
+    private DatabaseManager dbManager;
+    private RecyclerView recyclerView;
+    private NotificationArrayAdapter adapter;
+    private Context context;
+    private List<Notification> notificationList = new ArrayList<>();
+    private String currentUserId;
 
     /**
      * Called when the activity is created.
@@ -29,6 +48,30 @@ public class NotificationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+
+        db = FirebaseFirestore.getInstance();
+        dbManager = new DatabaseManager();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Log.e("Firestore", "User not logged in.");
+            return;
+        }
+
+        currentUserId = user.getUid();
+
+        //notificationsRecyclerView
+
+        // Set up RecyclerView for displaying user moods
+        recyclerView = findViewById(R.id.notificationsRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new NotificationArrayAdapter(this, notificationList);
+        recyclerView.setAdapter(adapter);
+
+        dbManager.getPendingFollowRequests(currentUserId, notifications -> {
+            adapter.updateNotificationList(notifications);
+        });
 
         // Find navigation buttons
         ImageButton home = findViewById(R.id.nav_home);

@@ -1,6 +1,8 @@
 package com.example.z.mood;
 
 import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,10 +17,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.bumptech.glide.Glide;
 import com.example.z.R;
+import com.example.z.utils.ImgUtil;
 import com.example.z.views.PostActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * A dialog fragment that displays details of a selected mood post.

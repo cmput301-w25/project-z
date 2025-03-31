@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#001219"
@@ -16,31 +16,50 @@
         android:layout_marginRight="15dp"
         android:fontFamily="@font/itim_regular"
         android:text="MAP OF MOOD EVENTS"
-        android:textColor="#E9D8A6"
+        android:textColor="@color/textColor"
         android:textSize="24sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_alignParentStart="true" />
 
-    <!-- Google Map Fragment
+    <!-- Filter -->
+
+    <!-- Google Map Fragment -->
+
+    <ImageButton
+        android:id="@+id/btnFilter2"
+        android:layout_width="48dp"
+        android:layout_height="35dp"
+        android:layout_alignTop="@id/tvMapTitle"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="filter button"
+        android:scaleType="centerInside"
+        android:src="@drawable/filter_button" />
+
+
+
     <FrameLayout
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:layout_below="@id/tvMapTitle"
+        android:layout_above="@id/bottomNavBar"
+        android:layout_marginTop="10dp">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </FrameLayout> -->
+    </FrameLayout>
 
-    <!-- Bottom Navigation Bar (Reused) -->
+    <!-- Bottom Navigation Bar -->
     <include
         android:id="@+id/bottomNavBar"
         layout="@layout/bottom_bar_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp" />
-</LinearLayout>
+</RelativeLayout>

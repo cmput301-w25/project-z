@@ -20,13 +20,13 @@
             android:padding="16dp">
 
             <ImageView
-                android:id="@+id/profilePicture"
-                android:layout_width="96dp"
-                android:layout_height="91dp"
+                android:id="@+id/userPicture"
+                android:layout_width="108dp"
+                android:layout_height="97dp"
                 android:layout_gravity="center_vertical"
                 android:adjustViewBounds="true"
-                android:background="@drawable/rounded_background"
-                android:backgroundTint="@android:color/transparent"
+                android:background="@drawable/profile_button"
+                android:backgroundTint="#001219"
                 android:contentDescription="@string/profile_accessibility"
                 android:cropToPadding="true"
                 android:scaleType="centerCrop" />
@@ -39,13 +39,13 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/notificationText"
+                    android:id="@+id/usernameUc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/itim_regular"
-                    android:text="@string/user_request"
+                    android:text="@string/username"
                     android:textColor="#001219"
-                    android:textSize="18sp" />
+                    android:textSize="24sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -53,30 +53,19 @@
                     android:layout_marginTop="8dp"
                     android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/acceptButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:backgroundTint="#001219"
-                        android:fontFamily="@font/itim_regular"
-                        android:text="@string/accept_request"
-                        android:textColor="#E9D8A6"
-                        android:textSize="16sp"
-                        app:cornerRadius="50dp" />
+<!--                    <Button-->
+<!--                        android:id="@+id/followButton"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:backgroundTint="#B30FA3B1"-->
+<!--                        android:fontFamily="@font/itim_regular"-->
+<!--                        android:text="@string/request_follow"-->
+<!--                        android:textColor="#F9F7F3"-->
+<!--                        android:textSize="12sp"-->
+<!--                        app:cornerRadius="50dp" />-->
 
-                    <Button
-                        android:id="@+id/declineButton"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#001219"
-                        android:fontFamily="@font/itim_regular"
-                        android:text="@string/decline_request"
-                        android:textColor="#E9D8A6"
-                        android:textSize="16sp"
-                        app:cornerRadius="50dp" />
+
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
