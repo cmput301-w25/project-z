@@ -3,27 +3,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/white">
+    android:background="#F9F7F3">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:id="@+id/capturedImage"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:scaleType="centerCrop"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <Button
-        android:id="@+id/btnSelectImage"
+        android:id="@+id/btnRetake"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select from Gallery"
+        android:text="Retake Photo"
         android:layout_marginTop="20dp" />
 
     <Button
-        android:id="@+id/btnCaptureImage"
+        android:id="@+id/btnConfirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Take Photo"
+        android:text="Confirm Photo"
         android:layout_marginTop="10dp" />
 
 </LinearLayout>

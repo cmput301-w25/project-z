@@ -7,6 +7,8 @@ import com.example.z.user.User;
 import com.example.z.utils.OnFollowStatusListener;
 import com.example.z.utils.OnUserSearchCompleteListener;
 import com.google.android.gms.tasks.OnCompleteListener;
+import android.net.Uri;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -15,6 +17,11 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -22,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Manages interactions with Firestore, including saving and editing mood entries.
@@ -33,6 +41,8 @@ public class DatabaseManager {
     private FirebaseFirestore db;
     private CollectionReference usersRef;
     private CollectionReference moodsRef;
+    private StorageReference imgRef;
+    private String impref = "imgs";
     private CollectionReference followersRef;
     private CollectionReference commentsRef;
 
@@ -43,6 +53,7 @@ public class DatabaseManager {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         moodsRef = db.collection("moods");
+        imgRef = FirebaseStorage.getInstance().getReference("user_images/" + UUID.randomUUID() + ".jpg");
         followersRef = db.collection("followers");
         commentsRef = db.collection(("comments"));
     }
@@ -74,7 +85,7 @@ public class DatabaseManager {
      * @param datePosted      The timestamp when the mood was created.
      */
     public void saveMood(String userId, DocumentReference moodDocRef, String username, String moodType,
-                         String description, String socialSituation, String trigger, Date datePosted, Double latitude, Double longitude, String emoji, boolean isPrivate) {
+                         String description, String socialSituation, String trigger, Date datePosted, String img, Double latitude, Double longitude, String emoji, boolean isPrivate) {
 
         Map<String, Object> mood = new HashMap<>();
         mood.put("userId", userId);
@@ -84,6 +95,7 @@ public class DatabaseManager {
         mood.put("situation", socialSituation);
         mood.put("trigger", trigger);
         mood.put("timestamp", datePosted);
+        mood.put("img", img);
         mood.put("emoji", emoji);
         mood.put("private post", isPrivate);
 
@@ -115,7 +127,9 @@ public class DatabaseManager {
      * @param onFailureListener Callback for failure during update.
      */
     public void editMood(String moodId, String userId, String moodType, String description,
-                         String socialSituation, String trigger, Date updatedAt, String emoji, boolean isPrivate,
+
+                         String socialSituation, String trigger, Date updatedAt, String img, String emoji, boolean isPrivate,
+
                          OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         DocumentReference moodRef = moodsRef.document(moodId);
 
@@ -127,6 +141,10 @@ public class DatabaseManager {
         updatedData.put("timestamp", updatedAt);
         updatedData.put("emoji", emoji);
         updatedData.put("private post", isPrivate);
+
+        if (img != null) {
+            updatedData.put("img", img);
+        }
 
         // Fetch latest username in case it has changed
         usersRef.document(userId).get()

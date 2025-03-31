@@ -11,9 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_alignParentTop="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/rounded_background"
-        app:tint="@android:color/transparent" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/rounded_background"/>
 
     <TextView
         android:id="@+id/username"

@@ -9,9 +9,19 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +38,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.z.data.DatabaseManager;
 import com.example.z.R;
+import com.example.z.utils.ImgUtil;
 import com.example.z.utils.GetEmoji;
 import com.example.z.utils.SocialSituations;
 import com.example.z.utils.userMoods;
@@ -43,6 +57,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,10 +80,15 @@ public class MoodFragment extends DialogFragment {
     private Spinner edit_mood_emotion;
     private EditText edit_mood_description;
     private EditText edit_trigger;
+    private ImageButton btn_take_photo, btn_select_image;
+    private ImageView imageView;
     private DatabaseManager databaseManager;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private OnMoodAddedListener moodAddedListener;
+    private Uri imgUri;
+    private String img;
+    private String imgPath;
     private String userStringEmoji;
     private ImageButton btnEmoji;
     private SwitchCompat privateSwitch;
@@ -76,6 +100,9 @@ public class MoodFragment extends DialogFragment {
 
     private boolean locationRequested = false;
 
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
+    private static final int PICK_IMAGE = 1;
+    private static final int TAKE_PHOTO = 2;
     /**
      * Called to create the dialog for adding a new mood post.
      *
@@ -92,6 +119,9 @@ public class MoodFragment extends DialogFragment {
         edit_mood_emotion = view.findViewById(R.id.spinner_mood);
         edit_mood_description = view.findViewById(R.id.edit_description);
         edit_trigger = view.findViewById(R.id.edit_hashtags);
+        btn_take_photo = view.findViewById(R.id.btn_take_photo);
+        btn_select_image = view.findViewById(R.id.btn_upload_image);
+        imageView = view.findViewById(R.id.image_view);
 
         btnEmoji = view.findViewById(R.id.btn_emoji_picker);
         privateSwitch = view.findViewById(R.id.switch_privacy);
@@ -130,6 +160,8 @@ public class MoodFragment extends DialogFragment {
         // Set up button listeners
         btnEmoji.setOnClickListener(v -> displayEmojiView());
         postButton.setOnClickListener(v -> validateAndPostMood());
+        btn_take_photo.setOnClickListener(v -> capturePhoto());
+        btn_select_image.setOnClickListener(v -> openGallery());
 
         return dialog;
     }
@@ -244,7 +276,7 @@ public class MoodFragment extends DialogFragment {
         location.put("latitude", latitude);
         location.put("longitude", longitude);
 
-        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, location, description, userStringEmoji, isPrivate);
+        Mood newMood = new Mood(userId, documentId, username, selectedMood.toString(), trigger, socialSituation.toString(), createdAt, location, description, img, userStringEmoji, isPrivate);
 
         // Save Mood
         saveMoodToFirebase(moodDocRef, newMood);
@@ -257,7 +289,8 @@ public class MoodFragment extends DialogFragment {
      * @param mood       The Mood object containing user input.
      */
     private void saveMoodToFirebase(DocumentReference moodDocRef, Mood mood) {
-        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), latitude, longitude, mood.getEmoticon(), mood.isPrivate());
+
+        databaseManager.saveMood(mood.getUserId(), moodDocRef, mood.getUsername(), mood.getEmotionalState(), mood.getDescription(), mood.getSocialSituation(), mood.getTrigger(), mood.getCreatedAt(), img, latitude, longitude, mood.getEmoticon(), mood.isPrivate());
 
         // Notify UI & Close Dialog
         if (moodAddedListener != null) {
@@ -310,7 +343,78 @@ public class MoodFragment extends DialogFragment {
         }
     }
 
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE);
+    }
 
+    private void capturePhoto() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            } else {
+                File photoFile = createImageFile();
+                imgUri = FileProvider.getUriForFile(getContext(),
+                        "com.example.z", photoFile);
+                imgPath = photoFile.getAbsolutePath();
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+                startActivityForResult(cameraIntent, TAKE_PHOTO);
+            }
+        } else {
+            Toast.makeText(getActivity(), "Camera not available", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            imgUri = data.getData();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                try {
+                    imgPath = ImgUtil.createTempFile(getContext(), imgUri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        try {
+//            InputStream imageStream = getActivity().getContentResolver().openInputStream(imgUri);
+//            Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//            imageView.setImageBitmap(selectedImage);
+            img = ImgUtil.compressToBase64(imgPath);
+            ImgUtil.displayBase64Image(img, imageView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private File createImageFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        try {
+            return File.createTempFile(fileName, ".jpg", storageDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_PERMISSIONS_REQUEST_CAMERA) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, TAKE_PHOTO);
+            } else {
+                // 用户拒绝权限，提示或关闭功能
+                Toast.makeText(getActivity(), "Camera not granted!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 }
 
