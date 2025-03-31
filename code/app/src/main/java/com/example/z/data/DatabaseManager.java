@@ -2,13 +2,17 @@ package com.example.z.data;
 
 import static android.app.PendingIntent.getActivity;
 
+import com.example.z.notifications.Notification;
 import com.example.z.user.User;
+import com.example.z.utils.OnFollowRequestsFetchedListener;
 import com.example.z.utils.OnFollowStatusListener;
 import com.example.z.utils.OnUserSearchCompleteListener;
+import com.example.z.utils.OnUsernameFetchedListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -208,29 +212,42 @@ public class DatabaseManager {
                         System.err.println("Error accepting follow request: " + e));
     }
 
-    public static void getUsernameById(String userId) {
+    public static void getUsernameById(String userId, OnUsernameFetchedListener listener) {
         FirebaseFirestore.getInstance().collection("users").document(userId)
                 .get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String username = documentSnapshot.getString("username");
+                        listener.onFetched(username);
                     }
                 });
     }
 
 
-    public void getPendingFollowRequests(String userId) {
+    public void getPendingFollowRequests(String userId, OnFollowRequestsFetchedListener listener) {
         followersRef.whereEqualTo("followedId", userId)
                 .whereEqualTo("status", "pending")
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<String> pendingRequests = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : querySnapshot) {
-                        pendingRequests.add(document.getString("followerId"));
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Notification> notifications = new ArrayList<>();
+                    List<Task<String>> usernameTasks = new ArrayList<>();
+
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String followerId = doc.getString("followerId");
+                        Date createdAt = doc.getDate("createdAt");
+
+                        Notification notification = new Notification(userId, followerId, "pending", createdAt);
+                        notifications.add(notification);
                     }
-                    System.out.println("Pending follow requests: " + pendingRequests);
+
+                    // Wait until all username fetch tasks are complete before passing the list
+                    Tasks.whenAllSuccess(usernameTasks).addOnSuccessListener(results -> {
+                        listener.onFetched(notifications);
+                    });
                 })
-                .addOnFailureListener(e ->
-                        System.err.println("Error fetching pending follow requests: " + e));
+                .addOnFailureListener(e -> {
+                    System.err.println("Error fetching follow requests: " + e);
+                    listener.onFetched(new ArrayList<>()); // Return empty list on failure
+                });
     }
 
 

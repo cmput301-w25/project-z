@@ -15,6 +15,7 @@ import com.example.z.R;
 import com.example.z.data.DatabaseManager;
 import com.example.z.user.User;
 import com.example.z.user.UserArrayAdapter;
+import com.example.z.utils.OnUsernameFetchedListener;
 import com.example.z.views.PublicProfileActivity;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -42,10 +43,17 @@ public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationA
     @Override
     public void onBindViewHolder(NotificationViewHolder holder, int position) {
         Notification notification = notificationList.get(position);
-        // Fetch and set username
-        DatabaseManager.getUsernameById(notification.getFollowerId(), username -> {
-            notification.setFollowedUsername(username);
-            holder.usernameTextView.setText(username + " sent you a follow request.");
+        // Fetch and set username asynchronously
+        DatabaseManager.getUsernameById(notification.getFollowerId(), new OnUsernameFetchedListener() {
+            @Override
+            public void onFetched(String username) {
+                if (username != null) {
+                    notification.setFollowedUsername(username);
+                    holder.usernameTextView.setText(username + " sent you a follow request.");
+                } else {
+                    holder.usernameTextView.setText("Unknown user sent you a follow request.");
+                }
+            }
         });
 
         //holder.usernameTextView.setText(notification.getFollowedUsername() );

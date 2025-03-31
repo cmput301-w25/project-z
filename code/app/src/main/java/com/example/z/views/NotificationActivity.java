@@ -1,5 +1,6 @@
 package com.example.z.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,7 @@ public class NotificationActivity extends AppCompatActivity {
     private DatabaseManager dbManager;
     private RecyclerView recyclerView;
     private NotificationArrayAdapter adapter;
+    private Context context;
     private List<Notification> notificationList = new ArrayList<>();
     private String currentUserId;
 
@@ -66,8 +68,13 @@ public class NotificationActivity extends AppCompatActivity {
         // Set up RecyclerView for displaying user moods
         recyclerView = findViewById(R.id.notificationsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NotificationArrayAdapter(notificationList);
+
+        adapter = new NotificationArrayAdapter(this, notificationList);
         recyclerView.setAdapter(adapter);
+
+        dbManager.getPendingFollowRequests(currentUserId, notifications -> {
+            adapter.updateNotificationList(notifications);
+        });
 
         // Find navigation buttons
         ImageButton home = findViewById(R.id.nav_home);
