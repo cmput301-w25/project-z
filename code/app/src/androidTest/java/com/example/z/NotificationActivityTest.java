@@ -18,6 +18,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.z.user.User;
 import com.example.z.views.NotificationActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -35,24 +37,52 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class NotificationActivityTest {
 
+    private static FirebaseAuth auth;
+    private static FirebaseFirestore db;
+
     @Rule
-    public ActivityScenarioRule<NotificationActivity> scenario = new ActivityScenarioRule<>(NotificationActivity.class);
+    public ActivityScenarioRule<NotificationActivity> scenario =
+            new ActivityScenarioRule<>(NotificationActivity.class);
 
     private static final String TEST_USER_ID = "1"; // The user receiving follow requests
     private static final String FOLLOWER_ID_1 = "2"; // First follower
     private static final String FOLLOWER_ID_2 = "3"; // Second follower
 
     @BeforeClass
-    public static void setup(){
-        // Specific address for emulated device to access our localHost
-        String androidLocalhost = "127.0.0.1";
+    public static void setup() throws InterruptedException {
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        int portNumber = 8080;
-        FirebaseFirestore.getInstance().useEmulator(androidLocalhost, portNumber);
+        auth.useEmulator("10.0.2.2", 9099); // Firebase Auth Emulator
+        db.useEmulator("10.0.2.2", 8080);   // Firestore Emulator
+
+        auth.signOut();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        auth.signInWithEmailAndPassword("testuser@example.com", "testpassword")
+                .addOnCompleteListener(signInTask -> {
+                    if (signInTask.isSuccessful()) {
+                        ensureFirestoreUserExists(auth.getCurrentUser(), latch);
+                    } else {
+                        auth.createUserWithEmailAndPassword("testuser@example.com", "testpassword")
+                                .addOnCompleteListener(createTask -> {
+                                    if (createTask.isSuccessful()) {
+                                        ensureFirestoreUserExists(auth.getCurrentUser(), latch);
+                                    } else {
+                                        Log.e("TestSetup", "User creation failed", createTask.getException());
+                                        latch.countDown();
+                                    }
+                                });
+                    }
+                });
+
+        latch.await(10, TimeUnit.SECONDS);
     }
 
     @Before
@@ -146,6 +176,45 @@ public class NotificationActivityTest {
         // Verify that the second request has disappeared
         onView(withText("user3 sent you a follow request."))
                 .check(matches(isDisplayed())); // Should FAIL if it was removed
+    }
+
+    /**
+     * Ensures that the Firestore user document exists before proceeding with tests.
+     */
+    private static void ensureFirestoreUserExists(FirebaseUser user, CountDownLatch latch) {
+        if (user == null) {
+            latch.countDown();
+            return;
+        }
+
+        String userId = user.getUid();
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        // Create user in Firestore Emulator
+                        Map<String, Object> testUser = new HashMap<>();
+                        testUser.put("username", "TestUser");
+                        testUser.put("email", "testuser@example.com");
+
+                        db.collection("users").document(userId)
+                                .set(testUser)
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("TestSetup", "Firestore Emulator user document created.");
+                                    latch.countDown();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("TestSetup", "Error creating Firestore Emulator user", e);
+                                    latch.countDown();
+                                });
+                    } else {
+                        Log.d("TestSetup", "Firestore user already exists. Proceeding.");
+                        latch.countDown();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("TestSetup", "Error checking Firestore user document", e);
+                    latch.countDown();
+                });
     }
 //    @Test
 //    public void appShouldDisplayExistingMoviesOnLaunch() {
