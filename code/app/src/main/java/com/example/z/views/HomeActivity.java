@@ -126,58 +126,69 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
                 moods_selected.add(selected.getKey());
             }
         }
-
         db.collection("followers")
-                .whereEqualTo("followerID", userId).get()
+                .whereEqualTo("followerId", userId).get()
                 .addOnSuccessListener(snapshot -> {
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         String followedId = doc.getString("followedId");
-                        if (followedId != null){
-                            following.add(followedId);
-                        }
+                        following.add(followedId);
                     }
-
                     if (!following.isEmpty()) {
-                        Query query = db.collection("moods")
-                                .whereIn("userId", following);
+                        List<Mood> moods_list = new ArrayList<>();
+                        int[] iteration = {0};
+                        for (String followerId: following) {
+                            Query query = db.collection("moods")
+                                    .whereEqualTo("userId", followerId)
+                                    .whereEqualTo("private post", true);
 
-                        if (!moods_selected.isEmpty()) {
-                            query = query.whereIn("type", moods_selected);
-                        }
 
-                        if (RecentMood) {
-                            Date Recent = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
-                            query = query.whereGreaterThan("timestamp", Recent);
-                        }
+                            if (!moods_selected.isEmpty()) {
+                                query = query.whereIn("type", moods_selected);
+                            }
 
-                        moodListener = query.orderBy("timestamp", Query.Direction.DESCENDING)
-                                .limit(3)
-                                .addSnapshotListener((snapshots, error) -> {
-                                    if (error != null) {
-                                        Log.e("Firestore", "Error listening for mood changes", error);
-                                        return;
-                                    }
+                            if (RecentMood) {
+                                Date Recent = new Date(new Date().getTime() - (7 * 24 * 60 * 60 * 1000));
+                                query = query.whereGreaterThan("timestamp", Recent);
+                            }
 
-                                    if (snapshots != null) {
-                                        moodList.clear();
+                            moodListener = query.orderBy("timestamp", Query.Direction.DESCENDING)
+                                    .limit(3)
+                                    .addSnapshotListener((snapshots, error) -> {
+                                        if (error != null) {
+                                            Log.e("Firestore", "Error listening for mood changes", error);
+                                            return;
+                                        }
 
-                                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                                            Mood mood = doc.toObject(Mood.class);
-                                            if (mood != null) {
-                                                if (!SearchText.isEmpty()) {
-                                                    if (mood.getDescription().contains(SearchText)) {
+                                        if (snapshots != null) {
+                                            Log.d("Firestore", "Mood documents found: " + snapshots.size());
+
+
+                                            for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                                                Mood mood = doc.toObject(Mood.class);
+                                                if (mood != null) {
+                                                    Log.d("Firestore", "Mood found: " + mood.getDescription());
+                                                    if (!SearchText.isEmpty()) {
+                                                        if (mood.getDescription().contains(SearchText)) {
+                                                            mood.setDocumentId(doc.getId());
+                                                            moods_list.add(mood);
+                                                        }
+                                                    }else{
                                                         mood.setDocumentId(doc.getId());
-                                                        moodList.add(mood);
-                                                    } else {
-                                                        mood.setDocumentId(doc.getId());
-                                                        moodList.add(mood);
+                                                        moods_list.add(mood);
+
                                                     }
                                                 }
                                             }
+                                            iteration[0]++;
+                                            if (iteration[0] == following.size()) {
+                                                moodList.clear();
+                                                moods_list.sort((m1, m2) -> m2.getCreatedAt().compareTo(m1.getCreatedAt()));
+                                                moodList.addAll(moods_list);
+                                                adapter.notifyDataSetChanged();
+                                            }
                                         }
-                                        adapter.notifyDataSetChanged(); // Refresh RecyclerView
-                                    }
-                                });
+                                    });
+                        }
                     }
                 })
                 .addOnFailureListener(e -> Log.e("Firestore", "Error fetching followers", e));
@@ -205,9 +216,6 @@ public class HomeActivity extends AppCompatActivity implements MoodFragment.OnMo
     }
 
     /**
-     * Called when a new mood is added.
-     * Updates the RecyclerView with the new mood at the top.
-     *
      * @param newMood The newly added mood.
      */
     public void onMoodAdded(Mood newMood) {
