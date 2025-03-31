@@ -21,6 +21,29 @@ public class Notification {
 
     public Notification() {}
 
-    public String getUsername() {return this.followedUsername;}
+
+    public String getFollowedId() {
+        return followedId;
+    }
+
+    public String getFollowerId() {
+        return followerId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getFollowedUsername() {
+        return followedUsername;
+    }
+
+    public void setFollowedUsername(String followedUsername) {
+        this.followedUsername = followedUsername;
+    }
 
 }

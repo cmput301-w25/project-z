@@ -37,6 +37,7 @@ public class NotificationActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private NotificationArrayAdapter adapter;
     private List<Notification> notificationList = new ArrayList<>();
+    private String currentUserId;
 
     /**
      * Called when the activity is created.
@@ -65,7 +66,7 @@ public class NotificationActivity extends AppCompatActivity {
         // Set up RecyclerView for displaying user moods
         recyclerView = findViewById(R.id.notificationsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NotificationArrayAdapter(this, notificationList);
+        adapter = new NotificationArrayAdapter(notificationList);
         recyclerView.setAdapter(adapter);
 
         // Find navigation buttons

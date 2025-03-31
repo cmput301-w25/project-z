@@ -179,6 +179,8 @@ public class DatabaseManager {
                 });
     }
 
+
+
     public void listenForFollowStatusChanges(String followerId, String followedId, OnFollowStatusListener listener) {
         followersRef.document(followerId + "_" + followedId)
                 .addSnapshotListener((documentSnapshot, error) -> {
@@ -204,6 +206,15 @@ public class DatabaseManager {
                         System.out.println("Follow request accepted for: " + followerId))
                 .addOnFailureListener(e ->
                         System.err.println("Error accepting follow request: " + e));
+    }
+
+    public static void getUsernameById(String userId) {
+        FirebaseFirestore.getInstance().collection("users").document(userId)
+                .get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String username = documentSnapshot.getString("username");
+                    }
+                });
     }
 
 

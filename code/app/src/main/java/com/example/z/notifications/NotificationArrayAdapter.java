@@ -6,38 +6,55 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.z.R;
+import com.example.z.data.DatabaseManager;
 import com.example.z.user.User;
 import com.example.z.user.UserArrayAdapter;
 import com.example.z.views.PublicProfileActivity;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationArrayAdapter.NotificationViewHolder>{
     private List<Notification> notificationList = new ArrayList<>();
+    private Context context;
 
 
-    public NotificationArrayAdapter(String notificationList) {
+    public NotificationArrayAdapter(Context context, List<Notification> notificationList) {
+        this.context = context;
         this.notificationList = notificationList;
-
     }
+
     @Override
-    public NotificationArrayAdapter.NotificationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NotificationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_card, parent, false);
-        return new NotificationArrayAdapter.NotificationViewHolder(view);
+        return new NotificationViewHolder(view);
 
     }
 
     @Override
-    public void onBindViewHolder(NotificationArrayAdapter.NotificationViewHolder holder, int position) {
+    public void onBindViewHolder(NotificationViewHolder holder, int position) {
         Notification notification = notificationList.get(position);
+        // Fetch and set username
+        DatabaseManager.getUsernameById(notification.getFollowerId(), username -> {
+            notification.setFollowedUsername(username);
+            holder.usernameTextView.setText(username + " sent you a follow request.");
+        });
 
-        holder.usernameTextView.setText(notification.getUsername() );
+        //holder.usernameTextView.setText(notification.getFollowedUsername() );
+
+        // Handle Accept Button Click
+        holder.acceptButton.setOnClickListener(v -> handleFollowRequest(notification, "accepted", position));
+
+        // Handle Reject Button Click
+        holder.rejectButton.setOnClickListener(v -> handleFollowRequest(notification, "rejected", position));
     }
 
     @Override
@@ -51,12 +68,33 @@ public class NotificationArrayAdapter extends RecyclerView.Adapter<NotificationA
         notifyDataSetChanged();
     }
 
+    private void handleFollowRequest(Notification notification, String action, int position) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference requestRef = db.collection("followers")
+                .document(notification.getFollowerId() + "_" + notification.getFollowedId());
+
+        if ("accepted".equals(action)) {
+            requestRef.update("status", "accepted").addOnSuccessListener(aVoid -> {
+                notificationList.remove(position);
+                notifyItemRemoved(position);
+            });
+        } else if ("rejected".equals(action)) {
+            requestRef.delete().addOnSuccessListener(aVoid -> {
+                notificationList.remove(position);
+                notifyItemRemoved(position);
+            });
+        }
+    }
+
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
         TextView usernameTextView;
+        Button acceptButton, rejectButton;
 
         public NotificationViewHolder(View itemView) {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.notificationText);
+            acceptButton = itemView.findViewById(R.id.acceptButton);
+            rejectButton = itemView.findViewById(R.id.declineButton);
         }
     }
 }
