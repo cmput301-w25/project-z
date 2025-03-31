@@ -3,14 +3,24 @@ package com.example.z.data;
 import static android.app.PendingIntent.getActivity;
 
 import com.example.z.comments.Comment;
+import com.example.z.user.User;
+import com.example.z.utils.OnFollowStatusListener;
+import com.example.z.utils.OnUserSearchCompleteListener;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +33,7 @@ public class DatabaseManager {
     private FirebaseFirestore db;
     private CollectionReference usersRef;
     private CollectionReference moodsRef;
+    private CollectionReference followersRef;
     private CollectionReference commentsRef;
 
     /**
@@ -32,6 +43,7 @@ public class DatabaseManager {
         db = FirebaseFirestore.getInstance();
         usersRef = db.collection("users");
         moodsRef = db.collection("moods");
+        followersRef = db.collection("followers");
         commentsRef = db.collection(("comments"));
     }
 
@@ -131,5 +143,108 @@ public class DatabaseManager {
                 })
                 .addOnFailureListener(onFailureListener);
     }
+
+    public void searchUsersByUsername(String username, OnUserSearchCompleteListener listener) {
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        usersRef
+                .orderBy("username") // Firestore requires ordering for range queries
+                .startAt(username)  // Starts at the search term
+                .endAt(username + "\uf8ff") // Ensures partial matches
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<User> users = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String email = document.getString("email");
+                        String fetchedUsername = document.getString("username");
+                        String id = document.getId();
+
+                        // Exclude the logged-in user
+                        if (email != null && fetchedUsername != null && !id.equals(currentUserId)) {
+                            users.add(new User(email, fetchedUsername, id));
+                        }
+                    }
+                    listener.onSuccess(users);
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
+
+    public void requestToFollow(String followerId, String followedId) {
+        DocumentReference followRequestRef = followersRef.document(followerId + "_" + followedId);
+
+        Map<String, Object> followRequest = new HashMap<>();
+        followRequest.put("followerId", followerId);
+        followRequest.put("followedId", followedId);
+        followRequest.put("status", "pending");
+        followRequest.put("createdAt", FieldValue.serverTimestamp());
+
+        followRequestRef.set(followRequest)
+                .addOnSuccessListener(aVoid ->
+                        System.out.println("Follow request sent to: " + followedId))
+                .addOnFailureListener(e ->
+                        System.err.println("Error sending follow request: " + e));
+    }
+
+    public void getFollowStatus(String followerId, String followedId, OnFollowStatusListener listener) {
+        DocumentReference followRequestRef = followersRef.document(followerId + "_" + followedId);
+
+        followRequestRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String status = documentSnapshot.getString("status");
+                        if (status != null) {
+                            listener.onFollowStatusRetrieved(status); // Pass status to listener
+                            return;
+                        }
+                    }
+                    listener.onFollowStatusRetrieved("not_following"); // Default case if no record
+                })
+                .addOnFailureListener(e -> {
+                    System.err.println("Error fetching follow status: " + e);
+                    listener.onFollowStatusRetrieved("error");
+                });
+    }
+
+    public void listenForFollowStatusChanges(String followerId, String followedId, OnFollowStatusListener listener) {
+        followersRef.document(followerId + "_" + followedId)
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        System.err.println("Error listening for follow status changes: " + error);
+                        return;
+                    }
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        String status = documentSnapshot.getString("status");
+                        listener.onFollowStatusRetrieved(status);
+                    } else {
+                        listener.onFollowStatusRetrieved(null);
+                    }
+                });
+    }
+
+    public void acceptFollowRequest(String followerId, String followedId) {
+        DocumentReference followRef = followersRef.document(followerId + "_" + followedId);
+
+        followRef.update("status", "accepted")
+                .addOnSuccessListener(aVoid ->
+                        System.out.println("Follow request accepted for: " + followerId))
+                .addOnFailureListener(e ->
+                        System.err.println("Error accepting follow request: " + e));
+    }
+
+    public void getPendingFollowRequests(String userId) {
+        followersRef.whereEqualTo("followedId", userId)
+                .whereEqualTo("status", "pending")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<String> pendingRequests = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        pendingRequests.add(document.getString("followerId"));
+                    }
+                    System.out.println("Pending follow requests: " + pendingRequests);
+                })
+                .addOnFailureListener(e ->
+                        System.err.println("Error fetching pending follow requests: " + e));
+    }
+
 }
 

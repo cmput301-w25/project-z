@@ -53,7 +53,7 @@ public class LogInActivtyTest {
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.createUserWithEmailAndPassword("valid@example.com", "valid123");
-        User user = new User("valid@example.com", "valid123");
+        User user = new User("valid@example.com", "valid123", "hoyoibh626");
     }
 
     @Test

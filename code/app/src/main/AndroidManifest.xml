@@ -40,5 +40,6 @@
         <activity android:name="com.example.z.views.MapActivity"/>
         <activity android:name="com.example.z.views.NotificationActivity"/>
         <activity android:name="com.example.z.views.PostActivity"/>
+        <activity android:name="com.example.z.views.PublicProfileActivity"/>
     </application>
 </manifest>

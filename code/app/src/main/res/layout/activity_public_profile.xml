@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/profile_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:padding="0dp">
+
+    <RelativeLayout
+        android:id="@+id/profileContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentTop="true">
+
+        <RelativeLayout
+            android:id="@+id/profileSection"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_centerHorizontal="true"
+                android:backgroundTint="#0FA3B1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile_button" />
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileImage"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:text="[User]"
+                android:fontFamily="@font/itim_regular"
+                android:textColor="@color/textColor"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/userBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/profileSection"
+            android:layout_toEndOf="@id/profileSection"
+            android:background="@drawable/rounded_button"
+            android:backgroundTint="#E9D8A6"
+            android:padding="12dp"
+            android:text="Bio goes here..."
+            android:textColor="@color/backgroundColor"
+            android:textSize="16sp"
+            android:textStyle="italic" />
+
+        <Button
+        android:id="@+id/followButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/userBio"
+        android:layout_alignParentEnd="true"
+        android:layout_weight="1"
+        android:backgroundTint="#E9D8A6"
+        android:fontFamily="@font/itim_regular"
+        android:text="@string/request_follow"
+        android:textColor="@color/backgroundColor"
+        android:textSize="16sp"
+        app:cornerRadius="50dp" />
+
+    </RelativeLayout>
+
+
+<!--    <Button-->
+<!--        android:id="@+id/followButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_toRightOf="@+id/username"-->
+<!--        android:layout_marginLeft="16dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginRight="16dp"-->
+<!--        android:layout_toEndOf="@+id/username"-->
+<!--        android:layout_below="@id/userBio"-->
+<!--        android:background="@drawable/rounded_button"-->
+<!--        android:backgroundTint="#0FA3B1"-->
+<!--        android:padding="12dp"-->
+<!--        android:text="FOLLOW"-->
+<!--        android:textColor="#F9F7F3"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textStyle="italic"/>-->
+
+
+    <!-- Moods Title -->
+
+    <TextView
+        android:id="@+id/moodTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profileContainer"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/itim_regular"
+        android:text="YOUR MOODS"
+        android:textColor="@color/textColor"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+
+    <!-- RecyclerView for User Moods -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewUserMoods"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavBar"
+        android:layout_below="@id/moodTitle"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" />
+
+    <!-- Bottom Navigation Bar (Reused) -->
+    <include
+        android:id="@+id/bottomNavBar"
+        layout="@layout/bottom_bar_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp" />
+
+</RelativeLayout>
