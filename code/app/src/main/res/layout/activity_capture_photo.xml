@@ -10,6 +10,7 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:scaleType="centerCrop"
+        android:rotation="90"
         android:background="@android:color/darker_gray" />
 
     <Button
