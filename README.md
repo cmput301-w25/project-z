@@ -29,11 +29,12 @@ Track your moods as well as your friends moods in this app! Share moods, support
 
 ## Documentation
 
-- Wiki - [https://github.com/cmput301-w25/project-z/wiki]
-- Scrum Board - [https://github.com/orgs/cmput301-w25/projects/46]
-- UI Mockups - [https://github.com/cmput301-w25/project-z/wiki/UI-Mockup]
-- UML Diagrams - [https://github.com/cmput301-w25/project-z/wiki/UML-Class-Diagrams]
-- Meeting Notes - [https://github.com/cmput301-w25/project-z/wiki/Z-Meeting-Notes]
+- Wiki - https://github.com/cmput301-w25/project-z/wiki
+- Scrum Board - https://github.com/orgs/cmput301-w25/projects/46
+- UI Mockups - https://github.com/cmput301-w25/project-z/wiki/UI-Mockup
+- UML Diagrams - https://github.com/cmput301-w25/project-z/wiki/UML-Class-Diagrams
+- Meeting Notes - https://github.com/cmput301-w25/project-z/wiki/Z-Meeting-Notes
+- Story Board - https://github.com/cmput301-w25/project-z/wiki/Story-Board
 
 ## Collaborators
 
