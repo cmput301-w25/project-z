@@ -2,6 +2,7 @@ package com.example.z;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
@@ -10,6 +11,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.graphics.Movie;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.test.espresso.action.ViewActions;
@@ -82,43 +84,112 @@ public class NotificationActivityTest {
                     }
                 });
 
-        latch.await(10, TimeUnit.SECONDS);
+        boolean completed = latch.await(10, TimeUnit.SECONDS);
+        if (!completed) {
+            throw new AssertionError("Authentication setup timed out!");
+        }
+
+        if (auth.getCurrentUser() == null) {
+            throw new AssertionError("User authentication failed!");
+        }
     }
 
+
     @Before
-    public void seedDatabase() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference followersRef = db.collection("followers");
-//        CollectionReference usersRef = db.collection("users");
-//        User[] users = {
-//                new User("user1@gmail.com", "user1", "1"),
-//                new User("user2@gmil.com", "user2", "2")
-//        };
-//        for (User user : users) {
-//            usersRef.document().set(user);
-//        }
+    public void seedFollowRequests() throws InterruptedException {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) {
+            throw new AssertionError("Test requires a logged-in user!");
+        }
 
-        // Create follow request from follower 1
-        Map<String, Object> followRequest1 = new HashMap<>();
-        followRequest1.put("followerId", FOLLOWER_ID_1);
-        followRequest1.put("followedId", TEST_USER_ID);
-        followRequest1.put("status", "pending");
+        String userId = user.getUid();
+        CountDownLatch latch = new CountDownLatch(1);
 
-        // Create follow request from follower 2
-        Map<String, Object> followRequest2 = new HashMap<>();
-        followRequest2.put("followerId", FOLLOWER_ID_2);
-        followRequest2.put("followedId", TEST_USER_ID);
-        followRequest2.put("status", "pending");
+        // Create follower1 and follower2 user documents
+        ensureUserExists("1", "follower1");
+        ensureUserExists("2", "follower2");
 
-        // Add requests to Firestore emulator
-        followersRef.document(FOLLOWER_ID_1 + "_" + TEST_USER_ID).set(followRequest1);
-        followersRef.document(FOLLOWER_ID_2 + "_" + TEST_USER_ID).set(followRequest2);
+        db.collection("followers")
+                .whereEqualTo("followedId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        Log.d("TEST", "Follow requests exist. Skipping seeding.");
+                    } else {
+                        addFollowRequest(userId, "1");
+                        addFollowRequest(userId, "2");
+                    }
+                    latch.countDown();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("TEST", "Error checking existing follow requests", e);
+                    latch.countDown();
+                });
 
+        latch.await(5, TimeUnit.SECONDS);
+    }
+
+    // Creates a user document if it does not already exist
+    private void ensureUserExists(String userId, String username) {
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("username", username);
+                        userData.put("email", userId + "@example.com");
+
+                        db.collection("users").document(userId)
+                                .set(userData)
+                                .addOnSuccessListener(aVoid -> Log.d("TEST", "User created: " + userId))
+                                .addOnFailureListener(e -> Log.e("TEST", "Error creating user", e));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("TEST", "Firestore check failed", e));
+    }
+
+    private void addFollowRequest(String followedId, String followerId) {
+        Map<String, Object> followRequest = new HashMap<>();
+        followRequest.put("followedId", followedId);
+        followRequest.put("followerId", followerId);
+        followRequest.put("status", "pending");
+
+        db.collection("followers").add(followRequest)
+                .addOnSuccessListener(docRef -> Log.d("TEST", "Follow request added: " + docRef.getId()))
+                .addOnFailureListener(e -> Log.e("TEST", "Error adding follow request", e));
+    }
+
+    @Test
+    public void testTwoFollowRequestsDisplayed() {
+        SystemClock.sleep(2000);
+        onView(withText("follower1")).check(matches(isDisplayed()));
+        onView(withText("follower2")).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testAcceptFollowRequestRemovesCard() {
+        SystemClock.sleep(2000);
+        onView(withId(R.id.notificationsRecyclerView))
+                .perform(actionOnItemAtPosition(0, click()));
+        SystemClock.sleep(2000);
+        onView(withText("Accept")).perform(click());
+        SystemClock.sleep(2000);
+        onView(withText("follower1")).check(doesNotExist());
+    }
+
+    @Test
+    public void testRejectFollowRequestRemovesCard() {
+        SystemClock.sleep(2000);
+        onView(withId(R.id.notificationsRecyclerView))
+                .perform(actionOnItemAtPosition(1, click()));
+        SystemClock.sleep(2000);
+        onView(withText("Reject")).perform(click());
+        SystemClock.sleep(2000);
+        onView(withText("follower2")).check(doesNotExist());
     }
 
     @After
     public void tearDown() {
-        String projectId = "YOUR-PROJECT-ID-HERE";
+        String projectId = "project-z-24051";
         URL url = null;
         try {
             url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
@@ -138,44 +209,6 @@ public class NotificationActivityTest {
                 urlConnection.disconnect();
             }
         }
-    }
-
-    /**
-     * Test if two follow request notifications are displayed.
-     */
-    @Test
-    public void testFollowRequestsAreDisplayed() {
-        // Check if both follow request notifications exist in RecyclerView
-        onView(withText("user2 has requested to follow you")).check(matches(isDisplayed()));
-        onView(withText("user3 has requested to follow you")).check(matches(isDisplayed()));
-    }
-
-    /**
-     * Test accepting a follow request removes it from the list.
-     */
-    @Test
-    public void testAcceptFollowRequest() {
-        // Click accept button for first follow request (position 0)
-        onView(withId(R.id.notificationsRecyclerView))
-                .perform(actionOnItemAtPosition(0, click()));
-
-        // Verify that the first request has disappeared
-        onView(withText("user2 sent you a follow request."))
-                .check(matches(isDisplayed())); // Should FAIL if it was removed
-    }
-
-    /**
-     * Test rejecting a follow request removes it from the list.
-     */
-    @Test
-    public void testRejectFollowRequest() {
-        // Click reject button for second follow request (position 1)
-        onView(withId(R.id.notificationsRecyclerView))
-                .perform(actionOnItemAtPosition(1, click()));
-
-        // Verify that the second request has disappeared
-        onView(withText("user3 sent you a follow request."))
-                .check(matches(isDisplayed())); // Should FAIL if it was removed
     }
 
     /**
@@ -216,46 +249,4 @@ public class NotificationActivityTest {
                     latch.countDown();
                 });
     }
-//    @Test
-//    public void appShouldDisplayExistingMoviesOnLaunch() {
-//        // Check that the initial data is loaded
-//        onView(withText("Oppenheimer")).check(matches(isDisplayed()));
-//        onView(withText("Barbie")).check(matches(isDisplayed()));
-//        // Click on Oppenheimer
-//        onView(withText("Oppenheimer")).perform(click());
-//        // Check that the movie details are displayed correctly
-//        onView(withId(R.id.edit_title)).check(matches(withText("Oppenheimer")));
-//        onView(withId(R.id.edit_genre)).check(matches(withText("Thriller/Historical Drama")));
-//        onView(withId(R.id.edit_year)).check(matches(withText("2023")));
-//    }
-//
-//    @Test
-//    public void addMovieShouldAddValidMovieToMovieList() {
-//        // Click on button to open addMovie dialog
-//        onView(withId(R.id.buttonAddMovie)).perform(click());
-//
-//        // Input Movie Details
-//        onView(withId(R.id.edit_title)).perform(ViewActions.typeText("Interstellar"));
-//        onView(withId(R.id.edit_genre)).perform(ViewActions.typeText("Science Fiction"));
-//        onView(withId(R.id.edit_year)).perform(ViewActions.typeText("2014"));
-//
-//        // Submit Form
-//        onView(withId(android.R.id.button1)).perform(click());
-//
-//        // Check that our movie list has our new movie
-//        onView(withText("Interstellar")).check(matches(isDisplayed()));
-//    }
-//
-//    @Test
-//    public void addMovieShouldShowErrorForInvalidMovieName() {
-//        // Click on button to open addMovie dialog
-//        onView(withId(R.id.buttonAddMovie)).perform(click());
-//        // Add movie details, but no title
-//        onView(withId(R.id.edit_genre)).perform(ViewActions.typeText("Science Fiction"));
-//        onView(withId(R.id.edit_year)).perform(ViewActions.typeText("2014"));
-//        // Submit Form
-//        onView(withId(android.R.id.button1)).perform(click());
-//        // Check that an error is shown to the user
-//        onView(withId(R.id.edit_title)).check(matches(hasErrorText("Move name cannot be empty!")));
-//  }
 }
